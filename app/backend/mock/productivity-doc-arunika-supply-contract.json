@@ -1,0 +1,6 @@
+{
+  "mock": "Labelled mock document for the Kalis demo. PT Arunika and CV Maju are fictional.",
+  "doc": "arunika-supply-contract-draft",
+  "title": "Supply agreement draft, PT Arunika Bahan Baku (fictional) to CV Maju (fictional)",
+  "text": "SUPPLY AGREEMENT (DRAFT v3, FICTIONAL DEMO DOCUMENT)\nSupplier: PT Arunika Bahan Baku. Buyer: CV Maju.\n1. Goods: steel chair frames, grade SPCC, powder coated.\n2. Volume: buyer commits to 6,000 frames over 12 months, minimum 450 frames per month.\n3. Unit price: IDR 412,000 per frame, fixed for 12 months.\n4. Payment: 30 days after delivery.\n5. Late delivery penalty: 0.5% of the order value per day, capped at 5%.\n6. Price review: supplier may raise the price if steel index rises more than 8%.\n7. Exclusivity: buyer may not buy frames from another supplier during the term.\n8. Term: 12 months, renewing automatically unless cancelled 60 days before the end."
+}

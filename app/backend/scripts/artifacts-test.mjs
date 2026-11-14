@@ -1,0 +1,33 @@
+// H5 tests: sealed artifacts with owner-only access, and input provenance on run drafts.
+// Usage: node scripts/artifacts-test.mjs [base url]
+import * as kalis from "../src/kalis-crypto.js";
+const BASE = process.argv[2] || "http://localhost:8787";
+const WS = `art-${Date.now().toString(36)}`;
+let pass = 0, fail = 0;
+const check = (n, ok, d = "") => { ok ? pass++ : fail++; console.log(`${ok ? "PASS" : "FAIL"}  ${n}${d ? `  (${d})` : ""}`); };
+const api = async (m, p, b, ws = WS) => { const r = await fetch(BASE + p, { method: m, headers: { "Content-Type": "application/json", "X-Kalis-Workspace": ws }, body: b ? JSON.stringify(b) : undefined }); return { status: r.status, body: await r.json() }; };
+const code = (r) => r.body?.error?.code;
+const cfg = (await api("GET", "/api/config")).body;
+const { sealed, dataCtSha256 } = kalis.sealData(cfg.runner.tee_pubkey, { note: "fictional extraction" });
+const plain = await api("POST", "/api/artifacts", { kind: "document_extraction", text: "cost 812 juta", sealed });
+check("plaintext fields are refused", code(plain) === "plaintext_refused");
+const notSealed = await api("POST", "/api/artifacts", { kind: "buyer_input", sealed: { ct: "abc" } });
+check("unsealed body is refused", code(notSealed) === "not_sealed");
+const art = await api("POST", "/api/artifacts", { kind: "document_extraction", label: "T-2026-114 extraction", sealed, source_refs: [{ type: "document", id: "doc-1", sha256: "a".repeat(64) }] });
+check("sealed artifact stored, metadata only returned", art.status === 200 && art.body.ct_sha256 === dataCtSha256 && !art.body.sealed);
+const other = await api("GET", `/api/artifacts/${art.body.id}/ciphertext`, null, `${WS}-x`);
+check("another principal cannot fetch the ciphertext", code(other) === "not_your_artifact");
+const mine = await api("GET", `/api/artifacts/${art.body.id}/ciphertext`);
+check("owner fetches the ciphertext", mine.body.sealed?.ct === sealed.ct);
+const del = await api("DELETE", `/api/artifacts/${art.body.id}`);
+const gone = await api("GET", `/api/artifacts/${art.body.id}`);
+check("deleted artifact is gone", del.body.deleted && code(gone) === "unknown_artifact");
+const d = await api("POST", "/api/run-drafts", { method_id: "tender-bid", input_sources: [{ field: "document_text", kind: "document", ref: "doc-1", sha256: "b".repeat(64) }, { field: "cost_price", kind: "connector", ref: "sheets_mock.read_range" }] });
+check("draft records input sources, unreviewed document flagged", d.body.input_sources?.length === 2 && d.body.input_sources[0].note?.includes("not reviewed"));
+await api("POST", `/api/run-drafts/${d.body.id}/consents`, { revision: 1, kind: "method_terms" });
+const p = await api("PATCH", `/api/run-drafts/${d.body.id}`, { expected_revision: 1, input_sources: [{ field: "document_text", kind: "document", ref: "doc-1", sha256: "b".repeat(64), revision: 2, reviewed_by_buyer: true }] });
+check("a corrected source clears consent", p.body.revision === 2 && p.body.consents.length === 0 && p.body.input_sources[0].reviewed_by_buyer === true);
+const bad = await api("POST", "/api/run-drafts", { method_id: "tender-bid", input_sources: [{ kind: "telepathy" }] });
+check("unknown source kind refused", code(bad) === "bad_input_sources");
+console.log(`\n${pass} passed, ${fail} failed`);
+process.exit(fail ? 1 : 0);

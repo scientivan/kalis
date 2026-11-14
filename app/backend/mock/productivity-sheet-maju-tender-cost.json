@@ -1,0 +1,35 @@
+{
+  "mock": "Labelled mock spreadsheet for the Kalis demo. CV Maju is fictional.",
+  "sheet": "maju-tender-cost-T-2026-114",
+  "company": "CV Maju (fictional furniture supplier)",
+  "tender": "T-2026-114",
+  "currency": "IDR",
+  "lines": [
+    {
+      "item": "Ergonomic office chair, unit cost",
+      "qty": 400,
+      "unit_cost": 1750000,
+      "total": 700000000
+    },
+    {
+      "item": "Delivery to Kota Harapan",
+      "qty": 1,
+      "unit_cost": 38000000,
+      "total": 38000000
+    },
+    {
+      "item": "Two-year warranty reserve",
+      "qty": 1,
+      "unit_cost": 24000000,
+      "total": 24000000
+    },
+    {
+      "item": "Overhead and bid preparation",
+      "qty": 1,
+      "unit_cost": 50000000,
+      "total": 50000000
+    }
+  ],
+  "cost_price": 812000000,
+  "min_margin": 0.09
+}

@@ -1,0 +1,31 @@
+{
+  "mock": "Labelled mock spreadsheet for the Kalis demo. Nusa Data Labs is fictional.",
+  "sheet": "nusa-data-cap-table",
+  "company": "Nusa Data Labs (fictional startup)",
+  "cap_table": [
+    {
+      "holder": "Founder A (fictional)",
+      "class": "common",
+      "shares": 4200000,
+      "founder": true
+    },
+    {
+      "holder": "Founder B (fictional)",
+      "class": "common",
+      "shares": 3000000,
+      "founder": true
+    },
+    {
+      "holder": "Angel round (fictional)",
+      "class": "preferred",
+      "shares": 1300000,
+      "founder": false
+    },
+    {
+      "holder": "Employee option pool",
+      "class": "options",
+      "shares": 500000,
+      "founder": false
+    }
+  ]
+}
