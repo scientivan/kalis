@@ -6,6 +6,7 @@ import { config, METHODS_DIR, DATA_DIR, ROOT } from "./config.js";
 import { view, balance, callMarket, serverAccountId } from "./near.js";
 import { callRunner, checkAttestation } from "./outlayer.js";
 import { sha256Hex, fromB64, verifyCompletion, methodKind, PROMPT_SELLER_WARNING } from "./kalis-crypto.js";
+import { registerPrivateRoutes } from "./private-api.js";
 import { registerProtectionRoutes } from "./protections/routes.js";
 import { registerRunRoutes } from "./runs-api.js";
 import { registerArtifactRoutes } from "./artifacts-api.js";
@@ -80,6 +81,7 @@ route("GET", /^\/api\/methods\/([^/]+)\/versions\/(\d+)\/sealed-method$/, async 
   return s;
 });
 
+registerPrivateRoutes(route);
 registerRunRoutes(route);
 registerArtifactRoutes(route);
 registerReviewRoutes(route);
@@ -133,6 +135,7 @@ export const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && url.pathname === "/checks.js") return send(res, 200, fs.readFileSync(path.join(ROOT, "src", "checks.js"), "utf8"), "text/javascript");
   // On-device .xlsx/.docx reader (RANCANGAN 65.3 option C): the file is parsed in the browser and never uploaded.
   if (req.method === "GET" && url.pathname === "/file-import.js") return send(res, 200, fs.readFileSync(path.join(ROOT, "src", "file-import.js"), "utf8"), "text/javascript");
+  if (url.pathname.startsWith("/api/protections/")) return send(res, 410, { error: { code: "plaintext_protections_retired", message: "This plaintext protection API is retired. Use the sealed private relay. Legacy records are preserved and are not migrated automatically." } });
   const r = routes.find((x) => x.method === req.method && x.pattern.test(url.pathname));
   if (!r) return send(res, 404, { error: { code: "not_found", message: `${req.method} ${url.pathname} is not an API route` } });
   try {

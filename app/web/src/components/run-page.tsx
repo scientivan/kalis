@@ -1,4 +1,5 @@
 "use client";
+import { rememberPrivateValues } from "../lib/backend/private-client";
 // Run a method privately: /runs/new?method=<id>&version=<n>, and an existing run at /runs/<run id>.
 // Data is sealed in this browser (crypto.sealData) before anything is sent. The answer is opened here,
 // the runner signature and chip attestation are compared, and the seller's checks run on this device.
@@ -132,7 +133,7 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
     if(m.ai?.allowed?.length && !models.length)throw new Error("Keep at least one model selected.");
     if(!consent || (v.method_kind?.kind === "prompt" && !promptConsent)) throw new Error("Review and accept the method terms first.");
     const sealed=kc.sealData(config.runner.tee_pubkey,input.o); prepared.current=sealed;
-    const draft=await backend<{id:string;revision:number}>("run-drafts",{method_id:d.method_id,version:v.number,data_ct_sha256:sealed.dataCtSha256,models,input_sources:(m.inputs?.fields||[]).map(f=>({field:f.id,...(sources[f.id]||{kind:"typed",reviewed_by_buyer:true})}))});
+    const draft=await backend<{id:string;revision:number}>("run-drafts",{method_id:d.method_id,version:v.number,data_ct_sha256:sealed.dataCtSha256,models,input_sources:(m.inputs?.fields||[]).map(f=>({field:f.id,kind:sources[f.id]?.kind||"typed",reviewed_by_buyer:sources[f.id]?.reviewed_by_buyer??true}))});
     for(const kind of ["method_terms","permissions",...(v.method_kind?.kind === "prompt"?["prompt_method_nature"]:[])]) await backend(`run-drafts/${draft.id}/consents`,{revision:draft.revision,kind});
     const q=await backend<Quote>(`run-drafts/${draft.id}/quote`,{expected_revision:draft.revision}); setQuote(q); setView("Pay");
   });
@@ -146,7 +147,7 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
     if(paymentAttempt.current)throw new Error("A payment was already submitted. Check its status instead of paying again.");
     const sealed=prepared.current;
     const privateValues=(m.inputs?.fields||[]).filter(f=>f.private).flatMap(f=>{const val=input.o[f.id];return val===undefined?[]:[typeof val === "string" ? val : JSON.stringify(val)];});
-    if(privateValues.length)await backend("protections/private-values",{label:d.title,values:privateValues});
+    if(privateValues.length)await rememberPrivateValues(d.title,privateValues);
     const key=crypto.randomUUID(); paymentAttempt.current=key;
     const created = await backend<{ run_id: string; operation_id?:string; run?: typeof chain; pay_tx_url?: string; contract_call?:ContractCall }>("runs", { quote_id:quote.id,data_ct_sha256:sealed.dataCtSha256,payment,idempotency_key:key });
     if(!created.run_id)throw new Error("Payment outcome is pending. Do not submit a new payment.");

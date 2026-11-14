@@ -4,6 +4,8 @@
 import { config } from "./config.js";
 
 export function capabilities() {
+  const privateReady = process.env.KALIS_PRIVATE_ENABLED === "1" && Boolean(process.env.KALIS_PRIVATE_TEE_KEY) && Boolean(process.env.KALIS_PRIVATE_RECEIPT_KEY);
+  const privateStatus = process.env.KALIS_PRIVATE_LOCAL_RUNNER ? "demo" : privateReady ? "enabled" : "unavailable";
   const has = (k) => Boolean(config.secrets[k]);
   const f = (id, status, reason, extra = {}) => ({ id, status, reason, ...extra });
   return {
@@ -31,7 +33,7 @@ export function capabilities() {
       f("run_bound_protections", "enabled", "Protection requests with run_id use the manifest of the version that run paid for, owned by the caller. Without run_id they use the latest version and say so."),
       f("private_artifacts", "enabled", "POST /api/artifacts stores ciphertext only, owner access only. Retention policy is not decided; DELETE removes it at once."),
       f("input_provenance", "enabled", "Run drafts record where each input came from (document, connector, memory, browser, file import, typed) and whether the buyer reviewed it."),
-      f("five_protections", "demo", "Run on the Kalis backend, not in a TEE. The operator could read them."),
+      f("five_protections", privateStatus, (privateStatus === "demo" ? "Local native development only, not a TEE. " : "") + "Private operations require the separate sealed TEE runner. No plaintext fallback. Public-document extraction remains an explicit opt-in. Device-key ownership is browser-local."),
       f("ratings", "enabled", "One rating 1-5 per executed run, by the principal who created it. Zero ratings show as null, not 0."),
       f("transactions_activity", "enabled", "Escrow hold, release split, stage refund and timeout reclaim from the contract; activity feed of runs, protection audit and reviews."),
       f("earnings", "read_only", "Public read-only seller view with ?account=. Owner view needs NEAR sign-in."),

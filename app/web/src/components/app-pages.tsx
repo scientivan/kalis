@@ -131,7 +131,7 @@ function ApprovalPanel() {
       if (!current || current.action_hash !== o.action_hash || current.content !== o.content || current.destination !== o.destination || JSON.stringify(current.params) !== JSON.stringify(o.params) || current.status !== o.status) throw new Error("This action changed. Review the refreshed content before choosing again.");
       if (action === "approve" && (!o.action_hash || o.private_values_found?.length || o.status === "blocked")) throw new Error("This action cannot be approved. Create a new proposal without private values.");
       const result = await backend<Outbound>(`protections/outbound/${encodeURIComponent(o.id)}/${action}`, action === "approve" ? {action_hash:o.action_hash} : {});
-      setMessage(action === "execute" ? (result.status === "sent" ? "The labelled mock portal confirmed receipt." : "The send did not complete. Review its status before another attempt.") : action === "approve" ? "Approved. Choose Send to mock portal to send the exact approved content." : "Action rejected.");
+      setMessage(action === "execute" ? (result.status === "sent" ? "The private mock submission was recorded. No external service was contacted." : "The send did not complete. Review its status before another attempt.") : action === "approve" ? "Approved. Choose Send to mock portal to send the exact approved content." : "Action rejected.");
     } catch(e) { setErr(e instanceof Error ? e.message : "Action failed. Refresh before trying again."); }
     finally {setBusy("");setRev(n=>n+1);}
   }
@@ -226,7 +226,7 @@ export function ConnectionsPage() {
   const [rev, setRev] = useState(0); const [err, setErr] = useState(""); const [adding, toggle] = useAdd();
   const r = useApi<Cred[] | { items: Cred[] }>("protections/credentials", rev);
   const items = Array.isArray(r.data) ? r.data : r.data?.items || [];
-  return <Page active="Connections" title="Connections" onRefresh={() => setRev(n => n + 1)} info={{ title: "Apps a method may read from", points: [["link", "Read-only access, for a limited time, that you can revoke."], ["lock", "Methods never get your token. They get only what they declared."], ["info", "Connections are held on the Kalis server, not in a locked chip."]] }}>
+  return <Page active="Connections" title="Connections" onRefresh={() => setRev(n => n + 1)} info={{ title: "Apps a method may read from", points: [["link", "Read-only access, for a limited time, that you can revoke."], ["lock", "Methods never get your token. They get only what they declared."], ["info", "Private connections use the sealed runner. This browser holds the ownership key."]] }}>
     <Main title="Your connections">
       {err && <ErrorPanel message={err} onRetry={() => { setErr(""); setRev(n => n + 1); }} title="That change did not go through"/>}
       <TileGrid label="Your connections">
@@ -252,7 +252,7 @@ export function DocumentsPage() {
   const r = useApi<Doc[] | { items: Doc[] }>("protections/documents", rev);
   const title = useMethodTitles();
   const items = Array.isArray(r.data) ? r.data : r.data?.items || [];
-  return <Page active="Documents" title="Documents" onRefresh={() => setRev(n => n + 1)} info={{ title: "Documents a method read", points: [["file", "Text is read from your file, then sealed into the run."], ["lock", "The server keeps only a fingerprint, not the text."], ["info", "Files pass through the Kalis server on the way to the private AI."]] }}>
+  return <Page active="Documents" title="Documents" onRefresh={() => setRev(n => n + 1)} info={{ title: "Documents a method read", points: [["file", "Text is read from your file, then sealed into the run."], ["lock", "The server keeps only a fingerprint, not the text."], ["info", "Private images are sealed first. Backend extraction requires explicit public-document permission."]] }}>
     <Main title="Read documents">
       <TileGrid label="Read documents">
         <AddTile title={adding ? "Close the form" : "Read a document"} desc="Reads the text of a file so a method can use it. The server keeps only a fingerprint." onClick={toggle}/>
@@ -265,7 +265,7 @@ export function DocumentsPage() {
           foot={<><span className="foot-left">Fingerprint kept, text sealed</span><DocumentDetails id={x.id} /></>}/>; })}
       </TileGrid>
     </Main>
-    {adding && <div id="add-form"><Capability id="five_protections"><DocumentUpload onChanged={() => setRev(n => n + 1)} /></Capability></div>}
+    {adding && <div id="add-form"><DocumentUpload onChanged={() => setRev(n => n + 1)} /></div>}
   </Page>;
 }
 
@@ -275,7 +275,7 @@ export function NotesPage() {
   const [rev, setRev] = useState(0); const [err, setErr] = useState(""); const [tab, setTab] = useState("Saved"); const [adding, toggle] = useAdd();
   const r = useApi<Note[] | { items: Note[] }>("protections/memory", rev);
   const items = (Array.isArray(r.data) ? r.data : r.data?.items || []).filter(n => tab === "Saved" ? n.status === "approved" || n.status === "active" : n.status === "pending");
-  return <Page active="Notes" title="Notes" onRefresh={() => setRev(n => n + 1)} info={{ title: "Notes methods may remember", points: [["note", "A method can only suggest a note. You decide what is saved."], ["check", "Methods that declare it may read your saved notes."], ["info", "Notes are kept on the Kalis server, not in a locked chip."]] }}>
+  return <Page active="Notes" title="Notes" onRefresh={() => setRev(n => n + 1)} info={{ title: "Notes methods may remember", points: [["note", "A method can only suggest a note. You decide what is saved."], ["check", "Methods that declare it may read your saved notes."], ["info", "Private notes belong to this browser’s device key. Clearing browser data loses access."]] }}>
     <Main tools={<Segmented label="Status" options={["Saved", "Suggested"]} value={tab} onChange={setTab} />}>
       {err && <ErrorPanel message={err} onRetry={() => { setErr(""); setRev(n => n + 1); }} title="That change did not go through"/>}
       <TileGrid label={tab === "Saved" ? "Saved notes" : "Suggested notes"}>

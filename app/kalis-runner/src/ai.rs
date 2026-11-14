@@ -198,3 +198,17 @@ impl AiPolicy {
         }
     }
 }
+
+/// Private document classification. The endpoint has attestation but does not expose a response signature.
+pub fn classify_private(key:&str,text:&str)->Result<(Value,Value),String>{
+ let model="openai/privacy-filter";
+ let (nonce,_)=attest(model)?;
+ let request=serde_json::to_vec(&json!({"model":model,"input":text})).unwrap();
+ let headers=[("Authorization",format!("Bearer {key}")),("Content-Type","application/json".to_string())];
+ let (status,body)=http("POST",&format!("{BASE}/privacy/classify"),&headers,Some(request))?;
+ if status!=200{return Err("private document classification failed".into())}
+ let data:Value=serde_json::from_slice(&body).map_err(|_|"invalid classification response")?;
+ let spans=data["data"][0]["spans"].as_array().ok_or("missing classification spans")?;
+ let safe:Vec<Value>=spans.iter().map(|s|json!({"category":s["category"],"start":s["start"],"end":s["end"],"score":s["score"]})).collect();
+ Ok((json!(safe),json!({"model":model,"fresh_nonce":nonce,"response_signature_verified":false,"note":"Classification endpoint has model attestation but no response signature."})))
+}

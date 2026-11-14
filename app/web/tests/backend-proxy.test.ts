@@ -82,3 +82,12 @@ test("proxy refuses unknown nested operations",async()=>{
   const r=await POST(new NextRequest("http://localhost/api/backend/api/bounties/b1/withdraw",{method:"POST",headers:{origin:"http://localhost"},body:"{}"}),{params:Promise.resolve({path:["api","bounties","b1","withdraw"]})});
   assert.equal(r.status,404);
 });
+
+test("legacy plaintext protections are retired before contacting backend",async()=>{
+ const original=globalThis.fetch;
+ globalThis.fetch=async()=>{throw new Error("A plaintext backend call must not happen.");};
+ try{
+  const r=await POST(new NextRequest("http://localhost/api/backend/api/protections/private-values",{method:"POST",headers:{origin:"http://localhost"},body:JSON.stringify({values:["SYNTHETIC_SECRET"]})}),{params:Promise.resolve({path:["api","protections","private-values"]})});
+  assert.equal(r.status,410);
+ }finally{globalThis.fetch=original;}
+});

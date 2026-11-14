@@ -88,9 +88,10 @@ fn tee_sign(message: &[u8]) -> Result<(Vec<u8>, Vec<u8>), String> {
 }
 
 mod ai;
+mod privacy;
 use ai::AiPolicy;
 
-const RUNNER: &str = "kalis-runner/0.5";
+const RUNNER: &str = "kalis-runner/0.6";
 const INFO_METHOD: &[u8] = b"kalis/v1/method";
 const INFO_DATA: &[u8] = b"kalis/v1/request";
 const INFO_ANSWER: &[u8] = b"kalis/v1/answer";
@@ -551,6 +552,7 @@ fn main() {
         }),
         Some("run") => run(&input),
         Some("evaluate") => evaluate(&input),
+        Some("protect") => privacy::protect(&input),
         _ => Err("unknown cmd".into()),
     };
     println!("{}", out.unwrap_or_else(|e| json!({"ok": false, "runner": RUNNER, "error": e})));

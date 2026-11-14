@@ -75,7 +75,7 @@ export function ConnectionCreate({ onChanged }: { onChanged: () => void }) {
         <div>
           <p>
             Allow a labelled mock app to share read-only data. Credentials are
-            held by the Kalis backend, outside the TEE.
+            sealed on this device for the private runner. Private records belong to this browser. Clearing browser data loses access.
           </p>
           {!open && (
             <button className="view" onClick={() => setOpen(true)}>
@@ -100,17 +100,7 @@ export function ConnectionCreate({ onChanged }: { onChanged: () => void }) {
               setBusy(true);
               setError("");
               try {
-                const r = await fetch(
-                  "/api/backend/mock/demo-token?connector=" +
-                    encodeURIComponent(connector),
-                  { cache: "no-store" },
-                );
-                const data = await r.json();
-                if (!r.ok || typeof data.token !== "string")
-                  throw new Error(
-                    data.error?.message || "Demo token unavailable.",
-                  );
-                setToken(data.token);
+                setToken("kalis-private-demo");
               } catch (e) {
                 setError(
                   e instanceof Error ? e.message : "Demo token unavailable.",
@@ -131,7 +121,7 @@ export function ConnectionCreate({ onChanged }: { onChanged: () => void }) {
               value={token}
               onChange={(e) => setToken(e.target.value)}
             />
-            <span className="se-fx-h">Held by the Kalis backend, never by a method.</span>
+            <span className="se-fx-h">Sealed for the private runner. Built-in mock connections only.</span>
           </label>
           <label className="se-fx">
             <span className="se-fx-l">Expires In</span>
@@ -175,6 +165,7 @@ export function DocumentUpload({ onChanged }: { onChanged: () => void }) {
     >([]),
     [method, setMethod] = useState(""),
     [file, setFile] = useState<File | null>(null),
+    [publicDocument, setPublicDocument] = useState(false),
     [result, setResult] = useState<RecordData | null>(null),
     [reviewed, setReviewed] = useState(false),
     [busy, setBusy] = useState(false),
@@ -192,13 +183,14 @@ export function DocumentUpload({ onChanged }: { onChanged: () => void }) {
     setResult(null);
     setReviewed(false);
     try {
-      if (file.size > 4 * 1024 * 1024)
-        throw new Error("Choose a file smaller than 4 MB.");
+      if (file.size > (publicDocument ? 1_200_000 : 750_000))
+        throw new Error(publicDocument ? "Choose a public file below 1.2 MB." : "Choose a private image below 750 KB.");
       const bytes = new Uint8Array(await file.arrayBuffer());
       let str = "";
       for (const b of bytes) str += String.fromCharCode(b);
       const r = await backend<RecordData>("protections/documents", {
         method_id: method,
+        public_document: publicDocument,
         filename: file.name,
         mime: file.type,
         base64: btoa(str),
@@ -215,9 +207,7 @@ export function DocumentUpload({ onChanged }: { onChanged: () => void }) {
     <Tool title="Read a Document">
       <form className="se-form" onSubmit={submit}>
         <div className="se-note rp-wide">
-          The Kalis backend sees this document on its way to private AI. Do not
-          upload private documents. Extracted text is returned once and kept
-          only in this page.
+          Private images are sealed for the private runner. Public documents can use backend extraction only when you explicitly allow it. Extracted text is returned to this page.
         </div>
         <div className="se-fx"><span className="se-fx-l">Method</span><Dropdown
           label="Method"
@@ -228,18 +218,19 @@ export function DocumentUpload({ onChanged }: { onChanged: () => void }) {
           ]}
           onChange={setMethod}
         /><span className="se-fx-h">The method whose inputs the document fills.</span></div>
+        <label className="consent rp-wide"><input type="checkbox" checked={publicDocument} onChange={e => { setPublicDocument(e.target.checked); setFile(null); setResult(null); }}/><span>This document is public. I allow the Kalis backend to read it.</span></label>
         <label className="se-fx">
-          <span className="se-fx-l">Public Document</span>
+          <span className="se-fx-l">{publicDocument ? "Public Document" : "Private Image"}</span>
           <input
             type="file"
             required
-            accept="application/pdf,image/png,image/jpeg,image/webp"
+            accept={publicDocument ? "application/pdf,image/png,image/jpeg,image/webp" : "image/png,image/jpeg,image/webp"}
             onChange={(e) => {
               setFile(e.target.files?.[0] || null);
               setResult(null);
             }}
           />
-          <span className="se-fx-h">PDF, PNG, JPEG or WebP. Public documents only.</span>
+          <span className="se-fx-h">Private images up to 750 KB, or public PDFs/images up to 1.2 MB with explicit permission.</span>
         </label>
         <div className="se-nav rp-wide"><span />
           <button className="primary-btn" disabled={busy || !method || !file}>
@@ -342,11 +333,11 @@ export function NoteCreate({ onChanged }: { onChanged: () => void }) {
           <textarea
             required
             rows={3}
-            maxLength={10000}
+            maxLength={2000}
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
-          <span className="se-fx-h">Notes are kept on the Kalis backend. Methods may read only the notes their policy permits.</span>
+          <span className="se-fx-h">Notes are sealed for the private runner. This browser holds their ownership key. Clearing browser data loses access.</span>
         </label>
         <div className="se-nav rp-wide"><span />
           <button className="primary-btn" disabled={busy || !text.trim()}>
@@ -543,8 +534,8 @@ export function PreparationSources({
           sha256: hash,
         });
       } else {
-        if (file.size > 4 * 1024 * 1024)
-          throw new Error("Choose a document smaller than 4 MB.");
+        if (file.size > 750_000)
+          throw new Error("Choose a private image below 750 KB.");
         const bytes = new Uint8Array(await file.arrayBuffer());
         let text = "";
         for (const b of bytes) text += String.fromCharCode(b);
@@ -571,8 +562,8 @@ export function PreparationSources({
       <h2 className="h3">Choose an Input Source</h2>
       <div className="note-row">
         Load a declared source, review its content and choose the value for an
-        input. Local Office files stay on this device. Uploaded documents and
-        connected apps pass through the Kalis backend.
+        input. Local Office files stay on this device. Uploaded images and
+        connected apps use the sealed private runner. Private PDF parsing is not enabled. Export pages as images, or use local Office import.
       </div>
       <div className="nform">
         <Dropdown

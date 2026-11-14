@@ -1,6 +1,6 @@
 # Kalis backend API (for frontend integration)
 
-Server code `app/backend/`, owned by Claude Code. Frontend (`design/app/`, later Next.js) is owned by Codex. Everything runs on **NEAR testnet** and **OutLayer testnet**.
+Server code `app/backend/`, owned by Claude Code. Frontend (`app/web/`, Next.js) is owned by Codex. Everything runs on **NEAR testnet** and **OutLayer testnet**.
 
 ```bash
 cd app/backend
@@ -11,6 +11,23 @@ node scripts/smoke.mjs http://localhost:8787 failure   # failing run, refund pat
 ```
 
 Secrets live in `app/backend/.env` (gitignored, testnet keys only): `DEMO_BUYER_ACCOUNT/KEY`, `SETTLER_ACCOUNT/KEY`, `OUTLAYER_PAYMENT_KEY`. The browser never receives any of them.
+
+
+## Current audit boundary, 14 November 2026
+
+The active frontend is app/web, not the design/app prototype. API and code inspection plus live GET checks are recorded in ../../CURRENT_STATE.md. This contract documents supported operations, not proof that every authenticated browser journey has been exercised.
+
+The encryption rule below applies to the runner payload. Since 15 November 2026 the frontend no longer calls POST /api/protections/private-values. Private-marked values stay in browser IndexedDB for the device outbound check, and the web proxy blocks every /api/protections/ request.
+
+The five protections now use a ciphertext-only relay.
+
+- `GET /api/privacy/config` returns the private runner public keys and mode. In native development it says "Local native development only. This is not a TEE."
+- `POST /api/privacy/execute` accepts exactly `{request:{epk,nonce,ct}}` (canonical base64, epk 32 bytes, nonce 12 bytes). The browser seals and signs each operation (credentials, memory, documents, outbound, browser.act, audit.list) with its device key. The private runner verifies owner, revision and nonce, and returns an encrypted result. Errors are `sealed_request_required` (400), `private_runner_unavailable` (503, runner not activated, no plaintext fallback), `private_runner_refused` and `private_attestation_mismatch` (502).
+- `POST /api/public-documents` extracts a document only when the user explicitly marks it public (rancangan 65.1).
+
+The protection routes in the table below are the legacy backend contract, kept for history. The private runner is proven only in native development and is not yet deployed as a TEE (`PRIVATE_RUNNER_HASH` is `not-built`), so the whole website still must not claim a deployed operator-blind TEE for protections.
+
+Community request preparation is not chain completion. Legacy bounties with no local evaluator cannot use private tests. The review handler accepts any council member other than the contributor, not only the nominated reviewer. Withholding results after grant revocation is implemented but the earlier product policy remains proposed. See the current-state reconciliation before expanding Social Money.
 
 ## The privacy rule for the frontend
 

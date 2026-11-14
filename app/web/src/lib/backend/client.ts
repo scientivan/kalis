@@ -1,3 +1,4 @@
+import { privateRequest } from "./private-client";
 export type Json =
   | null
   | boolean
@@ -41,6 +42,7 @@ export async function backend<T>(path: string, body?: unknown): Promise<T> {
   return request<T>(path, body === undefined ? "GET" : "POST", body);
 }
 export async function request<T>(path: string, method: "GET" | "POST" | "PATCH" | "DELETE", body?: unknown): Promise<T> {
+  if (path.startsWith("protections/")) return privateRequest<T>(path, method, body as Record<string, any> | undefined);
   let workspace = "kalis-web-demo";
   if (typeof window !== "undefined") {
     workspace =

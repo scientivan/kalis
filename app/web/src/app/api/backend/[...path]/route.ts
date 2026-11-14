@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
-const SAFE_GET = /^api\/(health|config|capabilities|dao|me(?:\/(?:methods|transactions|earnings|balance|preferences))?|activity|community\/config|creators\/[\w.-]+|methods(?:\/[\w-]+(?:\/(?:rating-summary|reviews|cover|versions\/\d+\/(?:manifest|sealed-method|evidence|contribution-package)))?)?|run-drafts\/[\w-]+|runs(?:\/[\w-]+(?:\/(?:events|evidence|execution|review-eligibility))?)?|operations\/[\w-]+|method-drafts\/[\w-]+|(?:issues|proposals|bounties|contributions|test-runs|private-test-cases|test-grants|artifacts)(?:\/[\w-]+(?:\/ciphertext)?)?|protections\/(?:credentials|outbound|memory(?:\/recall)?|documents(?:\/[\w-]+)?|audit))$/;
-const SAFE_POST = /^api\/(auth\/(?:challenge|verify|logout)|run-drafts(?:\/[\w-]+\/(?:consents|quote))?|method-drafts(?:\/[\w-]+\/(?:artifact|validate|publish|confirm))?|methods\/[\w-]+\/(?:cover|reviews)|runs(?:\/[\w-]+\/(?:execute|settle|reclaim))?|issues(?:\/[\w-]+\/close)?|proposals(?:\/[\w-]+\/vote)?|bounties\/[\w-]+\/(?:claim|contributions|payout)|contributions\/[\w-]+\/(?:tests|reviews|publish-version)|private-test-cases(?:\/[\w-]+\/grants)?|test-grants\/[\w-]+\/revoke|artifacts|protections\/(?:credentials(?:\/[\w-]+\/(?:revoke|use))?|private-values|outbound(?:\/[\w-]+\/(?:approve|reject|execute))?|memory(?:\/[\w-]+\/(?:approve|reject|delete|edit))?|documents|browser))$/;
+const SAFE_GET = /^api\/(health|config|capabilities|privacy\/config|dao|me(?:\/(?:methods|transactions|earnings|balance|preferences))?|activity|community\/config|creators\/[\w.-]+|methods(?:\/[\w-]+(?:\/(?:rating-summary|reviews|cover|versions\/\d+\/(?:manifest|sealed-method|evidence|contribution-package)))?)?|run-drafts\/[\w-]+|runs(?:\/[\w-]+(?:\/(?:events|evidence|execution|review-eligibility))?)?|operations\/[\w-]+|method-drafts\/[\w-]+|(?:issues|proposals|bounties|contributions|test-runs|private-test-cases|test-grants|artifacts)(?:\/[\w-]+(?:\/ciphertext)?)?|protections\/(?:credentials|outbound|memory(?:\/recall)?|documents(?:\/[\w-]+)?|audit))$/;
+const SAFE_POST = /^api\/(privacy\/execute|public-documents|auth\/(?:challenge|verify|logout)|run-drafts(?:\/[\w-]+\/(?:consents|quote))?|method-drafts(?:\/[\w-]+\/(?:artifact|validate|publish|confirm))?|methods\/[\w-]+\/(?:cover|reviews)|runs(?:\/[\w-]+\/(?:execute|settle|reclaim))?|issues(?:\/[\w-]+\/close)?|proposals(?:\/[\w-]+\/vote)?|bounties\/[\w-]+\/(?:claim|contributions|payout)|contributions\/[\w-]+\/(?:tests|reviews|publish-version)|private-test-cases(?:\/[\w-]+\/grants)?|test-grants\/[\w-]+\/revoke|artifacts|protections\/(?:credentials(?:\/[\w-]+\/(?:revoke|use))?|private-values|outbound(?:\/[\w-]+\/(?:approve|reject|execute))?|memory(?:\/[\w-]+\/(?:approve|reject|delete|edit))?|documents|browser))$/;
 const SAFE_PATCH = /^api\/(me(?:\/preferences)?|method-drafts\/[\w-]+|run-drafts\/[\w-]+)$/;
 const SAFE_DELETE = /^api\/artifacts\/[\w-]+$/;
 async function proxy(
@@ -11,6 +11,7 @@ async function proxy(
   ctx: { params: Promise<{ path: string[] }> },
 ) {
   const path = (await ctx.params).path.join("/");
+  if (path.startsWith("api/protections/")) return NextResponse.json({ error: { code: "plaintext_protections_retired", message: "Use the sealed private relay. No plaintext fallback is available." } }, { status: 410 });
   if (
     !(req.method === "GET" && /^(?:mock\/(?:broker\/demo-token|demo-token|catalog)|file-import\.js)$/.test(path)) &&
     !({ GET: SAFE_GET, POST: SAFE_POST, PATCH: SAFE_PATCH, DELETE: SAFE_DELETE }[req.method] || /$a/).test(path)

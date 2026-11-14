@@ -1,5 +1,7 @@
 # Kalis method manifest v5
 
+Documentation audit, 14 November 2026. This is the manifest schema contract, not proof of every end-to-end workflow. Current runtime, privacy boundaries, version evidence and unresolved policy are reconciled in ../../CURRENT_STATE.md. Runtime methods use the manifest hash of their selected on-chain version. Earlier example versions are not automatically the latest deployed version.
+
 One JSON file per method version. Its SHA-256 (of the exact file bytes) is recorded on chain as
 `manifest_hash`, so every field below is bound to the version the buyer pays for. The runner, the
 five protections, the buyer form, the result view and the buyer checks all read this file. No
