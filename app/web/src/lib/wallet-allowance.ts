@@ -59,3 +59,29 @@ export const setupCommands = (p: AllowancePolicy) => {
     revoke: `near account delete-account ${s} beneficiary ${p.owner} network-config testnet sign-with-legacy-keychain send`,
   };
 };
+
+// ---------- Browser flow ----------
+// The owner's wallet signs one transaction that creates the sandbox, funds it with the cap and adds a
+// key generated on this device. The owner's main key never leaves the wallet; the sandbox key never
+// leaves this browser. Balances are read live from NEAR testnet RPC.
+export const RPC = "https://rpc.testnet.near.org";
+const yocto = (near: number) => (BigInt(Math.round(near * 1e6)) * 10n ** 18n).toString();
+export async function createSandboxCall(p: AllowancePolicy) {
+  const { KeyPair } = await import("@near-js/crypto");
+  const kp = KeyPair.fromRandom("ed25519");
+  const account = sandboxAccount(p);
+  try { localStorage.setItem("kalis-sandbox-key:" + account, kp.toString()); } catch { throw new Error("This browser cannot keep the sandbox key. Allow site storage and try again."); }
+  return {
+    receiver_id: account, method_name: "", args: {}, gas_tgas: 30,
+    deposit_yocto: yocto(p.cap_near + STORAGE_RESERVE_NEAR), kind: "create_sandbox" as const,
+    public_key: kp.getPublicKey().toString(), signer_must_be: p.owner,
+  };
+}
+export async function sandboxBalance(account: string): Promise<number | null> {
+  const r = await fetch(RPC, { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: "kalis", method: "query", params: { request_type: "view_account", finality: "final", account_id: account } }) });
+  const j = await r.json();
+  if (j.error || j.result?.error) return null;
+  return Number(BigInt(j.result.amount) / 10n ** 18n) / 1e6;
+}
+export const hasDeviceKey = (account: string) => { try { return !!localStorage.getItem("kalis-sandbox-key:" + account); } catch { return false; } };

@@ -18,7 +18,7 @@ export const CONNECTOR_APPS: ConnectorApp[] = [
   { id: "kucoin", name: "KuCoin", category: "web3", brand: "kucoin", use: "Trade-split methods will read order book depth for the pair you pick." },
   { id: "tradingview", name: "TradingView", category: "web3", brand: "tradingview", use: "Strategy review methods will read the trade list you export from a backtest." },
   { id: "demo-broker", name: "Demo broker", category: "web3", icon: "m-chart", connector: "broker_mock", use: "Exit and risk methods read sample positions and prices. Every number is synthetic." },
-  { id: "wallet-allowance", name: "Wallet allowance", category: "web3", icon: "wallet", use: "Your AI agent pays from a sandbox sub-account funded with only the cap. The allowance guard checks every payment; you approve each one." },
+  { id: "wallet-allowance", name: "Wallet allowance", category: "web3", icon: "wallet", connector: "wallet_allowance", use: "Your AI agent pays from a sandbox sub-account funded with only the cap. The allowance guard checks every payment; you approve each one." },
   { id: "demo-lending-wallet", name: "Demo lending wallet", category: "web3", icon: "wallet", connector: "wallet_mock", use: "The liquidation guard reads a sample loan and its collateral. Every number is synthetic." },
   { id: "google-sheets", name: "Google Sheets", category: "web2", brand: "googlesheets", connector: "sheets_mock", use: "Cash planning and portfolio methods read your sheets. The sample sheet is synthetic." },
   { id: "google-docs", name: "Google Docs", category: "web2", brand: "googledocs", connector: "docs_mock", use: "Contract and tender methods read your drafts. The sample documents are synthetic." },

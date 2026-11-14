@@ -9,6 +9,7 @@ import { backend, plainError } from "../lib/backend/client";
 import { cachedPrivate } from "../lib/backend/private-client";
 import { CONNECTOR_APPS, appForConnector } from "../lib/connector-apps";
 import { BrandLogo } from "./brand-logo";
+import { WalletAllowanceForm } from "./wallet-allowance";
 import { useNearAuth } from "../lib/near/auth";
 import { AppShell, icon } from "./shell";
 import { NearTech, PageInfo, Segmented } from "./controls";
@@ -260,7 +261,7 @@ function AppsList({ connected, onConnect }: { connected: Set<string>; onConnect:
   </Main>;
 }
 export function ConnectionsPage() {
-  const [rev, setRev] = useState(0); const [err, setErr] = useState(""); const [adding, toggle] = useAdd(); const [pick, setPick] = useState<string | undefined>();
+  const [rev, setRev] = useState(0); const [err, setErr] = useState(""); const [adding, toggle] = useAdd(); const auth = useNearAuth(); const [pick, setPick] = useState<string | undefined>();
   const r = useApi<Cred[] | { items: Cred[] }>("protections/credentials", rev);
   const items = Array.isArray(r.data) ? r.data : r.data?.items || [];
   return <Page active="Connectors" near={NEAR_TECH.connectors} title="Connectors" onRefresh={() => setRev(n => n + 1)} info={{ title: "Apps a method may read from", points: [["link", "Read-only access, for a limited time, that you can revoke."], ["lock", "Methods never get your token. They get only what they declared."], ["info", "Private connectors use the sealed runner. This browser holds the ownership key."]] }}>
@@ -279,7 +280,7 @@ export function ConnectionsPage() {
         <StatePanel title="Every connector here is a labelled mock service" text="No real Google account, broker or wallet is connected. A method asks for a connector when it needs one."/>
       </TileGrid>
     </Main>
-    {adding && <div id="add-form"><Capability id="five_protections"><ConnectionCreate key={pick || "none"} initial={pick} onChanged={() => setRev(n => n + 1)} /></Capability></div>}
+    {adding && pick === "wallet_allowance" ? <div id="add-form"><WalletAllowanceForm owner={auth.session?.account_id || ""} signCalls={auth.signCalls as never}/></div> : (adding && <div id="add-form"><Capability id="five_protections"><ConnectionCreate key={pick || "none"} initial={pick} onChanged={() => setRev(n => n + 1)} /></Capability></div>)}
   </Page>;
 }
 
