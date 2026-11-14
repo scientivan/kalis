@@ -34,14 +34,14 @@ function Tool({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 const options = [
-  { value: "broker_mock", label: "Broker (mock)" },
-  { value: "sheets_mock", label: "Spreadsheet (mock)" },
-  { value: "docs_mock", label: "Documents (mock)" },
-  { value: "wallet_mock", label: "Wallet (mock)" },
+  { value: "broker_mock", label: "Demo broker (mock)" },
+  { value: "sheets_mock", label: "Google Sheets (mock)" },
+  { value: "docs_mock", label: "Google Docs (mock)" },
+  { value: "wallet_mock", label: "Demo lending wallet (mock)" },
 ];
-export function ConnectionCreate({ onChanged }: { onChanged: () => void }) {
-  const [open, setOpen] = useState(false),
-    [connector, setConnector] = useState("broker_mock"),
+export function ConnectionCreate({ onChanged, initial }: { onChanged: () => void; initial?: string }) {
+  const [open, setOpen] = useState(!!initial),
+    [connector, setConnector] = useState(initial || "broker_mock"),
     [token, setToken] = useState(""),
     [ttl, setTtl] = useState("60"),
     [busy, setBusy] = useState(false),

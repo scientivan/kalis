@@ -155,7 +155,7 @@ try {
     alice,
     "memory.list",
     {},
-    Math.floor(Date.now() / 1000) - 500,
+    Math.floor(Date.now() / 1000) - 1000,
   );
   ok("expired signature refused", () =>
     assert.equal(call({ cmd: "protect", request: expired.sealed }).ok, false),

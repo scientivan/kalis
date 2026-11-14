@@ -30,7 +30,7 @@ type Review = { id: string; rating: number; comment?: string; created_at: string
 
 const IDS = ["tender-bid", "portfolio-rebalance", "salary-counteroffer", "cash-runway-13w", "defi-liquidation-guard", "token-unlock", "supplier-concession-plan", "term-sheet-dilution"];
 const identity = (id: string) => { const i = Math.max(0, IDS.indexOf(id)); const color = ["#FF5F04", "#0038FF", "#FF77CD", "#FEE897", "#9FA9F5", "#F44A32", "#FF5F04", "#FEE897"][i]; return { color, ink: ["#FEE897", "#9FA9F5", "#FF77CD"].includes(color) ? "#101010" : "#fff", icon: ["m-doc", "m-chart", "m-person", "m-cash", "m-shield", "m-rocket", "m-hand", "m-pie"][i] }; };
-const CONNECTOR_NAMES: Record<string, string> = { sheets: "Spreadsheet", broker: "Broker", docs: "Documents", wallet: "Wallet" };
+const CONNECTOR_NAMES: Record<string, string> = { sheets: "Google Sheets", broker: "Demo broker", docs: "Google Docs", wallet: "Demo lending wallet" };
 const connectorName = (id: string) => { const k = id.replace(/_mock$/, ""); return CONNECTOR_NAMES[k] || k.charAt(0).toUpperCase() + k.slice(1); };
 const TABS = ["Overview", "Inputs", "Checks", "Versions", "Reviews"];
 const nameOf = (d: Detail, m: Manifest) => (m.listing?.seller?.display_name || d.owner).replace(/\s*\(demo seller\)/i, "");

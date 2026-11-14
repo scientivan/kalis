@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { backend, plainError } from "../lib/backend/client";
 import { cachedPrivate } from "../lib/backend/private-client";
+import { CONNECTOR_APPS, appForConnector } from "../lib/connector-apps";
+import { BrandLogo } from "./brand-logo";
 import { useNearAuth } from "../lib/near/auth";
 import { AppShell, icon } from "./shell";
 import { PageInfo, Segmented } from "./controls";
@@ -234,16 +236,30 @@ export function ImprovementsPage({ section = "Bounties" }: { section?: "Bounties
 
 // ---------- Connected apps ----------
 type Cred = { effective_state?: string; allowed_actions?: string[]; id: string; connector: string; scopes: string[]; expires_at?: string; last_used_at?: string | null; revoked?: boolean; status?: string; created_at?: string };
-const CONNECTOR: Record<string, [string, string]> = { broker_mock: ["Broker", "m-chart"], sheets_mock: ["Spreadsheet", "file"], docs_mock: ["Documents", "m-doc"], wallet_mock: ["Lending wallet", "wallet"] };
+const CONNECTOR: Record<string, [string, string]> = { broker_mock: ["Demo broker", "m-chart"], sheets_mock: ["Google Sheets", "file"], docs_mock: ["Google Docs", "m-doc"], wallet_mock: ["Demo lending wallet", "wallet"] };
 function useAdd(): [boolean, () => void] {
   const [open, setOpen] = useState(false);
   return [open, () => { setOpen(o => !o); setTimeout(() => document.getElementById("add-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); }];
 }
+function AppsList({ connected, onConnect }: { connected: Set<string>; onConnect: (connector: string) => void }) {
+  return <Main title="Apps">
+    <div className="mcards app-cards" role="list" aria-label="Apps a method may read from">
+      {CONNECTOR_APPS.map(a => { const on = !!a.connector && connected.has(a.connector); return <article className={`mcard app-card ${a.connector ? "" : "is-soon"}`} role="listitem" key={a.id}>
+        <div className="mcard-top"><BrandLogo brand={a.brand} size={52}/><span className={`app-status ${on ? "is-on" : ""}`}>{on ? "Connected" : a.connector ? "Ready to connect" : "Coming soon"}</span></div>
+        <h3>{a.name}</h3>
+        <p className="mcard-desc">{a.use}</p>
+        <div className="mcard-foot"><span className="app-mode">{a.connector ? "Mock data" : "Not available yet"}</span>{a.connector && !on ? <button className="view" onClick={() => onConnect(a.connector!)}>Connect</button> : null}</div>
+      </article>; })}
+    </div>
+    <StatePanel title="Every app here is a labelled mock for now" text="Kalis does not hold real Google, Notion, Slack, Zoom or Telegram access yet. Connected apps return synthetic sample data, and the others show what methods will read next."/>
+  </Main>;
+}
 export function ConnectionsPage() {
-  const [rev, setRev] = useState(0); const [err, setErr] = useState(""); const [adding, toggle] = useAdd();
+  const [rev, setRev] = useState(0); const [err, setErr] = useState(""); const [adding, toggle] = useAdd(); const [pick, setPick] = useState<string | undefined>();
   const r = useApi<Cred[] | { items: Cred[] }>("protections/credentials", rev);
   const items = Array.isArray(r.data) ? r.data : r.data?.items || [];
   return <Page active="Connections" title="Connections" onRefresh={() => setRev(n => n + 1)} info={{ title: "Apps a method may read from", points: [["link", "Read-only access, for a limited time, that you can revoke."], ["lock", "Methods never get your token. They get only what they declared."], ["info", "Private connections use the sealed runner. This browser holds the ownership key."]] }}>
+    <AppsList connected={new Set(items.filter(c => !c.revoked && c.status !== "revoked").map(c => c.connector))} onConnect={c => { setPick(c); if (!adding) toggle(); else setTimeout(() => document.getElementById("add-form")?.scrollIntoView({ behavior: "smooth" }), 50); }}/>
     <Main title="Your connections">
       {err && <ErrorPanel message={err} onRetry={() => { setErr(""); setRev(n => n + 1); }} title="That change did not go through"/>}
       <TileGrid label="Your connections">
@@ -251,14 +267,14 @@ export function ConnectionsPage() {
         <PrivateWait r={r} count={3}/>
         {r.error && <ErrorPanel message={r.error} onRetry={() => setRev(n => n + 1)} title="We could not load your connections"/>}
         {items.map(c => { const state = c.effective_state || (c.revoked || c.status === "revoked" ? "revoked" : c.expires_at && Date.parse(c.expires_at) <= Date.now() ? "expired" : "active"); const off = state !== "active"; const [name, ic] = CONNECTOR[c.connector] || [c.connector, "link"];
-          return <Tile key={c.id} iconNode={<TileIcon name={ic} color={off ? "#5c5c5c" : "#0038FF"}/>} chip={<Chip tone={off ? "grey" : "pink"}>{off ? statusLabel(state) : "Mock app"}</Chip>} title={name}
+          return <Tile key={c.id} iconNode={appForConnector(c.connector)?.brand ? <BrandLogo brand={appForConnector(c.connector)!.brand}/> : <TileIcon name={ic} color={off ? "#5c5c5c" : "#0038FF"}/>} chip={<Chip tone={off ? "grey" : "pink"}>{off ? statusLabel(state) : "Mock app"}</Chip>} title={name}
             desc={`Can ${c.scopes.map(x => x.replace(/_/g, " ")).join(" and ")} your data. It cannot change anything.`}
             meta={[c.expires_at ? `${off ? "Ended" : "Until"} ${when(c.expires_at)}` : "No end date", c.last_used_at ? `Last used ${when(c.last_used_at)}` : "Never used"]}
             foot={off ? <span className="foot-left">No method can read from it now</span> : <><span className="foot-left">{c.created_at ? `Connected ${when(c.created_at)}` : "Active"}</span>{(!c.allowed_actions || c.allowed_actions.includes("revoke")) && <button className="view" onClick={() => post(`protections/credentials/${c.id}/revoke`, {}, () => setRev(n => n + 1), setErr)}>Revoke</button>}</>}/>; })}
-        <StatePanel title="Every connection here is a labelled mock service" text="No real broker, sheet or wallet is connected. A method asks for a connection when it needs one."/>
+        <StatePanel title="Every connection here is a labelled mock service" text="No real Google account, broker or wallet is connected. A method asks for a connection when it needs one."/>
       </TileGrid>
     </Main>
-    {adding && <div id="add-form"><Capability id="five_protections"><ConnectionCreate onChanged={() => setRev(n => n + 1)} /></Capability></div>}
+    {adding && <div id="add-form"><Capability id="five_protections"><ConnectionCreate key={pick || "none"} initial={pick} onChanged={() => setRev(n => n + 1)} /></Capability></div>}
   </Page>;
 }
 

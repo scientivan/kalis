@@ -622,13 +622,34 @@ pub fn protect(input: &Value) -> Result<Value, String> {
     let time = now();
     let issued = r["issued_at"].as_u64().ok_or("missing request time")?;
     let expires = r["expires_at"].as_u64().ok_or("missing expiry")?;
-    if issued > time + 30 || expires < time || expires < issued || expires - issued > 300 {
+    if issued > time + 30 || expires < time || expires < issued || expires - issued > 900 {
         return Err("private request expired or has invalid time".into());
+    }
+    let action = string(&r, "action")?;
+    // Device vault mode. The browser keeps the owner's records encrypted on the device and sends
+    // them sealed with the request. The runner applies the protection rules in memory, returns the
+    // updated rows sealed to the owner, and stores nothing. Only actions that need the TEE are allowed.
+    if let Some(rows_in) = r.get("state") {
+        const TEE_ONLY: [&str; 6] = ["credentials.use", "memory.recall", "outbound.propose", "outbound.execute", "documents.ingest", "browser.act"];
+        let mut state = State {
+            rows: serde_json::from_value(rows_in["rows"].clone()).map_err(|_| "invalid device state")?,
+            ..Default::default()
+        };
+        let result = if TEE_ONLY.contains(&action) {
+            actions(&mut state, action, &r["payload"])
+        } else {
+            Err("this operation runs on the device, not in the runner".into())
+        };
+        let value = match result {
+            Ok(v) => json!({"ok":true,"value":v}),
+            Err(e) => json!({"ok":false,"error":e}),
+        };
+        let body = json!({"request_id":request_id,"revision":0,"result":value,"state":{"rows":state.rows},"ownership":"device-key","protocol":"kalis-private/v1"});
+        return seal_body(&sk, &tpk, &shared, &epk, sealed, body);
     }
     let key = storage_key(&sk, owner);
     let old = read(&key)?;
     let mut state = unbox_state(&sk, owner, &old)?;
-    let action = string(&r, "action")?;
     let expected = r["revision"].as_u64().ok_or("missing private revision")?;
     let result = if action == "snapshot" {
         actions(&mut state, action, &json!({}))
@@ -666,6 +687,10 @@ pub fn protect(input: &Value) -> Result<Value, String> {
         Err(e) => json!({"ok":false,"error":e}),
     };
     let body = json!({"request_id":request_id,"revision":state.revision,"result":value,"ownership":"device-key","protocol":"kalis-private/v1"});
+    seal_body(&sk, &tpk, &shared, &epk, sealed, body)
+}
+fn seal_body(sk: &StaticSecret, tpk: &PublicKey, shared: &[u8], epk: &[u8], sealed: &Value, body: Value) -> Result<Value, String> {
+    let _ = sk;
     let mut pt = serde_json::to_vec(&body).unwrap();
     // Keep small response size independent of content length. Large document results are padded to 128 KiB.
     let size = if pt.len() < 65536 { 65536 } else { 131072 };

@@ -13,16 +13,20 @@ export async function preparePrivateRequest(
   payload,
   revision,
   now = Math.floor(Date.now() / 1000),
+  state = undefined,
 ) {
   const request_id = kc.toHex(randomBytes(16));
   const request = JSON.stringify({
     owner,
     request_id,
     issued_at: now,
-    expires_at: now + 180,
+    // Runner build 0.7 accepts up to 900 s, because testnet OutLayer queues often exceed 5 minutes.
+    expires_at: now + 900,
     revision,
     action,
     payload,
+    // Device vault mode sends the owner's records sealed with the request. The runner stores nothing.
+    ...(state ? { state } : {}),
   });
   const signature = kc.toHex(await sign(enc.encode(REQUEST_PREFIX + request)));
   const box = kc.sealData(teePubkey, { request, signature });
@@ -56,5 +60,5 @@ export function openPrivateResponse(packet, output, pinnedReceiptKey) {
     throw new Error("Private answer binding is invalid.");
   if (!body.result?.ok)
     throw new Error(body.result?.error || "The private operation was refused.");
-  return { value: body.result.value, revision: body.revision };
+  return { value: body.result.value, revision: body.revision, state: body.state };
 }

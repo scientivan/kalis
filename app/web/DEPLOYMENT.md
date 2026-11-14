@@ -48,6 +48,7 @@ Redeploy backend dari komputer Dien (data di VPS tidak ditimpa):
 
 ```bash
 cd app
+ssh tinjau-vps 'sudo chown -R ubuntu /opt/kalis/app'
 rsync -az --delete --exclude node_modules --exclude .env --exclude data backend/ tinjau-vps:/opt/kalis/app/backend/
 rsync -az --delete --exclude node_modules methods/ tinjau-vps:/opt/kalis/app/methods/
 ssh tinjau-vps 'cd /opt/kalis/app/backend && sudo chown -R ubuntu /opt/kalis/app && npm ci --omit=dev && sudo chown -R kalis:kalis /opt/kalis && sudo systemctl restart kalis-backend'

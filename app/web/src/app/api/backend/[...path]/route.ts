@@ -53,7 +53,7 @@ async function proxy(
       headers,
       body: ["POST", "PATCH", "DELETE"].includes(req.method) ? await req.text() : undefined,
       cache: "no-store",
-      signal: AbortSignal.timeout(/\/(execute|tests)$/.test(path) ? 240000 : 60000),
+      signal: AbortSignal.timeout(/\/(execute|tests)$/.test(path) ? 285000 : 60000),
     });
     const type = response.headers.get("content-type") || "";
     if (/^image\/(png|jpeg|webp)$/.test(type))

@@ -3315,3 +3315,33 @@ html body #near-wallet-selector-modal, html body #near-wallet-selector-modal .nw
 
 .kalis-logo-mark { display:grid; place-items:center; width:42px; height:42px; }
 .kalis-logo-mark svg { width:34px; height:34px; display:block; }
+
+/* Connector apps and upcoming methods */
+.brand-logo { display:grid; place-items:center; flex:none; background:#fff; border:1px solid #e4e4e7; border-radius:10px; }
+.app-list { display:flex; flex-direction:column; gap:8px; }
+.app-row { display:flex; align-items:center; gap:14px; padding:12px 14px; border:1px solid #e4e4e7; border-radius:12px; background:#fff; }
+.app-row-body { flex:1; min-width:0; }
+.app-row-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.app-row-head b { font-size:15px; font-weight:700; color:#101010; }
+.app-row-body p { margin:2px 0 0; font-size:13px; font-weight:500; color:#3f3f46; }
+.app-status { font-size:12px; font-weight:600; padding:2px 8px; border-radius:999px; background:#f4f4f5; color:#3f3f46; }
+.app-status.is-on { background:#0038FF; color:#fff; }
+.mcard.is-upcoming .mcard-apps { display:flex; gap:6px; }
+.mcard.is-upcoming .mcard-foot button[disabled] { opacity:1; cursor:not-allowed; background:#f4f4f5; color:#3f3f46; border-color:#e4e4e7; }
+.reference .mcard-art { position:relative; margin:-4px -4px 2px; border-radius:10px; overflow:hidden; border:1px solid #e4e4e7; }
+.reference .mcard-art .usecase-art { display:block; width:100%; height:auto; aspect-ratio:320/120; }
+.reference .mcard-art .kchip { position:absolute; top:8px; right:8px; background:#fff; }
+.reference .mcard-connectors { display:flex; align-items:center; gap:6px; min-height:24px; }
+.reference .mcard-connectors .brand-logo { border-radius:6px; }
+.reference .mcard-connectors .brand-logo.is-demo svg { width:13px; height:13px; color:#3f3f46; }
+.reference .mcard-connector-names { font-size:12.5px; font-weight:600; color:#3f3f46; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+.reference .mcard-connectors.is-none span { font-size:12.5px; font-weight:600; color:#3f3f46; }
+.reference .mcard-expert.is-static { pointer-events:none; }
+.reference .app-cards { margin-bottom:12px; }
+.reference .app-card .mcard-top { align-items:center; }
+.reference .app-card.is-soon .brand-logo { background:#fafafa; }
+.reference .app-mode { font-size:13px; font-weight:600; color:#3f3f46; }
+.reference .mcard-meta .upcoming-tag { color:#0038FF; font-weight:700; }
+.reference .mcard-art .mcard-art-kind { position:absolute; left:8px; bottom:8px; }
+.reference .mcard-art .mcard-art-kind .kchip { background:#fff; }
+.reference .mcard-kindrow { display:flex; margin-bottom:-4px; }

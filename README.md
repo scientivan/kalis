@@ -99,6 +99,8 @@ The optional smoke script performs a paid testnet run and consumes configured fu
 
 ## Limits
 
+- Owner data for the five protections (notes, connections, documents, outbound approvals, audit) is kept encrypted in this browser and handled on the device, so those pages open instantly. Actions that must be enforced against a method or need sealed secrets (using a connection, recalling notes for a method, proposing or sending outbound, reading a private image, the browser agent) go to the TEE with the owner's records sealed inside the request, and the runner stores nothing. Those TEE actions still wait for the OutLayer testnet queue, measured at about 5 minutes, and were not re-tested end to end on runner build `cd95487f…`.
+
 - The private runner runs on OutLayer testnet (BUILD_STATUS.md 6.19). Only the notes path was tested end to end in the TEE. Credentials, documents, outbound and the browser agent share that code path but were not tested one by one there. The browser proof ran in native mode, and the web app has not been deployed with the TEE yet.
 - Ownership of private data is tied to a non-extractable signing key in this browser. Clearing browser data loses access. There is no recovery or multi-device flow yet.
 - The old plaintext endpoints under /api/protections/ are blocked by the web proxy, but data stored there by earlier versions is not migrated or deleted. That cleanup needs an explicit scope.
