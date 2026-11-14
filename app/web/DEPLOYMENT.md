@@ -50,11 +50,13 @@ Redeploy backend dari komputer Dien (data di VPS tidak ditimpa):
 cd app
 ssh tinjau-vps 'sudo chown -R ubuntu /opt/kalis/app'
 rsync -az --delete --exclude node_modules --exclude .env --exclude data backend/ tinjau-vps:/opt/kalis/app/backend/
-rsync -az --delete --exclude node_modules methods/ tinjau-vps:/opt/kalis/app/methods/
+rsync -az --delete --exclude node_modules --exclude seller-private methods/ tinjau-vps:/opt/kalis/app/methods/
 ssh tinjau-vps 'cd /opt/kalis/app/backend && sudo chown -R ubuntu /opt/kalis/app && npm ci --omit=dev && sudo chown -R kalis:kalis /opt/kalis && sudo systemctl restart kalis-backend'
 ```
 
 Log: `ssh tinjau-vps 'sudo journalctl -u kalis-backend -f'`.
+
+Folder `methods/*/seller-private/` berisi prompt dan sumber rahasia penjual dalam bentuk plaintext. Folder ini tidak boleh dikirim ke VPS (operator tidak boleh bisa membacanya) dan sudah di-gitignore. Backend hanya membutuhkan manifest dan artifact tersegel.
 
 Saat `PRIVATE_RUNNER_HASH` di `app/backend/src/private-release.js` atau `app/web/src/lib/backend/private-release.js` berubah, redeploy backend dan frontend.
 
