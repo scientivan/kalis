@@ -2,6 +2,7 @@
 // Method detail at /marketplace/<id>[/<tab>]. Built from the approved Marketplace template
 // (FRONTEND_GUIDE.md section 9): head card, one main card with a segmented switch, one side card.
 import Link from "next/link";
+import { VersionEvidence } from "./version-evidence";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { backend, type ApiVersion } from "../lib/backend/client";
@@ -125,6 +126,7 @@ export function MethodDetail({ id, tab }: { id: string; tab?: string }) {
         </div>
         {(m.disclosures || []).length > 0 && <details className="disclose"><summary>{icon("info")}Before you run</summary>{m.disclosures!.map((t, i) => <p key={i}>{t}</p>)}</details>}
         <div className="dside-foot">
+          <VersionEvidence methodId={id} version={v.number}/>
           {v.runnable ? <Link className="primary-btn wide" href={runHref}>{icon("lock")}Run privately</Link> : <span className="note-row">{icon("info")}<span>This version cannot run yet. The sealed method is not on this server.</span></span>}
           <span className="hint2">Payment is held and released only if every step works.</span>
         </div>

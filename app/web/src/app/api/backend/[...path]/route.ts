@@ -2,18 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
-const SAFE_GET =
-  /^api\/(health|config|capabilities|dao|me|me\/(?:methods|transactions|earnings|balance)|activity|bounties|issues|community\/config|creators\/[\w.-]+|methods(?:\/[\w-]+(?:\/(?:rating-summary|reviews|cover|versions\/\d+\/(?:manifest|sealed-method|evidence)))?)?|runs\/[\w-]+|protections\/(?:credentials|outbound|memory(?:\/recall)?|documents(?:\/[\w-]+)?|audit))$/;
-const SAFE_POST =
-  /^api\/(auth\/(?:challenge|verify|logout)|method-drafts|methods\/[\w-]+\/(?:cover|reviews)|runs(?:\/[\w-]+\/(?:execute|settle))?|protections\/(?:credentials(?:\/[\w-]+\/(?:revoke|use))?|private-values|outbound(?:\/[\w-]+\/(?:approve|reject|execute))?|memory(?:\/[\w-]+\/(?:approve|reject|delete|edit))?|documents|browser))$/;
+const SAFE_GET = /^api\/(health|config|capabilities|dao|me(?:\/(?:methods|transactions|earnings|balance|preferences))?|activity|community\/config|creators\/[\w.-]+|methods(?:\/[\w-]+(?:\/(?:rating-summary|reviews|cover|versions\/\d+\/(?:manifest|sealed-method|evidence|contribution-package)))?)?|run-drafts\/[\w-]+|runs(?:\/[\w-]+(?:\/(?:events|evidence|execution|review-eligibility))?)?|operations\/[\w-]+|method-drafts\/[\w-]+|(?:issues|proposals|bounties|contributions|test-runs|private-test-cases|test-grants|artifacts)(?:\/[\w-]+(?:\/ciphertext)?)?|protections\/(?:credentials|outbound|memory(?:\/recall)?|documents(?:\/[\w-]+)?|audit))$/;
+const SAFE_POST = /^api\/(auth\/(?:challenge|verify|logout)|run-drafts(?:\/[\w-]+\/(?:consents|quote))?|method-drafts(?:\/[\w-]+\/(?:artifact|validate|publish|confirm))?|methods\/[\w-]+\/(?:cover|reviews)|runs(?:\/[\w-]+\/(?:execute|settle|reclaim))?|issues(?:\/[\w-]+\/close)?|proposals(?:\/[\w-]+\/vote)?|bounties\/[\w-]+\/(?:claim|contributions|payout)|contributions\/[\w-]+\/(?:tests|reviews|publish-version)|private-test-cases(?:\/[\w-]+\/grants)?|test-grants\/[\w-]+\/revoke|artifacts|protections\/(?:credentials(?:\/[\w-]+\/(?:revoke|use))?|private-values|outbound(?:\/[\w-]+\/(?:approve|reject|execute))?|memory(?:\/[\w-]+\/(?:approve|reject|delete|edit))?|documents|browser))$/;
+const SAFE_PATCH = /^api\/(me(?:\/preferences)?|method-drafts\/[\w-]+|run-drafts\/[\w-]+)$/;
+const SAFE_DELETE = /^api\/artifacts\/[\w-]+$/;
 async function proxy(
   req: NextRequest,
   ctx: { params: Promise<{ path: string[] }> },
 ) {
   const path = (await ctx.params).path.join("/");
   if (
-    !(req.method === "GET" && path === "mock/broker/demo-token") &&
-    !(req.method === "GET" ? SAFE_GET : SAFE_POST).test(path)
+    !(req.method === "GET" && /^(?:mock\/(?:broker\/demo-token|demo-token|catalog)|file-import\.js)$/.test(path)) &&
+    !({ GET: SAFE_GET, POST: SAFE_POST, PATCH: SAFE_PATCH, DELETE: SAFE_DELETE }[req.method] || /$a/).test(path)
   )
     return NextResponse.json(
       {
@@ -24,7 +24,7 @@ async function proxy(
       },
       { status: 404 },
     );
-  if (req.method === "POST" && req.headers.get("origin") !== req.nextUrl.origin)
+  if (req.method !== "GET" && req.headers.get("origin") !== req.nextUrl.origin)
     return NextResponse.json(
       {
         error: {
@@ -47,9 +47,9 @@ async function proxy(
     const response = await fetch(base + "/" + path + req.nextUrl.search, {
       method: req.method,
       headers,
-      body: req.method === "POST" ? await req.text() : undefined,
+      body: ["POST", "PATCH", "DELETE"].includes(req.method) ? await req.text() : undefined,
       cache: "no-store",
-      signal: AbortSignal.timeout(path.endsWith("/execute") ? 240000 : 60000),
+      signal: AbortSignal.timeout(/\/(execute|tests)$/.test(path) ? 240000 : 60000),
     });
     const type = response.headers.get("content-type") || "";
     if (/^image\/(png|jpeg|webp)$/.test(type))
@@ -60,7 +60,7 @@ async function proxy(
     return new NextResponse(await response.text(), {
       status: response.status,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": path === "file-import.js" ? "text/javascript; charset=utf-8" : "application/json",
         "Cache-Control": "no-store",
       },
     });
@@ -79,3 +79,6 @@ async function proxy(
 }
 export const GET = proxy;
 export const POST = proxy;
+
+export const PATCH = proxy;
+export const DELETE = proxy;

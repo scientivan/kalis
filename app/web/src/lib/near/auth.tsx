@@ -6,10 +6,12 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { WalletSelector } from "@near-wallet-selector/core";
 import { Buffer } from "buffer";
+import { actionCreators } from "@near-js/transactions";
 
 export const SESSION_KEY = "kalis-session";
 type Session = { token: string; account_id: string; expires_at: string };
-type Auth = { session: Session | null; busy: boolean; error: string; signIn: () => Promise<void>; signOut: () => Promise<void>; clearError: () => void };
+export type ContractCall = { receiver_id: string; method_name: string; args: Record<string, unknown>; deposit_yocto: string; gas_tgas: number | string; signer_must_be?: string };
+type Auth = { session: Session | null; busy: boolean; error: string; signIn: () => Promise<void>; signOut: () => Promise<void>; clearError: () => void; signCalls: (calls: ContractCall[]) => Promise<unknown> };
 const Ctx = createContext<Auth | null>(null);
 
 export function readSession(): Session | null {
@@ -83,7 +85,21 @@ export function NearAuthProvider({ children }: { children: ReactNode }) {
     try { const sel = await getSelector(); if (sel.isSignedIn()) await (await sel.wallet()).signOut(); } catch { /* wallet already gone */ }
   }, [getSelector]);
 
-  return <Ctx.Provider value={{ session, busy, error, signIn, signOut, clearError: () => setError("") }}>{children}</Ctx.Provider>;
+  const signCalls = useCallback(async (calls: ContractCall[]) => {
+    const account = readSession()?.account_id;
+    if (!account) throw new Error("Sign in with NEAR before signing a transaction.");
+    if (!calls.length) throw new Error("No transaction was returned.");
+    for (const call of calls) {
+      if (call.signer_must_be && call.signer_must_be !== account) throw new Error(`This action must be signed by ${call.signer_must_be}.`);
+      if (!/^\d+$/.test(call.deposit_yocto) || !Number.isFinite(Number(call.gas_tgas)) || Number(call.gas_tgas) <= 0 || Number(call.gas_tgas) > 300) throw new Error("Invalid transaction amount or gas limit.");
+    }
+    const wallet = await (await getSelector()).wallet();
+    const walletAccount = (await wallet.getAccounts())[0]?.accountId;
+    if (walletAccount !== account) throw new Error("The wallet account changed. Sign in again before continuing.");
+    return wallet.signAndSendTransactions({ transactions: calls.map(call => ({ signerId: account, receiverId: call.receiver_id, actions: [actionCreators.functionCall(call.method_name,call.args,BigInt(Math.round(Number(call.gas_tgas)*1e6))*1000000n,BigInt(call.deposit_yocto))] })) });
+  }, [getSelector]);
+
+  return <Ctx.Provider value={{ session, busy, error, signIn, signOut, signCalls, clearError: () => setError("") }}>{children}</Ctx.Provider>;
 }
 export function useNearAuth() {
   const c = useContext(Ctx);

@@ -38,6 +38,9 @@ export type ApiConfig = {
   demo_topup: { enabled: boolean; label: string; buyer_account: string };
 };
 export async function backend<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, body === undefined ? "GET" : "POST", body);
+}
+export async function request<T>(path: string, method: "GET" | "POST" | "PATCH" | "DELETE", body?: unknown): Promise<T> {
   let workspace = "kalis-web-demo";
   if (typeof window !== "undefined") {
     workspace =
@@ -46,7 +49,7 @@ export async function backend<T>(path: string, body?: unknown): Promise<T> {
     sessionStorage.setItem("kalis-backend-workspace", workspace);
   }
   const r = await fetch("/api/backend/api/" + path, {
-    method: body === undefined ? "GET" : "POST",
+    method,
     headers: {
       "Content-Type": "application/json",
       "X-Kalis-Workspace": workspace,

@@ -597,3 +597,157 @@ svg.i { width: 20px; height: 20px; flex: none }
   .reference .dpane { padding: 14px }
   .reference .nf-foot { flex-direction: column; align-items: stretch }
 }
+
+.reference {
+  & .rail-wallet.on { color:#fff; position:relative; cursor:pointer; list-style:none; }
+  & .rail-wallet.on::-webkit-details-marker { display:none; }
+  & .wallet-label { min-width:0; overflow:hidden; }
+  & .wallet-label strong, & .wallet-label small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  & .wallet-label small { font-size:11px; font-weight:500; }
+  & .connected-dot { position:absolute; right:4px; top:4px; width:8px; height:8px; background:#fff; border:2px solid #0038ff; border-radius:50%; }
+  & .wallet-account { position:relative; }
+  & .wallet-account-menu { position:absolute; left:calc(100% + 12px); bottom:0; z-index:80; width:240px; border:1px solid #cfcfcf; border-radius:12px; padding:12px; background:white; color:#101010; box-shadow:0 6px 18px #10101018; }
+  & .wallet-account-menu p { margin:0 0 4px; font-size:12px; color:#5c5c5c; }
+  & .wallet-account-menu>strong { display:block; overflow-wrap:anywhere; margin-bottom:10px; }
+  & .wallet-account-menu a, & .wallet-account-menu button { display:flex; align-items:center; width:100%; min-height:38px; padding:8px; background:white; border:0; border-radius:6px; color:#101010; font:600 13px var(--font-inter),sans-serif; cursor:pointer; }
+  & .wallet-account-menu a:hover, & .wallet-account-menu button:hover { color:#0038ff; background:#f4f4f4; }
+  @media(max-width:560px) { & .wallet-account-menu { left:0; bottom:calc(100% + 8px); width:220px; } }
+}
+
+.reference {
+  & .role-picker { position:relative; flex:none; min-height:42px; }
+  & .role-symbol { display:grid; place-items:center; width:44px; height:42px; color:#0038ff; }
+  & .role-picker>.dd { display:none; }
+  & .nav-parent { border-bottom:1px solid #e2e2e2; padding:4px 0; }
+  & .parent-control { cursor:pointer; list-style:none; }
+  & .parent-control::-webkit-details-marker { display:none; }
+  & .parent-control>span { display:none; }
+  & .nav-children { display:none; padding:4px 0 6px 32px; }
+  & .child-link { display:flex; align-items:center; min-height:36px; padding:6px 10px; border-radius:8px; font-size:13px; font-weight:600; color:#3a3a3a; }
+  & .child-link.active { color:#0038ff; background:#f4f4f4; }
+  & .child-link:hover { color:#0038ff; }
+  & .side:hover .role-symbol, & .side:focus-within .role-symbol, & .side.mobile-open .role-symbol { display:none; }
+  & .side:hover .role-picker>.dd, & .side:focus-within .role-picker>.dd, & .side.mobile-open .role-picker>.dd { display:block; width:220px; }
+  & .role-picker .dd-btn { width:100%; }
+  & .side:hover .parent-control>span, & .side:focus-within .parent-control>span, & .side.mobile-open .parent-control>span { display:block; }
+  & .side:hover .nav-parent[open]>.nav-children, & .side:focus-within .nav-parent[open]>.nav-children, & .side.mobile-open .nav-parent[open]>.nav-children { display:block; }
+  & .parent-chevron { margin-left:auto; }
+  & .nav-parent[open] .parent-chevron { transform:rotate(180deg); }
+}
+
+/* Always-visible hierarchy in the expanded rail. */
+.reference {
+  & .parent-control { cursor:default; font-weight:700; }
+  & .side:hover .nav-parent>.nav-children, & .side:focus-within .nav-parent>.nav-children, & .side.mobile-open .nav-parent>.nav-children { display:block; }
+  & .nav-children { margin-left:20px; padding:0 0 6px 12px; border-left:1px solid #e2e2e2; }
+  & .child-link { min-height:34px; padding:5px 10px; }
+  & .side .parent-control.active { background:transparent; }
+}
+
+/* Compact complete navigation hierarchy. */
+.reference {
+  & .side { gap:4px; padding-top:8px; padding-bottom:8px; }
+  & .rail-top { gap:3px; padding-bottom:5px; }
+  & .rail-logo { min-height:32px; }
+  & .rail-logo>span { font-size:21px; }
+  & .rail-logo b { font-size:18px; }
+  & .role-picker { min-height:36px; }
+  & .role-symbol { height:36px; }
+  & .role-picker .dd-btn { height:36px; min-height:36px; font-size:12px; }
+  & .rail-navigation.hierarchy { flex:0 1 auto; }
+  & .nav-parent { padding:2px 0; }
+  & .side .parent-control { height:28px; min-height:28px; }
+  & .side:hover .parent-control, & .side:focus-within .parent-control, & .side.mobile-open .parent-control { font-size:12px; }
+  & .side .parent-control svg { width:18px; height:18px; }
+  & .nav-children { padding-top:0; padding-bottom:3px; margin-left:19px; }
+  & .child-link { min-height:28px; padding:3px 9px; font-size:12px; line-height:1.4; }
+  & .rail-bottom { gap:4px; padding-top:5px; }
+  & .rail-control { min-height:36px; }
+  & .rail-control svg { width:19px; height:19px; }
+  @media(max-height:700px) {
+    & .side { gap:3px; }
+    & .side .parent-control { height:25px; min-height:25px; }
+    & .child-link { min-height:25px; padding-top:2px; padding-bottom:2px; }
+    & .nav-parent { padding:1px 0; }
+    & .nav-children { padding-bottom:1px; }
+  }
+}
+
+/* Size the capsule to its contents rather than stretching empty space. */
+.reference {
+  & .side { height:auto; max-height:calc(100dvh - 32px); gap:6px; padding-top:12px; padding-bottom:12px; }
+  & .rail-navigation.hierarchy { flex:0 1 auto; }
+  & .rail-bottom { margin-top:0; padding-top:8px; }
+  & .side .parent-control { height:44px; min-height:44px; }
+  & .side .parent-control svg { width:24px; height:24px; }
+  & .nav-parent { padding:3px 0; }
+  & .rail-control { min-height:40px; }
+  & .rail-control svg { width:22px; height:22px; }
+  & .role-symbol { height:38px; }
+  & .side:hover, & .side:focus-within, & .side.mobile-open { gap:4px; padding-top:10px; padding-bottom:10px; }
+  & .side:hover .parent-control, & .side:focus-within .parent-control, & .side.mobile-open .parent-control { height:28px; min-height:28px; }
+  & .side:hover .parent-control svg, & .side:focus-within .parent-control svg, & .side.mobile-open .parent-control svg { width:18px; height:18px; }
+  & .side:hover .nav-parent, & .side:focus-within .nav-parent, & .side.mobile-open .nav-parent { padding:2px 0; }
+  & .side:hover .rail-bottom, & .side:focus-within .rail-bottom, & .side.mobile-open .rail-bottom { padding-top:6px; }
+  @media(max-height:700px) {
+    & .side:hover .parent-control, & .side:focus-within .parent-control, & .side.mobile-open .parent-control { height:25px; min-height:25px; }
+  }
+}
+
+/* Equal spacing at both ends of the navigation section. */
+.reference {
+  & .rail-navigation.hierarchy { padding-top:8px; padding-bottom:8px; }
+  & .side .hierarchy .nav-parent { padding-top:0; padding-bottom:4px; }
+  & .side .hierarchy .nav-parent:last-child { padding-bottom:0; border-bottom:0; }
+  & .side .hierarchy .nav-children { padding-bottom:0; }
+  & .side .rail-bottom, & .side:hover .rail-bottom, & .side:focus-within .rail-bottom, & .side.mobile-open .rail-bottom { padding-top:0; border-top:0; margin-top:0; }
+}
+
+/* Lower the navigation slightly and present the network as a status label. */
+.reference {
+  & .rail-navigation.hierarchy { margin-top:6px; }
+  & .rail-network { background:transparent; border:0; border-radius:0; color:#5c5c5c; cursor:default; }
+  & .rail-network svg { width:18px; height:18px; color:#5c5c5c; }
+  & .rail-network span { font-size:12px; font-weight:600; }
+}
+
+/* Symmetric menu block between Role and the network/account block. */
+.reference {
+  & .rail-navigation.hierarchy { margin-top:0; padding-top:14px; padding-bottom:14px; }
+  & .hierarchy>.rail-control { margin-top:8px; }
+  & .rail-bottom { gap:4px; }
+  & .rail-network { min-height:40px; }
+  & .network-label strong, & .network-label small { display:block; line-height:1.4; }
+  & .network-label strong { font-size:12px; font-weight:600; }
+  & .network-label small { font-size:11px; font-weight:500; }
+  & .side:hover .rail-network, & .side:focus-within .rail-network, & .side.mobile-open .rail-network { padding-left:10px; gap:12px; }
+  & .rail-network svg { width:22px; height:22px; }
+}
+
+/* Final boundary rules take precedence over earlier rail experiments. */
+.reference {
+  & .side .rail-navigation.hierarchy { margin:0; padding:16px 0; flex:0 1 auto; }
+  & .side .rail-bottom { display:flex; flex-direction:column; gap:4px; margin:0; padding:0; border:0; }
+  & .side .rail-network { margin:0; padding-top:0; padding-bottom:0; min-height:38px; border:0; background:transparent; }
+  & .side .wallet-account { margin:0; padding:0; border:0; }
+  & .side .rail-wallet { margin:0; }
+}
+
+.reference {
+  & .page-purpose { flex-basis:100%; display:flex; align-items:flex-start; gap:9px; padding:10px 12px; border:1px dashed #cfcfcf; border-radius:8px; background:#f4f4f4; margin-top:2px; }
+  & .page-purpose>svg { width:18px; height:18px; color:#0038ff; flex:none; margin-top:1px; }
+  & .ph .page-purpose p { margin:0; font-size:13px; line-height:1.5; color:#3a3a3a; font-weight:500; }
+}
+
+.reference {
+  & .empty-context { display:flex; flex-direction:column; align-items:stretch; gap:12px; }
+  & .context-action { display:flex; justify-content:flex-start; padding-left:30px; }
+  & .context-action .view { display:inline-flex; align-items:center; }
+}
+
+.reference {
+  & .note-row.empty-context { display:flex; flex-direction:row; align-items:flex-start; gap:10px; }
+  & .empty-context-body { display:flex; flex-direction:column; align-items:flex-start; gap:12px; min-width:0; }
+  & .empty-context-body p { margin:0; }
+  & .empty-context-body .context-action { padding:0; }
+}

@@ -199,3 +199,34 @@ Dien approved the Marketplace at `/marketplace` (`app/web/src/components/marketp
 - Chain text is cleaned for display (`[kalis:...]` tags removed, "| Accept if:" moved to the second line).
 - Fields (Dien, 14 Nov 2026). Every input, select and info row uses the Dropdown frame: 42px, 1px border, radius 10px, label inside on the left in grey 600, value on the right in ink 650 (`.fx` in `reference.css`). Yes/no and fixed choices use `Dropdown`, never a native select. Long text uses the same frame with the label on top (`.fx.tall`). Help text goes in the field's tooltip, not below it. Checkboxes are custom 20px squares that turn solid blue. Do not repeat the active tab name as a heading.
 - Navigation naming (Dien, 14 Nov 2026). Rail items are short nouns in Title Case and page titles match them exactly: Marketplace, Runs, Approvals (group Buying); Connections, Documents, Notes (group Private Data); Listings, Fund, Bounties (group Selling); Account, Activity (group Profile). Everything else (card titles, sentences, buttons) stays in sentence case. Never mix the two styles inside one element.
+
+
+## 10. Role navigation (Dien, approved 14 Nov 2026)
+
+The rail has a Consumer / Author role selector and expandable parent navigation with child links. Consumer parents are Marketplace, Runs, Data, Community and Activity. Author parents are Listings, Community and Activity. Marketplace contains Methods. Runs contains History and Approvals. Data contains Connections, Documents and Notes. Listings contains Methods and Drafts. Community contains Fund (including proposals and council) and Bounties (including reported problems). Activity contains History. Account and Sign out remain in the wallet menu. Roles organise navigation and do not confer permissions. Preserve access through the role selector and existing routes.
+
+Revision to section 10. Parent headings sit farther left, with visibly indented child links and a subtle vertical guide. All child links appear immediately when the rail expands. No accordion click or individual parent hover is required.
+
+Navigation density revision. Preserve the approved indentation, while reducing parent/child row heights, icons and group gaps so the whole role navigation fits without scrolling on ordinary desktop heights. Use compact 12px navigation labels and 28px rows, tightening to 25px on short viewports. Keep overflow as a fallback for very short screens, zoom and accessibility rather than clipping destinations.
+
+Capsule proportion correction. Its height follows its contents, centered vertically, with only a viewport max-height. Do not stretch the capsule to viewport height or push bottom utilities away with auto margins. Collapsed parent icons use 24px inside 44px rows. Expanded navigation keeps compact indented rows, followed closely by notifications/network/wallet. Avoid a large empty gap after History.
+
+Sidebar spacing. Use equal vertical gaps between Role and the first parent (Marketplace for Consumer), and between the last child (History) and Notifications. Navigation has symmetric top/bottom padding and no extra trailing group padding.
+
+Sidebar refinement. Lower the navigation and following utility area slightly beneath Role. NEAR testnet is a noninteractive network status, with an icon and quiet text, no filled button background or button border.
+
+Sidebar grouping correction. Notifications belongs at the end of the central navigation block. Give this block equal top and bottom margins between Role above and the network/account block below. Place the noninteractive NEAR testnet status immediately above the wallet Connected label, aligned with its text, and show the network identifier as Chain ID testnet. Do not invent a numeric EVM chain ID for NEAR.
+
+Approved naming revision. Replace Runs parent with Jobs. Its children are Ongoing, Results and Approvals. Ongoing and Results use separate URLs and titles. Results includes released or refunded jobs, without promising a decrypted answer survives reload.
+
+Page orientation revision. Each subsection page should visibly explain its purpose for first-time visitors. Package a concise explanation inside a small inset note row within the title card, with a blue icon. Describe what is shown and what the visitor can do. Extra details stay in the existing info popover. This supersedes the earlier rule that all explanation must be hidden in the info popover.
+
+Jobs consolidation approved by Dien. Jobs contains only Ongoing and Results. Ongoing shows Needs your approval above its job list, including outbound actions without an attached job. Preserve exact-action-hash approval and rejection. Existing /approvals links open the same Ongoing surface for compatibility.
+
+Contextual action placement. When a button follows from an explanation or empty state, place it immediately beneath that text within the same content group. Do not put that action in a toolbar above the explanation. Filters and global page actions remain in their toolbars. Apply this to job empty states, connection/document onboarding and similar contexts.
+
+Empty-state packaging correction. Put the explanation and its contextual action inside the same grey note panel. The button sits beneath the text, aligned to the text column beside the icon, and never outside the panel.
+
+Author naming approved. Methods replaces Listings, with Drafts and Published child pages. Create method is a button within Drafts. Existing draft creation remains draft-only, without implying manifest/seal/publish is implemented.
+
+Community structure approved. Both roles have Fund, Proposals, Bounties and Issues as child links. Fund shows treasury and council, Proposals shows funding decisions, Bounties shows paid improvement opportunities, Issues shows reported problems. Contribution tests, reviews and payout belong within bounty/contribution details.
