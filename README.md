@@ -4,7 +4,7 @@ Kalis is a marketplace for private expert methods. Authors publish a WASM progra
 
 The active website is Next.js in app/web, backed by app/backend and NEAR testnet. Runner execution uses OutLayer testnet and private AI on NEAR AI Cloud. Demo people, businesses and inputs are fictional. External connectors, the procurement portal and fiat top-up are labelled mocks. Payment settlement uses real testnet transactions.
 
-The core runner accepts encrypted methods and inputs, then returns an encrypted answer. The five protections (connections, notes, documents, outbound approval and the browser agent) now use a sealed protocol. The browser encrypts each operation for a separate private runner, and the backend only relays ciphertext. **This private path is proven locally in native development mode only. It is not yet built or deployed as a TEE on OutLayer, so in a normal deployment the protection pages refuse with `private_runner_unavailable` instead of falling back to plaintext.** See the limits below before using data.
+The core runner accepts encrypted methods and inputs, then returns an encrypted answer. The five protections (connections, notes, documents, outbound approval and the browser agent) now use a sealed protocol. The browser encrypts each operation for a separate private runner, and the backend only relays ciphertext. **The private runner is deployed on OutLayer testnet as `scientivan.testnet/kalis-private` (build `457e260c…`), with a seal key generated inside the TEE and locked to that build. An end-to-end test through the backend relay passed for notes.** If the backend starts without the private runner keys, protection pages refuse with `private_runner_unavailable` instead of falling back to plaintext. See the limits below before using data.
 
 ## Try the local website
 
@@ -88,6 +88,7 @@ Private protections checks. They are local, native development only (not a TEE),
 cd app/backend
 node scripts/privacy-local-test.mjs   # 27 protocol checks
 node scripts/privacy-http-test.mjs    # 13 relay checks
+node scripts/privacy-remote-test.mjs  # 6 checks against the testnet TEE, spends a little OutLayer compute
 ```
 
 The browser proof needs `node scripts/privacy-preview.mjs` (port 8798) and the web app built with `NEXT_PUBLIC_KALIS_PRIVATE_DEV=1` and started on port 3312 with `KALIS_BACKEND_URL=http://127.0.0.1:8798`. Then run `node app/backend/scripts/privacy-browser-test.mjs` from the Product folder. It saves a note with a sentinel value, reloads the page and confirms the sentinel never appears in a browser request. Result: audit/2026-11-14-private-migration/browser-proof.json.
@@ -98,7 +99,7 @@ The optional smoke script performs a paid testnet run and consumes configured fu
 
 ## Limits
 
-- The private protections runner is proven only in native development mode on one machine. `PRIVATE_RUNNER_HASH` is still `not-built`, so no attested TEE build exists, OutLayer testnet storage (atomic set-if-absent and set-if-equals, persistent across calls) was probed successfully with a separate project on 15 November 2026, and outbound HTTP from the TEE was already proven earlier. The private runner itself has not run there yet. Until it is built, pinned and deployed (which needs Dien's approval), protection pages refuse instead of running.
+- The private runner runs on OutLayer testnet (BUILD_STATUS.md 6.19). Only the notes path was tested end to end in the TEE. Credentials, documents, outbound and the browser agent share that code path but were not tested one by one there. The browser proof ran in native mode, and the web app has not been deployed with the TEE yet.
 - Ownership of private data is tied to a non-extractable signing key in this browser. Clearing browser data loses access. There is no recovery or multi-device flow yet.
 - The old plaintext endpoints under /api/protections/ are blocked by the web proxy, but data stored there by earlier versions is not migrated or deleted. That cleanup needs an explicit scope.
 - Private PDFs are refused in the private path. Public documents can still be extracted by the backend only after an explicit opt-in, as agreed in rancangan 65.1. Connectors inside the private runner are labelled mocks with no free network access.
