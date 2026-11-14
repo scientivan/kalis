@@ -56,7 +56,7 @@ const Refresh = ({ onClick }: { onClick: () => void }) => <button className="gho
 function Page({ active, title, info, near, onRefresh, children }: { active: string; title: string; info: { title: string; points: [string, string][] }; near?: NearPage; onRefresh: () => void; children: ReactNode }) {
   return <AppShell active={active}>
     <section className="card ph"><div className="ph-title"><h1>{title}</h1></div>
-      <div className="ph-actions">{near && <NearTech {...near} />}<PageInfo title={info.title} points={info.points.map(([ic, text]) => ({ icon: icon(ic), text }))} /><Refresh onClick={onRefresh} /></div><div className="page-purpose">{icon(info.points[0][0])}<p>{info.points[0][1]}</p></div></section>
+      <div className="ph-actions">{near && <NearTech {...near} />}<Refresh onClick={onRefresh} /></div><div className="page-purpose">{icon(info.points[0][0])}<p>{info.points[0][1]}</p><span className="page-purpose-info"><PageInfo title={info.title} points={info.points.map(([ic, text]) => ({ icon: icon(ic), text }))} /></span></div></section>
     {children}
   </AppShell>;
 }
