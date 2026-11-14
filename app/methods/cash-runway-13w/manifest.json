@@ -1,0 +1,597 @@
+{
+  "manifest_version": 5,
+  "method_id": "cash-runway-13w",
+  "kind": "wasm",
+  "listing": {
+    "title": "Keep payroll paid through the next 13 weeks",
+    "outcome": "A week-by-week payment plan that pays payroll and tax first, delays only what suppliers allow, and tells you the first week cash runs short.",
+    "category": "Business finance",
+    "seller": {
+      "display_name": "Sari Wulandari (demo seller)",
+      "role": "Turnaround consultant",
+      "demo": true
+    },
+    "urgency": "Payroll is due on Friday and the bank reviews your credit line next month. If suppliers or the bank see this sheet, credit tightens.",
+    "limits": [
+      "13 weeks (up to 26), weekly buckets, one currency",
+      "Invoices are paid whole, never split",
+      "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+    ],
+    "sample_output": "Synthetic example: payroll and tax paid every week, two invoices delayed within their allowed time, lowest closing balance IDR 78,000,000 against a reserve of IDR 75,000,000.",
+    "not_advice": false
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "opening_balance",
+        "label": "Cash today",
+        "type": "money",
+        "unit": "IDR",
+        "required": true,
+        "private": true,
+        "source": "connector:sheets_mock.read_range"
+      },
+      {
+        "id": "reserve",
+        "label": "Minimum cash to keep",
+        "type": "money",
+        "unit": "IDR",
+        "required": true,
+        "min": 0,
+        "private": true,
+        "source": "connector:sheets_mock.read_range"
+      },
+      {
+        "id": "weeks",
+        "label": "Weekly cash in and fixed costs",
+        "type": "array",
+        "required": true,
+        "source": "connector:sheets_mock.read_range",
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "week",
+              "label": "Week",
+              "type": "integer",
+              "required": true,
+              "min": 1
+            },
+            {
+              "id": "receipts",
+              "label": "Cash in",
+              "type": "money",
+              "unit": "IDR",
+              "required": true,
+              "min": 0,
+              "private": true
+            },
+            {
+              "id": "payroll",
+              "label": "Payroll",
+              "type": "money",
+              "unit": "IDR",
+              "required": true,
+              "min": 0,
+              "private": true
+            },
+            {
+              "id": "tax",
+              "label": "Tax",
+              "type": "money",
+              "unit": "IDR",
+              "required": true,
+              "min": 0,
+              "private": true
+            }
+          ],
+          "min_items": 1,
+          "max_items": 26
+        }
+      },
+      {
+        "id": "invoices",
+        "label": "Supplier invoices",
+        "type": "array",
+        "required": true,
+        "source": "connector:sheets_mock.read_range",
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "supplier",
+              "label": "Supplier",
+              "type": "string",
+              "required": true,
+              "private": true
+            },
+            {
+              "id": "amount",
+              "label": "Amount",
+              "type": "money",
+              "unit": "IDR",
+              "required": true,
+              "min": 0,
+              "private": true
+            },
+            {
+              "id": "due_week",
+              "label": "Due week",
+              "type": "integer",
+              "required": true,
+              "min": 1
+            },
+            {
+              "id": "critical",
+              "label": "Critical supplier",
+              "type": "boolean",
+              "required": true
+            },
+            {
+              "id": "max_defer_weeks",
+              "label": "Delay the supplier allows",
+              "type": "integer",
+              "unit": "weeks",
+              "min": 0
+            }
+          ],
+          "max_items": 200
+        }
+      }
+    ],
+    "alternative_sources": [
+      "file_import:xlsx"
+    ],
+    "sample": {
+      "fictional": true,
+      "ref": "fixtures/sample-input.json"
+    }
+  },
+  "ai": {
+    "allowed": [],
+    "proprietary": false
+  },
+  "steps": [
+    {
+      "id": "read_cash_sheet",
+      "what": "Read the 13-week sheet"
+    },
+    {
+      "id": "check_inputs",
+      "what": "Check weeks and invoices"
+    },
+    {
+      "id": "schedule_payments",
+      "what": "Pay payroll and tax first, then critical suppliers, then delay others within what they allow"
+    },
+    {
+      "id": "check_reserve",
+      "what": "Find the first week cash falls below the reserve"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "sheets_mock",
+      "operations": [
+        "read_range"
+      ],
+      "what": "Read the cash sheet from a spreadsheet you connect. Labelled mock, no real Excel or Google account."
+    }
+  ],
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "outputs": {
+    "status_field": "status",
+    "unverifiable_status": [],
+    "fields": [
+      {
+        "id": "status",
+        "label": "Result",
+        "type": "enum",
+        "enum": [
+          "ok",
+          "infeasible"
+        ],
+        "display": "badge"
+      },
+      {
+        "id": "weeks",
+        "label": "Week by week",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "payments",
+        "label": "Supplier payments",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "carried_over",
+        "label": "Paid after the 13 weeks",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "min_closing",
+        "label": "Lowest closing balance",
+        "type": "money",
+        "unit": "IDR",
+        "display": "money"
+      },
+      {
+        "id": "first_shortfall_week",
+        "label": "First week below reserve",
+        "type": "integer",
+        "display": "number"
+      },
+      {
+        "id": "shortfall",
+        "label": "Shortfall",
+        "type": "money",
+        "unit": "IDR",
+        "display": "money"
+      },
+      {
+        "id": "reason",
+        "label": "What it means",
+        "type": "text",
+        "display": "text"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "reserve_every_week",
+      "description": "Closing cash stays at or above your reserve every week",
+      "when": {
+        "==": [
+          {
+            "var": "answer.status"
+          },
+          "ok"
+        ]
+      },
+      "rule": {
+        ">=": [
+          {
+            "reduce": [
+              {
+                "map": [
+                  {
+                    "var": "answer.weeks"
+                  },
+                  {
+                    "var": "closing"
+                  }
+                ]
+              },
+              {
+                "if": [
+                  {
+                    "<": [
+                      {
+                        "var": "current"
+                      },
+                      {
+                        "var": "accumulator"
+                      }
+                    ]
+                  },
+                  {
+                    "var": "current"
+                  },
+                  {
+                    "var": "accumulator"
+                  }
+                ]
+              },
+              1e+300
+            ]
+          },
+          {
+            "var": "input.reserve"
+          }
+        ]
+      },
+      "message": "In at least one week the plan leaves less cash than your reserve.",
+      "tolerance": 1
+    },
+    {
+      "id": "payroll_paid",
+      "description": "All payroll in your sheet is paid",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "sum": {
+                    "map": [
+                      {
+                        "var": "answer.weeks"
+                      },
+                      {
+                        "var": "payroll"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "sum": {
+                    "map": [
+                      {
+                        "var": "input.weeks"
+                      },
+                      {
+                        "var": "payroll"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          1
+        ]
+      },
+      "message": "The plan does not pay all the payroll in your sheet."
+    },
+    {
+      "id": "tax_paid",
+      "description": "All tax in your sheet is paid",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "sum": {
+                    "map": [
+                      {
+                        "var": "answer.weeks"
+                      },
+                      {
+                        "var": "tax"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "sum": {
+                    "map": [
+                      {
+                        "var": "input.weeks"
+                      },
+                      {
+                        "var": "tax"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          1
+        ]
+      },
+      "message": "The plan does not pay all the tax in your sheet."
+    },
+    {
+      "id": "every_invoice_handled",
+      "description": "Every invoice is either paid or carried over, nothing disappears",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "+": [
+                    {
+                      "sum": {
+                        "map": [
+                          {
+                            "var": "answer.payments"
+                          },
+                          {
+                            "var": "amount"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "sum": {
+                        "map": [
+                          {
+                            "var": "answer.carried_over"
+                          },
+                          {
+                            "var": "amount"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "sum": {
+                    "map": [
+                      {
+                        "var": "input.invoices"
+                      },
+                      {
+                        "var": "amount"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          1
+        ]
+      },
+      "message": "Some invoices from your sheet are missing from the plan."
+    },
+    {
+      "id": "delays_within_allowed",
+      "description": "No invoice is delayed longer than the plan says the supplier allows",
+      "rule": {
+        "all": [
+          {
+            "var": "answer.payments"
+          },
+          {
+            "<=": [
+              {
+                "var": "deferred_weeks"
+              },
+              {
+                "var": "max_defer_weeks"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "An invoice is paid later than the supplier allows."
+    },
+    {
+      "id": "balance_adds_up",
+      "description": "Your device recomputes the final balance from your sheet and the payments",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "reduce": [
+                    {
+                      "map": [
+                        {
+                          "var": "answer.weeks"
+                        },
+                        {
+                          "var": "closing"
+                        }
+                      ]
+                    },
+                    {
+                      "var": "current"
+                    },
+                    null
+                  ]
+                },
+                {
+                  "-": [
+                    {
+                      "+": [
+                        {
+                          "var": "input.opening_balance"
+                        },
+                        {
+                          "sum": {
+                            "map": [
+                              {
+                                "var": "input.weeks"
+                              },
+                              {
+                                "var": "receipts"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "+": [
+                        {
+                          "sum": {
+                            "map": [
+                              {
+                                "var": "input.weeks"
+                              },
+                              {
+                                "var": "payroll"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "sum": {
+                            "map": [
+                              {
+                                "var": "input.weeks"
+                              },
+                              {
+                                "var": "tax"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "sum": {
+                            "map": [
+                              {
+                                "var": "answer.payments"
+                              },
+                              {
+                                "var": "amount"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          1
+        ]
+      },
+      "message": "The final balance does not follow from your sheet and the payments in the plan."
+    },
+    {
+      "id": "same_number_of_weeks",
+      "description": "The plan covers every week in your sheet",
+      "rule": {
+        "==": [
+          {
+            "count": {
+              "var": "answer.weeks"
+            }
+          },
+          {
+            "count": {
+              "var": "input.weeks"
+            }
+          }
+        ]
+      },
+      "message": "The plan covers a different number of weeks than your sheet."
+    }
+  ],
+  "seller_secrets": [
+    "payment prioritisation and buffer rules"
+  ],
+  "disclosures": [
+    "The plan only orders payments you already owe. It does not negotiate with anyone or move money.",
+    "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

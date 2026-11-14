@@ -1,0 +1,381 @@
+{
+  "manifest_version": 5,
+  "method_id": "token-unlock-sell-plan",
+  "kind": "prompt",
+  "listing": {
+    "title": "Sell unlocked tokens without crashing the price",
+    "outcome": "A day-by-day selling schedule that splits OTC blocks from market sales and keeps each day under your share of volume.",
+    "category": "Token treasury",
+    "seller": {
+      "display_name": "Kenji Arakawa (demo seller)",
+      "role": "Treasury and OTC advisor",
+      "demo": true
+    },
+    "urgency": "The tokens unlock on a fixed date. If the market sees how much you plan to sell, it sells first.",
+    "limits": [
+      "One token per run, up to 60 days",
+      "Volume and price are the numbers you give",
+      "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+    ],
+    "sample_output": "Synthetic example: 2.8M NUSA as OTC blocks over the first 10 days, 4.2M on the market at about 213k per day against a 240k cap, limit price USD 0.485.",
+    "not_advice": true
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "token",
+        "label": "Token",
+        "type": "string",
+        "required": true
+      },
+      {
+        "id": "unlock_date",
+        "label": "Unlock date",
+        "type": "date",
+        "required": true
+      },
+      {
+        "id": "tokens_to_sell",
+        "label": "Tokens to sell",
+        "type": "number",
+        "required": true,
+        "min": 0,
+        "private": true
+      },
+      {
+        "id": "days_window",
+        "label": "Days to sell over",
+        "type": "integer",
+        "required": true,
+        "min": 1,
+        "max": 60,
+        "private": true
+      },
+      {
+        "id": "avg_daily_volume_tokens",
+        "label": "Average daily volume",
+        "type": "number",
+        "unit": "tokens",
+        "required": true,
+        "min": 0
+      },
+      {
+        "id": "max_pct_of_volume",
+        "label": "Most of daily volume to sell",
+        "type": "percent",
+        "required": true,
+        "min": 0,
+        "max": 1,
+        "private": true
+      },
+      {
+        "id": "min_price_usd",
+        "label": "Lowest price you accept",
+        "type": "money",
+        "unit": "USD",
+        "required": true,
+        "private": true
+      },
+      {
+        "id": "current_price_usd",
+        "label": "Current price",
+        "type": "money",
+        "unit": "USD",
+        "required": true
+      }
+    ],
+    "sample": {
+      "fictional": true,
+      "ref": "fixtures/sample-input.json"
+    }
+  },
+  "ai": {
+    "allowed": [
+      "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+    ],
+    "proprietary": false
+  },
+  "steps": [
+    {
+      "id": "ask_model",
+      "what": "Send the sealed method and your data to the private model and check its attestation and signature"
+    },
+    {
+      "id": "leak_check",
+      "what": "Withhold the answer if it repeats the seller's method text"
+    }
+  ],
+  "connectors": [],
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "outputs": {
+    "parse": "json_in_text",
+    "status_field": "plan_status",
+    "unverifiable_status": [
+      "infeasible"
+    ],
+    "fields": [
+      {
+        "id": "plan_status",
+        "label": "Result",
+        "type": "enum",
+        "enum": [
+          "ok",
+          "infeasible"
+        ],
+        "display": "badge"
+      },
+      {
+        "id": "schedule",
+        "label": "Daily schedule",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "market_total",
+        "label": "Sold on the market",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "otc_total",
+        "label": "Sold as OTC blocks",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "expected_avg_price_usd",
+        "label": "Expected average price",
+        "type": "money",
+        "unit": "USD",
+        "display": "money"
+      },
+      {
+        "id": "notes",
+        "label": "Notes",
+        "type": "array",
+        "display": "list"
+      },
+      {
+        "id": "reason",
+        "label": "Why it is not possible",
+        "type": "text",
+        "display": "text"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "total_matches",
+      "description": "Market plus OTC amounts add up to the tokens you want to sell",
+      "when": {
+        "==": [
+          {
+            "var": "answer.plan_status"
+          },
+          "ok"
+        ]
+      },
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "sum": {
+                    "map": [
+                      {
+                        "var": "answer.schedule"
+                      },
+                      {
+                        "+": [
+                          {
+                            "var": "market_amount"
+                          },
+                          {
+                            "var": "otc_amount"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "var": "input.tokens_to_sell"
+                }
+              ]
+            }
+          },
+          1
+        ]
+      },
+      "message": "The schedule does not add up to the tokens you want to sell."
+    },
+    {
+      "id": "daily_market_cap",
+      "description": "No day sells more on the market than your share of daily volume",
+      "when": {
+        "==": [
+          {
+            "var": "answer.plan_status"
+          },
+          "ok"
+        ]
+      },
+      "rule": {
+        "<=": [
+          {
+            "reduce": [
+              {
+                "map": [
+                  {
+                    "var": "answer.schedule"
+                  },
+                  {
+                    "var": "market_amount"
+                  }
+                ]
+              },
+              {
+                "if": [
+                  {
+                    ">": [
+                      {
+                        "var": "current"
+                      },
+                      {
+                        "var": "accumulator"
+                      }
+                    ]
+                  },
+                  {
+                    "var": "current"
+                  },
+                  {
+                    "var": "accumulator"
+                  }
+                ]
+              },
+              -1e+300
+            ]
+          },
+          {
+            "*": [
+              {
+                "var": "input.max_pct_of_volume"
+              },
+              {
+                "var": "input.avg_daily_volume_tokens"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "At least one day sells more on the market than your limit.",
+      "tolerance": 1
+    },
+    {
+      "id": "lowest_price_respected",
+      "description": "No limit price is below your lowest price",
+      "when": {
+        "==": [
+          {
+            "var": "answer.plan_status"
+          },
+          "ok"
+        ]
+      },
+      "rule": {
+        ">=": [
+          {
+            "reduce": [
+              {
+                "map": [
+                  {
+                    "var": "answer.schedule"
+                  },
+                  {
+                    "var": "limit_price_usd"
+                  }
+                ]
+              },
+              {
+                "if": [
+                  {
+                    "<": [
+                      {
+                        "var": "current"
+                      },
+                      {
+                        "var": "accumulator"
+                      }
+                    ]
+                  },
+                  {
+                    "var": "current"
+                  },
+                  {
+                    "var": "accumulator"
+                  }
+                ]
+              },
+              1e+300
+            ]
+          },
+          {
+            "var": "input.min_price_usd"
+          }
+        ]
+      },
+      "message": "At least one day has a limit price below your lowest price."
+    },
+    {
+      "id": "within_window",
+      "description": "The schedule fits in your window",
+      "when": {
+        "==": [
+          {
+            "var": "answer.plan_status"
+          },
+          "ok"
+        ]
+      },
+      "rule": {
+        "<=": [
+          {
+            "count": {
+              "var": "answer.schedule"
+            }
+          },
+          {
+            "var": "input.days_window"
+          }
+        ]
+      },
+      "message": "The schedule is longer than your window."
+    }
+  ],
+  "seller_secrets": [
+    "OTC split, unlock-day and pricing rules (the prompt)"
+  ],
+  "disclosures": [
+    "Not financial advice. The method plans; it never places an order.",
+    "This method is a prompt. The answer comes from an AI model, so the same data can give a different answer. Check the numbers yourself.",
+    "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

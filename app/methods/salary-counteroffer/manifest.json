@@ -1,0 +1,31 @@
+{
+  "manifest_version": 4,
+  "method_id": "salary-counteroffer",
+  "kind": "prompt",
+  "title": "Write a salary counter-offer that protects your walk-away number",
+  "status": "demo, fictional offers only, no outcome claim",
+  "runtime": {
+    "runner": "platform runner, prompt method: the runner sends the sealed seller prompt and your data to one private model",
+    "outlayer_network": ["cloud-api.near.ai"]
+  },
+  "ai": {
+    "allowed": ["deepseek-ai/DeepSeek-V4.1-Flash-1017"],
+    "proprietary": false
+  },
+  "connectors": [],
+  "inputs": { "format": "json", "documents": [] },
+  "outbound": [],
+  "memory": { "read": false, "write": false },
+  "browser": { "enabled": false },
+  "seller_secrets": ["negotiation rules (the prompt)"],
+  "output": { "visible_to": ["buyer"] },
+  "steps": [
+    { "id": "ask_model", "what": "Send the sealed method and your data to the private model and check its attestation and signature" },
+    { "id": "leak_check", "what": "Withhold the answer if it repeats the seller's method text" }
+  ],
+  "disclosures": [
+    "This method is a prompt. The answer comes from an AI model, so the same data can give a different answer.",
+    "The runner cannot prove the model followed every rule. Check the numbers yourself."
+  ],
+  "dao_share_percent": 10
+}

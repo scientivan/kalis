@@ -1,0 +1,67 @@
+{
+  "manifest_version": 4,
+  "method_id": "portfolio-rebalance",
+  "kind": "wasm",
+  "title": "Rebalance a portfolio at minimum transaction cost under allocation and cash limits",
+  "status": "draft, synthetic data only, no profit claim",
+  "runtime": {
+    "runner": "platform runner v0.5, seller code runs in wasmi sandbox with no imports",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ],
+    "method_network": "none: this method lists no AI model, so the runner gives it no ai_chat import"
+  },
+  "ai": {
+    "allowed": []
+  },
+  "connectors": [
+    {
+      "id": "broker_mock",
+      "operations": [
+        "read_positions"
+      ],
+      "what": "Read your positions from a broker connection you control. Labelled mock, no real broker."
+    }
+  ],
+  "inputs": {
+    "format": "json",
+    "documents": []
+  },
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "seller_secrets": [],
+  "output": {
+    "visible_to": [
+      "buyer"
+    ]
+  },
+  "steps": [
+    {
+      "id": "read_portfolio",
+      "what": "Read the portfolio and the limits"
+    },
+    {
+      "id": "check_inputs",
+      "what": "Check that the inputs are consistent"
+    },
+    {
+      "id": "search_trades",
+      "what": "Try every allowed trade combination"
+    },
+    {
+      "id": "pick_cheapest",
+      "what": "Keep the cheapest combination that meets every limit"
+    },
+    {
+      "id": "self_check",
+      "what": "Re-check the chosen trades against every limit"
+    }
+  ],
+  "dao_share_percent": 10
+}

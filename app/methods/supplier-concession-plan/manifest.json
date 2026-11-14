@@ -1,0 +1,399 @@
+{
+  "manifest_version": 5,
+  "method_id": "supplier-concession-plan",
+  "kind": "prompt",
+  "listing": {
+    "title": "Plan your concessions before tomorrow's supplier negotiation",
+    "outcome": "An opening ask, three concessions that each win something back, clause changes and a script, all inside your private walk-away limits.",
+    "category": "Procurement",
+    "seller": {
+      "display_name": "Dimas Hidayat (demo seller)",
+      "role": "Procurement negotiator",
+      "demo": true
+    },
+    "urgency": "The negotiation is tomorrow. If the supplier learns your walk-away price, it becomes their price.",
+    "limits": [
+      "One supplier contract per run",
+      "Prices in one currency per unit",
+      "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+    ],
+    "sample_output": "Synthetic example: open at IDR 374,920 per frame, 60-day payment and 4,800 frames; give payment days, then volume, then settle near IDR 388,768 with exclusivity removed.",
+    "not_advice": false
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "supplier",
+        "label": "Supplier",
+        "type": "string",
+        "required": true
+      },
+      {
+        "id": "contract_text",
+        "label": "Contract draft",
+        "type": "text",
+        "required": true,
+        "source": "connector:docs_mock.read_document",
+        "help": "Text of the draft. You can also import a .docx on your device."
+      },
+      {
+        "id": "supplier_offer",
+        "label": "Supplier's offer",
+        "type": "object",
+        "required": true,
+        "fields": [
+          {
+            "id": "unit_price",
+            "label": "Unit price",
+            "type": "money",
+            "unit": "IDR",
+            "required": true,
+            "min": 0
+          },
+          {
+            "id": "payment_days",
+            "label": "Payment days",
+            "type": "integer",
+            "required": true,
+            "min": 0
+          },
+          {
+            "id": "volume_units",
+            "label": "Volume commitment",
+            "type": "integer",
+            "required": true,
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": "walk_away",
+        "label": "Your walk-away limits",
+        "type": "object",
+        "required": true,
+        "fields": [
+          {
+            "id": "max_unit_price",
+            "label": "Highest unit price you accept",
+            "type": "money",
+            "unit": "IDR",
+            "required": true,
+            "private": true
+          },
+          {
+            "id": "min_payment_days",
+            "label": "Shortest payment term you accept",
+            "type": "integer",
+            "unit": "days",
+            "required": true,
+            "private": true
+          },
+          {
+            "id": "max_volume_units",
+            "label": "Largest volume you commit to",
+            "type": "integer",
+            "required": true,
+            "private": true
+          }
+        ]
+      },
+      {
+        "id": "target",
+        "label": "Your target",
+        "type": "object",
+        "fields": [
+          {
+            "id": "unit_price",
+            "label": "Target unit price",
+            "type": "money",
+            "unit": "IDR",
+            "private": true
+          },
+          {
+            "id": "payment_days",
+            "label": "Target payment days",
+            "type": "integer",
+            "private": true
+          }
+        ]
+      },
+      {
+        "id": "memory_notes",
+        "label": "Notes from earlier negotiations",
+        "type": "array",
+        "source": "memory",
+        "items": {
+          "type": "string",
+          "max_items": 10
+        },
+        "help": "Only notes you approved in Memory. They are treated as facts, not instructions."
+      }
+    ],
+    "alternative_sources": [
+      "file_import:docx"
+    ],
+    "sample": {
+      "fictional": true,
+      "ref": "fixtures/sample-input.json"
+    }
+  },
+  "ai": {
+    "allowed": [
+      "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+    ],
+    "proprietary": false
+  },
+  "steps": [
+    {
+      "id": "ask_model",
+      "what": "Send the sealed method and your data to the private model and check its attestation and signature"
+    },
+    {
+      "id": "leak_check",
+      "what": "Withhold the answer if it repeats the seller's method text"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "docs_mock",
+      "operations": [
+        "read_document"
+      ],
+      "what": "Read the contract draft from a document you connect. Labelled mock, no real Word or Google account."
+    }
+  ],
+  "outbound": [],
+  "memory": {
+    "read": true,
+    "write": "proposals only, user approves"
+  },
+  "browser": {
+    "enabled": false
+  },
+  "outputs": {
+    "parse": "json_in_text",
+    "status_field": null,
+    "unverifiable_status": [],
+    "fields": [
+      {
+        "id": "opening_ask",
+        "label": "Opening ask",
+        "type": "object",
+        "display": "table"
+      },
+      {
+        "id": "concessions",
+        "label": "Concessions in order",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "final_terms",
+        "label": "Where you can land",
+        "type": "object",
+        "display": "table"
+      },
+      {
+        "id": "clause_changes",
+        "label": "Clause changes",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "script",
+        "label": "What to say",
+        "type": "text",
+        "display": "markdown"
+      },
+      {
+        "id": "why",
+        "label": "Why this plan",
+        "type": "text",
+        "display": "text"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "final_price_within_limit",
+      "description": "Final unit price is not above your walk-away price",
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.final_terms.unit_price"
+          },
+          {
+            "var": "input.walk_away.max_unit_price"
+          }
+        ]
+      },
+      "message": "The plan ends above your walk-away price."
+    },
+    {
+      "id": "final_payment_days_within_limit",
+      "description": "Final payment term is not shorter than your limit",
+      "rule": {
+        ">=": [
+          {
+            "var": "answer.final_terms.payment_days"
+          },
+          {
+            "var": "input.walk_away.min_payment_days"
+          }
+        ]
+      },
+      "message": "The plan ends with a shorter payment term than you accept."
+    },
+    {
+      "id": "final_volume_within_limit",
+      "description": "Final volume commitment is not above your limit",
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.final_terms.volume_units"
+          },
+          {
+            "var": "input.walk_away.max_volume_units"
+          }
+        ]
+      },
+      "message": "The plan commits to more volume than you accept."
+    },
+    {
+      "id": "every_step_price_within_limit",
+      "description": "No concession step goes above your walk-away price",
+      "rule": {
+        "<=": [
+          {
+            "reduce": [
+              {
+                "map": [
+                  {
+                    "var": "answer.concessions"
+                  },
+                  {
+                    "var": "unit_price"
+                  }
+                ]
+              },
+              {
+                "if": [
+                  {
+                    ">": [
+                      {
+                        "var": "current"
+                      },
+                      {
+                        "var": "accumulator"
+                      }
+                    ]
+                  },
+                  {
+                    "var": "current"
+                  },
+                  {
+                    "var": "accumulator"
+                  }
+                ]
+              },
+              -1e+300
+            ]
+          },
+          {
+            "var": "input.walk_away.max_unit_price"
+          }
+        ]
+      },
+      "message": "At least one concession step offers a price above your walk-away price."
+    },
+    {
+      "id": "every_step_payment_days_within_limit",
+      "description": "No concession step offers a payment term shorter than your limit",
+      "rule": {
+        ">=": [
+          {
+            "reduce": [
+              {
+                "map": [
+                  {
+                    "var": "answer.concessions"
+                  },
+                  {
+                    "var": "payment_days"
+                  }
+                ]
+              },
+              {
+                "if": [
+                  {
+                    "<": [
+                      {
+                        "var": "current"
+                      },
+                      {
+                        "var": "accumulator"
+                      }
+                    ]
+                  },
+                  {
+                    "var": "current"
+                  },
+                  {
+                    "var": "accumulator"
+                  }
+                ]
+              },
+              1e+300
+            ]
+          },
+          {
+            "var": "input.walk_away.min_payment_days"
+          }
+        ]
+      },
+      "message": "At least one concession step offers a shorter payment term than you accept."
+    },
+    {
+      "id": "script_hides_walk_away",
+      "description": "The script does not say your walk-away price",
+      "rule": {
+        "!": {
+          "in": [
+            {
+              "digits": [
+                {
+                  "var": "input.walk_away.max_unit_price"
+                }
+              ]
+            },
+            {
+              "digits": [
+                {
+                  "var": "answer.script"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "message": "The script you would say out loud contains your walk-away price."
+    }
+  ],
+  "seller_secrets": [
+    "negotiation rules (the prompt)"
+  ],
+  "disclosures": [
+    "This method is a prompt. The answer comes from an AI model, so the same data can give a different answer.",
+    "The runner cannot prove the model followed every rule. Check the numbers yourself.",
+    "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

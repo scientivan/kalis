@@ -1,0 +1,24 @@
+[package]
+name = "guest_spike"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+evil = []
+# Test build that skips its declared self_check step.
+lazy = []
+# Contribution v2: skip combinations that cannot beat the best cost found so far.
+pruning = []
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+panic = "abort"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

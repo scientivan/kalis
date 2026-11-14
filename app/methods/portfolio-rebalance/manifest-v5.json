@@ -1,0 +1,890 @@
+{
+  "manifest_version": 5,
+  "method_id": "portfolio-rebalance",
+  "kind": "wasm",
+  "listing": {
+    "title": "Rebalance a portfolio at minimum transaction cost under allocation and cash limits",
+    "outcome": "The cheapest set of whole-unit trades that keeps every asset inside your target range, your sector cap and your cash minimum.",
+    "category": "Personal investing",
+    "seller": {
+      "display_name": "Arif Santoso (demo seller)",
+      "role": "Investment planner",
+      "demo": true
+    },
+    "urgency": "Rebalance before the market opens, without showing anyone the positions that others could trade against.",
+    "limits": [
+      "Up to a few assets with whole units",
+      "Synthetic data only",
+      "No trades are placed"
+    ],
+    "sample_output": "Synthetic example: sell 3 A, buy 2 C, cost 0.18, cash after 8.82.",
+    "not_advice": true
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "holdings",
+        "label": "Units you hold per asset",
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "min_items": 1,
+        "required": true,
+        "private": true,
+        "source": "connector:broker_mock.read_positions"
+      },
+      {
+        "id": "prices",
+        "label": "Price per unit",
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "required": true,
+        "private": false,
+        "source": "connector:broker_mock.read_positions"
+      },
+      {
+        "id": "cash",
+        "label": "Cash available",
+        "type": "money",
+        "unit": "USD",
+        "required": true,
+        "private": true,
+        "min": 0
+      },
+      {
+        "id": "reserve",
+        "label": "Cash you must keep",
+        "type": "money",
+        "unit": "USD",
+        "required": true,
+        "private": true,
+        "min": 0
+      },
+      {
+        "id": "fee_rates",
+        "label": "Fee rate per asset",
+        "type": "array",
+        "items": {
+          "type": "percent"
+        },
+        "required": true,
+        "private": false
+      },
+      {
+        "id": "fixed_fees",
+        "label": "Fixed fee per trade",
+        "type": "array",
+        "items": {
+          "type": "money"
+        },
+        "required": true,
+        "private": false
+      },
+      {
+        "id": "lower",
+        "label": "Lowest share per asset",
+        "type": "array",
+        "items": {
+          "type": "percent"
+        },
+        "required": true,
+        "private": true
+      },
+      {
+        "id": "upper",
+        "label": "Highest share per asset",
+        "type": "array",
+        "items": {
+          "type": "percent"
+        },
+        "required": true,
+        "private": true
+      },
+      {
+        "id": "sector_cap",
+        "label": "Cap for assets A and B together",
+        "type": "percent",
+        "required": true,
+        "private": true,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "id": "buy_limit",
+        "label": "Most units you buy of one asset",
+        "type": "integer",
+        "required": true,
+        "private": false,
+        "min": 0
+      },
+      {
+        "id": "allow_sell",
+        "label": "Allow selling",
+        "type": "boolean",
+        "required": true,
+        "private": false
+      }
+    ],
+    "sample": {
+      "_label": "fictional",
+      "holdings": [
+        7,
+        1,
+        1
+      ],
+      "prices": [
+        2,
+        3,
+        1
+      ],
+      "cash": 5,
+      "reserve": 3,
+      "fee_rates": [
+        0.01,
+        0.015,
+        0.02
+      ],
+      "fixed_fees": [
+        0.05,
+        0.08,
+        0.03
+      ],
+      "lower": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "upper": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "sector_cap": 0.65,
+      "buy_limit": 5,
+      "allow_sell": true
+    }
+  },
+  "ai": {
+    "allowed": []
+  },
+  "steps": [
+    {
+      "id": "read_portfolio",
+      "what": "Read the portfolio and the limits"
+    },
+    {
+      "id": "check_inputs",
+      "what": "Check that the inputs are consistent"
+    },
+    {
+      "id": "search_trades",
+      "what": "Try every allowed trade combination"
+    },
+    {
+      "id": "pick_cheapest",
+      "what": "Keep the cheapest combination that meets every limit"
+    },
+    {
+      "id": "self_check",
+      "what": "Re-check the chosen trades against every limit"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "broker_mock",
+      "operations": [
+        "read_positions"
+      ],
+      "what": "Read your positions from a broker connection you control. Labelled mock, no real broker."
+    }
+  ],
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "outputs": {
+    "status_field": "status",
+    "unverifiable_status": [
+      "infeasible"
+    ],
+    "fields": [
+      {
+        "id": "status",
+        "label": "Result",
+        "type": "enum",
+        "enum": [
+          "feasible",
+          "infeasible"
+        ],
+        "display": "badge"
+      },
+      {
+        "id": "delta",
+        "label": "Units to buy (+) or sell (-) per asset",
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "display": "list"
+      },
+      {
+        "id": "cost",
+        "label": "Transaction cost",
+        "type": "money",
+        "unit": "USD",
+        "display": "money"
+      }
+    ]
+  },
+  "derived": {
+    "cost": {
+      "sum": [
+        {
+          "map": [
+            {
+              "range": [
+                {
+                  "count": [
+                    {
+                      "var": "input.holdings"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "+": [
+                {
+                  "*": [
+                    {
+                      "abs": [
+                        {
+                          "get": [
+                            {
+                              "var": "answer.delta"
+                            },
+                            {
+                              "var": ""
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "get": [
+                        {
+                          "var": "input.prices"
+                        },
+                        {
+                          "var": ""
+                        }
+                      ]
+                    },
+                    {
+                      "get": [
+                        {
+                          "var": "input.fee_rates"
+                        },
+                        {
+                          "var": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "if": [
+                    {
+                      "!=": [
+                        {
+                          "get": [
+                            {
+                              "var": "answer.delta"
+                            },
+                            {
+                              "var": ""
+                            }
+                          ]
+                        },
+                        0
+                      ]
+                    },
+                    {
+                      "get": [
+                        {
+                          "var": "input.fixed_fees"
+                        },
+                        {
+                          "var": ""
+                        }
+                      ]
+                    },
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "cash": {
+      "-": [
+        {
+          "-": [
+            {
+              "var": "input.cash"
+            },
+            {
+              "zip_dot": [
+                {
+                  "var": "answer.delta"
+                },
+                {
+                  "var": "input.prices"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "var": "derived.cost"
+        }
+      ]
+    },
+    "values": {
+      "map": [
+        {
+          "range": [
+            {
+              "count": [
+                {
+                  "var": "input.holdings"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "*": [
+            {
+              "+": [
+                {
+                  "get": [
+                    {
+                      "var": "input.holdings"
+                    },
+                    {
+                      "var": ""
+                    }
+                  ]
+                },
+                {
+                  "get": [
+                    {
+                      "var": "answer.delta"
+                    },
+                    {
+                      "var": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "get": [
+                {
+                  "var": "input.prices"
+                },
+                {
+                  "var": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "nav": {
+      "+": [
+        {
+          "sum": [
+            {
+              "var": "derived.values"
+            }
+          ]
+        },
+        {
+          "var": "derived.cash"
+        }
+      ]
+    },
+    "shares": {
+      "map": [
+        {
+          "var": "derived.values"
+        },
+        {
+          "/": [
+            {
+              "var": ""
+            },
+            {
+              "var": "derived.nav"
+            }
+          ]
+        }
+      ]
+    },
+    "sector_share": {
+      "/": [
+        {
+          "+": [
+            {
+              "get": [
+                {
+                  "var": "derived.values"
+                },
+                0
+              ]
+            },
+            {
+              "get": [
+                {
+                  "var": "derived.values"
+                },
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "var": "derived.nav"
+        }
+      ]
+    }
+  },
+  "buyer_checks": [
+    {
+      "id": "status",
+      "description": "The method returned a usable result",
+      "rule": {
+        "in": [
+          {
+            "var": [
+              "answer.status",
+              ""
+            ]
+          },
+          [
+            "feasible",
+            "infeasible"
+          ]
+        ]
+      },
+      "pass_message": "The method returned a usable result.",
+      "message": "The method did not return a usable answer."
+    },
+    {
+      "id": "shape",
+      "description": "One whole-unit trade per asset",
+      "when": {
+        "==": [
+          {
+            "var": [
+              "answer.status",
+              ""
+            ]
+          },
+          "feasible"
+        ]
+      },
+      "rule": {
+        "and": [
+          {
+            "==": [
+              {
+                "count": [
+                  {
+                    "var": "answer.delta"
+                  }
+                ]
+              },
+              {
+                "count": [
+                  {
+                    "var": "input.holdings"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "all": [
+              {
+                "var": "answer.delta"
+              },
+              {
+                "is_int": [
+                  {
+                    "var": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "pass_message": "The answer lists one whole-unit trade per asset.",
+      "message": "The answer does not list one whole-unit trade per asset."
+    },
+    {
+      "id": "no_short",
+      "description": "Never sells more than you hold",
+      "when": {
+        "==": [
+          {
+            "var": [
+              "answer.status",
+              ""
+            ]
+          },
+          "feasible"
+        ]
+      },
+      "rule": {
+        "all": [
+          {
+            "range": [
+              {
+                "count": [
+                  {
+                    "var": "input.holdings"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            ">=": [
+              {
+                "get": [
+                  {
+                    "var": "answer.delta"
+                  },
+                  {
+                    "var": ""
+                  }
+                ]
+              },
+              {
+                "-": [
+                  {
+                    "get": [
+                      {
+                        "var": "input.holdings"
+                      },
+                      {
+                        "var": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "pass_message": "No asset sells more units than you hold.",
+      "message": "An asset would sell more units than you hold."
+    },
+    {
+      "id": "buy_limit",
+      "description": "Buys stay within your per-asset limit",
+      "when": {
+        "==": [
+          {
+            "var": [
+              "answer.status",
+              ""
+            ]
+          },
+          "feasible"
+        ]
+      },
+      "rule": {
+        "all": [
+          {
+            "range": [
+              {
+                "count": [
+                  {
+                    "var": "input.holdings"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "<=": [
+              {
+                "get": [
+                  {
+                    "var": "answer.delta"
+                  },
+                  {
+                    "var": ""
+                  }
+                ]
+              },
+              {
+                "var": "input.buy_limit"
+              }
+            ]
+          }
+        ]
+      },
+      "pass_message": "Every buy is within your limit of {{input.buy_limit}} units.",
+      "message": "An asset would buy more than your limit of {{input.buy_limit}} units."
+    },
+    {
+      "id": "no_sell",
+      "description": "Sells only if you allowed selling",
+      "when": {
+        "==": [
+          {
+            "var": [
+              "answer.status",
+              ""
+            ]
+          },
+          "feasible"
+        ]
+      },
+      "rule": {
+        "or": [
+          {
+            "var": "input.allow_sell"
+          },
+          {
+            "all": [
+              {
+                "var": "answer.delta"
+              },
+              {
+                ">=": [
+                  {
+                    "var": ""
+                  },
+                  0
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "pass_message": "Selling matches your choice.",
+      "message": "An asset would be sold, but you did not allow selling."
+    },
+    {
+      "id": "cash_minimum",
+      "description": "Cash after the trades stays at or above your minimum",
+      "when": {
+        "==": [
+          {
+            "var": [
+              "answer.status",
+              ""
+            ]
+          },
+          "feasible"
+        ]
+      },
+      "tolerance": 1e-06,
+      "rule": {
+        ">=": [
+          {
+            "var": "derived.cash"
+          },
+          {
+            "var": "input.reserve"
+          }
+        ]
+      },
+      "pass_message": "Cash after the trades is {{derived.cash:2}}, at or above your minimum of {{input.reserve:2}}.",
+      "message": "Cash after the trades would be {{derived.cash:2}}, below your minimum of {{input.reserve:2}}."
+    },
+    {
+      "id": "shares",
+      "description": "Every asset ends inside your range",
+      "when": {
+        "==": [
+          {
+            "var": [
+              "answer.status",
+              ""
+            ]
+          },
+          "feasible"
+        ]
+      },
+      "tolerance": 1e-06,
+      "rule": {
+        "all": [
+          {
+            "range": [
+              {
+                "count": [
+                  {
+                    "var": "input.holdings"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "and": [
+              {
+                ">=": [
+                  {
+                    "get": [
+                      {
+                        "var": "derived.shares"
+                      },
+                      {
+                        "var": ""
+                      }
+                    ]
+                  },
+                  {
+                    "get": [
+                      {
+                        "var": "input.lower"
+                      },
+                      {
+                        "var": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "<=": [
+                  {
+                    "get": [
+                      {
+                        "var": "derived.shares"
+                      },
+                      {
+                        "var": ""
+                      }
+                    ]
+                  },
+                  {
+                    "get": [
+                      {
+                        "var": "input.upper"
+                      },
+                      {
+                        "var": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "pass_message": "Every asset ends inside your range.",
+      "message": "At least one asset would end outside your range."
+    },
+    {
+      "id": "sector_cap",
+      "description": "Assets A and B together stay within your cap",
+      "when": {
+        "==": [
+          {
+            "var": [
+              "answer.status",
+              ""
+            ]
+          },
+          "feasible"
+        ]
+      },
+      "tolerance": 1e-06,
+      "rule": {
+        "<=": [
+          {
+            "var": "derived.sector_share"
+          },
+          {
+            "var": "input.sector_cap"
+          }
+        ]
+      },
+      "pass_message": "Assets A and B together end at {{derived.sector_share:pct}}, within your cap.",
+      "message": "Assets A and B together would end at {{derived.sector_share:pct}}, above your {{input.sector_cap:pct}} cap."
+    },
+    {
+      "id": "cost_matches",
+      "description": "The stated cost matches your device's calculation",
+      "when": {
+        "==": [
+          {
+            "var": [
+              "answer.status",
+              ""
+            ]
+          },
+          "feasible"
+        ]
+      },
+      "rule": {
+        "<": [
+          {
+            "abs": [
+              {
+                "-": [
+                  {
+                    "var": "derived.cost"
+                  },
+                  {
+                    "var": "answer.cost"
+                  }
+                ]
+              }
+            ]
+          },
+          1e-06
+        ]
+      },
+      "pass_message": "The stated cost of {{answer.cost:2}} matches your device's calculation.",
+      "message": "The method says the cost is {{answer.cost:2}}, but your device calculates {{derived.cost:2}}."
+    }
+  ],
+  "seller_secrets": [],
+  "disclosures": [
+    "Recheck covers limits and cost only. It cannot prove the answer is the cheapest.",
+    "A result of infeasible cannot be checked on your device.",
+    "Not financial advice. Synthetic data only."
+  ],
+  "runtime": {
+    "runner": "platform runner v0.5, seller code runs in wasmi sandbox with no imports",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ],
+    "method_network": "none: this method lists no AI model, so the runner gives it no ai_chat import"
+  },
+  "dao_share_percent": 10
+}

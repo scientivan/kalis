@@ -1,0 +1,31 @@
+{
+  "company": "Nusa Data Labs (fictional startup)",
+  "cap_table": [
+    {
+      "holder": "Founder A (fictional)",
+      "class": "common",
+      "shares": 4200000,
+      "founder": true
+    },
+    {
+      "holder": "Founder B (fictional)",
+      "class": "common",
+      "shares": 3000000,
+      "founder": true
+    },
+    {
+      "holder": "Angel round (fictional)",
+      "class": "preferred",
+      "shares": 1300000,
+      "founder": false
+    },
+    {
+      "holder": "Employee option pool",
+      "class": "options",
+      "shares": 500000,
+      "founder": false
+    }
+  ],
+  "term_sheet_text": "TERM SHEET (FICTIONAL DEMO DOCUMENT, NOT AN OFFER)\nIssuer: Nusa Data Labs. Lead investor: Garuda Seed Partners.\nInvestment: USD 2,000,000 for Series A preferred shares.\nPre-money valuation: USD 8,000,000, fully diluted, including an option pool equal to 12% of the post-money capitalisation (the pool increase comes out of the pre-money).\nLiquidation preference: 1x, non-participating.\nBoard: 2 founder seats, 1 investor seat.\nAnti-dilution: broad-based weighted average.\nPro rata rights for the investor in the next round.\nThis term sheet expires 72 hours after it is sent.",
+  "founders_floor_pct": 0.6
+}

@@ -1,0 +1,17 @@
+[package]
+name = "net-probe"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde_json = "1.0.154"
+wstd = "0.6.5"
+
+[features]
+# With this feature the program carries the OutLayer manifest that allows no hosts.
+no-network = []
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true

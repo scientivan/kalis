@@ -1,0 +1,14 @@
+{
+  "title": "Answers match an exhaustive oracle on 12 synthetic cases",
+  "dataset": { "kind": "synthetic", "reference": "validation/portfolio-method-02/cases.json", "cases": 12, "note": "Cases and oracle were written by the same team as the method. Not market data and not an independent audit." },
+  "protocol": "Run the method on every case and compare status and minimum cost with the enumeration oracle in validation/portfolio-method-02/benchmark.py. Reproduce with app/kalis-runner/client/local-test.mjs.",
+  "metrics": { "cases_matching_oracle": "12/12", "feasible_cases": 9, "infeasible_cases_recognised": 3, "cost_difference_to_oracle": 0 },
+  "tested_at": "2026-11-14",
+  "method_code_hash": "646d4690642480d1b3e77748af4980927e34e1d4e56feb3fb6bff428af5003f8",
+  "verifier": { "who": "Kalis team (same as the demo seller)", "independent": false },
+  "limits": [
+    "Small synthetic cases with three assets.",
+    "A plain AI prompt also solved these 12 cases (RANCANGAN section 42), so this shows correctness, not an advantage over AI.",
+    "No profit claim."
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "opening_balance": 420000000,
+  "reserve": 75000000,
+  "weeks": [
+    {
+      "week": 1,
+      "receipts": 90000000,
+      "payroll": 0,
+      "tax": 0
+    },
+    {
+      "week": 2,
+      "receipts": 120000000,
+      "payroll": 138000000,
+      "tax": 0
+    },
+    {
+      "week": 3,
+      "receipts": 70000000,
+      "payroll": 0,
+      "tax": 0
+    },
+    {
+      "week": 4,
+      "receipts": 170000000,
+      "payroll": 138000000,
+      "tax": 35000000
+    },
+    {
+      "week": 5,
+      "receipts": 100000000,
+      "payroll": 0,
+      "tax": 0
+    },
+    {
+      "week": 6,
+      "receipts": 140000000,
+      "payroll": 138000000,
+      "tax": 0
+    },
+    {
+      "week": 7,
+      "receipts": 50000000,
+      "payroll": 0,
+      "tax": 0
+    },
+    {
+      "week": 8,
+      "receipts": 210000000,
+      "payroll": 138000000,
+      "tax": 35000000
+    },
+    {
+      "week": 9,
+      "receipts": 120000000,
+      "payroll": 0,
+      "tax": 0
+    },
+    {
+      "week": 10,
+      "receipts": 90000000,
+      "payroll": 138000000,
+      "tax": 0
+    },
+    {
+      "week": 11,
+      "receipts": 160000000,
+      "payroll": 0,
+      "tax": 0
+    },
+    {
+      "week": 12,
+      "receipts": 110000000,
+      "payroll": 138000000,
+      "tax": 0
+    },
+    {
+      "week": 13,
+      "receipts": 130000000,
+      "payroll": 0,
+      "tax": 40000000
+    }
+  ],
+  "invoices": [
+    {
+      "supplier": "PT Gula Prima (fictional)",
+      "amount": 160000000,
+      "due_week": 1,
+      "critical": true,
+      "max_defer_weeks": 0
+    },
+    {
+      "supplier": "CV Kemasan Jaya (fictional)",
+      "amount": 95000000,
+      "due_week": 2,
+      "critical": false,
+      "max_defer_weeks": 3
+    },
+    {
+      "supplier": "PT Logistik Nusantara (fictional)",
+      "amount": 48000000,
+      "due_week": 3,
+      "critical": true,
+      "max_defer_weeks": 0
+    },
+    {
+      "supplier": "PT Minyak Sehat (fictional)",
+      "amount": 130000000,
+      "due_week": 5,
+      "critical": false,
+      "max_defer_weeks": 2
+    },
+    {
+      "supplier": "CV Rempah Asli (fictional)",
+      "amount": 40000000,
+      "due_week": 6,
+      "critical": false,
+      "max_defer_weeks": 4
+    },
+    {
+      "supplier": "PT Gula Prima (fictional)",
+      "amount": 160000000,
+      "due_week": 7,
+      "critical": true,
+      "max_defer_weeks": 0
+    },
+    {
+      "supplier": "Warehouse rent (fictional)",
+      "amount": 55000000,
+      "due_week": 9,
+      "critical": true,
+      "max_defer_weeks": 0
+    },
+    {
+      "supplier": "CV Kemasan Jaya (fictional)",
+      "amount": 95000000,
+      "due_week": 10,
+      "critical": false,
+      "max_defer_weeks": 3
+    },
+    {
+      "supplier": "PT Minyak Sehat (fictional)",
+      "amount": 130000000,
+      "due_week": 11,
+      "critical": false,
+      "max_defer_weeks": 2
+    }
+  ]
+}

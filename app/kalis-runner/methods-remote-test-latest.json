@@ -1,0 +1,100 @@
+{
+  "at": "2026-11-14T05:57:52.505Z",
+  "runner": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+  "out": [
+    {
+      "id": "defi-liquidation-guard",
+      "call_id": "5e2ed072-7033-44b2-9ac5-f11f0ea83374",
+      "time_ms": 5080,
+      "all_ok": true,
+      "completion_signed": true,
+      "executed_build_ok": true,
+      "plaintext_seen": [
+        "stable_available"
+      ],
+      "checks": {
+        "pass": 5,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 0
+      },
+      "ai_signed": []
+    },
+    {
+      "id": "cash-runway-13w",
+      "call_id": "27be929e-206c-4c63-a6ef-56415c3a5207",
+      "time_ms": 6016,
+      "all_ok": true,
+      "completion_signed": true,
+      "executed_build_ok": true,
+      "plaintext_seen": [],
+      "checks": {
+        "pass": 7,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 0
+      },
+      "ai_signed": []
+    },
+    {
+      "id": "supplier-concession-plan",
+      "call_id": "779b610d-fcd0-4185-bcf2-5b0bf080f65d",
+      "time_ms": 64685,
+      "all_ok": true,
+      "completion_signed": true,
+      "executed_build_ok": true,
+      "plaintext_seen": [
+        "walk_away"
+      ],
+      "checks": {
+        "pass": 6,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 0
+      },
+      "ai_signed": [
+        true
+      ]
+    },
+    {
+      "id": "token-unlock-sell-plan",
+      "call_id": "e1262cfa-b134-47be-a673-afe828818f3b",
+      "time_ms": 45252,
+      "all_ok": true,
+      "completion_signed": true,
+      "executed_build_ok": true,
+      "plaintext_seen": [
+        "tokens_to_sell"
+      ],
+      "checks": {
+        "pass": 4,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 0
+      },
+      "ai_signed": [
+        true
+      ]
+    },
+    {
+      "id": "term-sheet-dilution",
+      "call_id": "c4057c30-2104-424d-b294-36fa73cd163e",
+      "time_ms": 54904,
+      "all_ok": true,
+      "completion_signed": true,
+      "executed_build_ok": true,
+      "plaintext_seen": [
+        "founders_floor_pct"
+      ],
+      "checks": {
+        "pass": 7,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 0
+      },
+      "ai_signed": [
+        true
+      ]
+    }
+  ]
+}

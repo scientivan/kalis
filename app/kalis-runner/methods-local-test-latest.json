@@ -1,0 +1,657 @@
+{
+  "at": "2026-11-14T05:44:01.272Z",
+  "pass": 20,
+  "fail": 0,
+  "results": {
+    "defi-liquidation-guard": {
+      "kind": "wasm",
+      "all_ok": true,
+      "checks": [
+        {
+          "id": "health_factor_reaches_target",
+          "status": "pass"
+        },
+        {
+          "id": "repay_within_wallet",
+          "status": "pass"
+        },
+        {
+          "id": "collateral_within_wallet",
+          "status": "pass"
+        },
+        {
+          "id": "health_factor_before_recomputed",
+          "status": "pass"
+        },
+        {
+          "id": "health_factor_after_recomputed",
+          "status": "pass"
+        }
+      ],
+      "answer": {
+        "actions": [
+          {
+            "amount": 3200,
+            "asset": "USDC",
+            "type": "repay"
+          },
+          {
+            "amount": 0.8,
+            "asset": "ETH",
+            "type": "add_collateral"
+          }
+        ],
+        "debt_after": 23300,
+        "health_factor_after": 1.7003,
+        "health_factor_before": 1.4352,
+        "repay_amount": 3200,
+        "status": "ok",
+        "stressed_health_factor_after": 1.3603,
+        "target_used": 1.7,
+        "topup_amount": 0.8
+      },
+      "infeasible": {
+        "status": "infeasible",
+        "reason": "Even with 400 USDC repaid and all 0.1 ETH added, the health factor only reaches 1.4648.",
+        "checks": "4 pass, 0 fail, 0 cannot check, 1 n/a"
+      }
+    },
+    "cash-runway-13w": {
+      "kind": "wasm",
+      "all_ok": true,
+      "checks": [
+        {
+          "id": "reserve_every_week",
+          "status": "pass"
+        },
+        {
+          "id": "payroll_paid",
+          "status": "pass"
+        },
+        {
+          "id": "tax_paid",
+          "status": "pass"
+        },
+        {
+          "id": "every_invoice_handled",
+          "status": "pass"
+        },
+        {
+          "id": "delays_within_allowed",
+          "status": "pass"
+        },
+        {
+          "id": "balance_adds_up",
+          "status": "pass"
+        },
+        {
+          "id": "same_number_of_weeks",
+          "status": "pass"
+        }
+      ],
+      "answer": {
+        "carried_over": [],
+        "min_closing": 78000000,
+        "payments": [
+          {
+            "amount": 160000000,
+            "critical": true,
+            "deferred_weeks": 0,
+            "due_week": 1,
+            "max_defer_weeks": 0,
+            "paid_week": 1,
+            "supplier": "PT Gula Prima (fictional)"
+          },
+          {
+            "amount": 95000000,
+            "critical": false,
+            "deferred_weeks": 0,
+            "due_week": 2,
+            "max_defer_weeks": 3,
+            "paid_week": 2,
+            "supplier": "CV Kemasan Jaya (fictional)"
+          },
+          {
+            "amount": 48000000,
+            "critical": true,
+            "deferred_weeks": 0,
+            "due_week": 3,
+            "max_defer_weeks": 0,
+            "paid_week": 3,
+            "supplier": "PT Logistik Nusantara (fictional)"
+          },
+          {
+            "amount": 130000000,
+            "critical": false,
+            "deferred_weeks": 0,
+            "due_week": 5,
+            "max_defer_weeks": 2,
+            "paid_week": 5,
+            "supplier": "PT Minyak Sehat (fictional)"
+          },
+          {
+            "amount": 40000000,
+            "critical": false,
+            "deferred_weeks": 0,
+            "due_week": 6,
+            "max_defer_weeks": 4,
+            "paid_week": 6,
+            "supplier": "CV Rempah Asli (fictional)"
+          },
+          {
+            "amount": 160000000,
+            "critical": true,
+            "deferred_weeks": 0,
+            "due_week": 7,
+            "max_defer_weeks": 0,
+            "paid_week": 7,
+            "supplier": "PT Gula Prima (fictional)"
+          },
+          {
+            "amount": 55000000,
+            "critical": true,
+            "deferred_weeks": 0,
+            "due_week": 9,
+            "max_defer_weeks": 0,
+            "paid_week": 9,
+            "supplier": "Warehouse rent (fictional)"
+          },
+          {
+            "amount": 95000000,
+            "critical": false,
+            "deferred_weeks": 1,
+            "due_week": 10,
+            "max_defer_weeks": 3,
+            "paid_week": 11,
+            "supplier": "CV Kemasan Jaya (fictional)"
+          },
+          {
+            "amount": 130000000,
+            "critical": false,
+            "deferred_weeks": 2,
+            "due_week": 11,
+            "max_defer_weeks": 2,
+            "paid_week": 13,
+            "supplier": "PT Minyak Sehat (fictional)"
+          }
+        ],
+        "reserve": 75000000,
+        "status": "ok",
+        "weeks": [
+          {
+            "closing": 350000000,
+            "opening": 420000000,
+            "payroll": 0,
+            "receipts": 90000000,
+            "supplier_paid": 160000000,
+            "tax": 0,
+            "week": 1
+          },
+          {
+            "closing": 237000000,
+            "opening": 350000000,
+            "payroll": 138000000,
+            "receipts": 120000000,
+            "supplier_paid": 95000000,
+            "tax": 0,
+            "week": 2
+          },
+          {
+            "closing": 259000000,
+            "opening": 237000000,
+            "payroll": 0,
+            "receipts": 70000000,
+            "supplier_paid": 48000000,
+            "tax": 0,
+            "week": 3
+          },
+          {
+            "closing": 256000000,
+            "opening": 259000000,
+            "payroll": 138000000,
+            "receipts": 170000000,
+            "supplier_paid": 0,
+            "tax": 35000000,
+            "week": 4
+          },
+          {
+            "closing": 226000000,
+            "opening": 256000000,
+            "payroll": 0,
+            "receipts": 100000000,
+            "supplier_paid": 130000000,
+            "tax": 0,
+            "week": 5
+          },
+          {
+            "closing": 188000000,
+            "opening": 226000000,
+            "payroll": 138000000,
+            "receipts": 140000000,
+            "supplier_paid": 40000000,
+            "tax": 0,
+            "week": 6
+          },
+          {
+            "closing": 78000000,
+            "opening": 188000000,
+            "payroll": 0,
+            "receipts": 50000000,
+            "supplier_paid": 160000000,
+            "tax": 0,
+            "week": 7
+          },
+          {
+            "closing": 115000000,
+            "opening": 78000000,
+            "payroll": 138000000,
+            "receipts": 210000000,
+            "supplier_paid": 0,
+            "tax": 35000000,
+            "week": 8
+          },
+          {
+            "closing": 180000000,
+            "opening": 115000000,
+            "payroll": 0,
+            "receipts": 120000000,
+            "supplier_paid": 55000000,
+            "tax": 0,
+            "week": 9
+          },
+          {
+            "closing": 132000000,
+            "opening": 180000000,
+            "payroll": 138000000,
+            "receipts": 90000000,
+            "supplier_paid": 0,
+            "tax": 0,
+            "week": 10
+          },
+          {
+            "closing": 197000000,
+            "opening": 132000000,
+            "payroll": 0,
+            "receipts": 160000000,
+            "supplier_paid": 95000000,
+            "tax": 0,
+            "week": 11
+          },
+          {
+            "closing": 169000000,
+            "opening": 197000000,
+            "payroll": 138000000,
+            "receipts": 110000000,
+            "supplier_paid": 0,
+            "tax": 0,
+            "week": 12
+          },
+          {
+            "closing": 129000000,
+            "opening": 169000000,
+            "payroll": 0,
+            "receipts": 130000000,
+            "supplier_paid": 130000000,
+            "tax": 40000000,
+            "week": 13
+          }
+        ]
+      },
+      "infeasible": {
+        "status": "infeasible",
+        "reason": "Even with payroll and tax first and every allowed delay used, cash falls below the reserve in week 7 by 237000000. Talk to the bank or the largest customer before that week.",
+        "checks": "6 pass, 0 fail, 0 cannot check, 1 n/a"
+      }
+    },
+    "supplier-concession-plan": {
+      "kind": "prompt",
+      "all_ok": true,
+      "checks": [
+        {
+          "id": "final_price_within_limit",
+          "status": "pass"
+        },
+        {
+          "id": "final_payment_days_within_limit",
+          "status": "pass"
+        },
+        {
+          "id": "final_volume_within_limit",
+          "status": "pass"
+        },
+        {
+          "id": "every_step_price_within_limit",
+          "status": "pass"
+        },
+        {
+          "id": "every_step_payment_days_within_limit",
+          "status": "pass"
+        },
+        {
+          "id": "script_hides_walk_away",
+          "status": "pass"
+        }
+      ],
+      "answer": {
+        "opening_ask": {
+          "unit_price": 374920,
+          "payment_days": 60,
+          "volume_units": 4800
+        },
+        "concessions": [
+          {
+            "step": 1,
+            "give": "Accept a shorter payment window (45 days instead of 60)",
+            "ask_in_return": "Delete the exclusivity clause so we can source part of our volume elsewhere",
+            "unit_price": 374920,
+            "payment_days": 45,
+            "volume_units": 4800
+          },
+          {
+            "step": 2,
+            "give": "Raise the committed volume to 5,400 frames over the term",
+            "ask_in_return": "Cap the steel-index price review once per year with a fixed ceiling and a share of any increase",
+            "unit_price": 374920,
+            "payment_days": 45,
+            "volume_units": 5400
+          },
+          {
+            "step": 3,
+            "give": "Move to IDR 388,768 per frame",
+            "ask_in_return": "Make the late-delivery penalty mutual, shorten auto-renewal notice to 30 days, and hold the penalty cap",
+            "unit_price": 388768,
+            "payment_days": 45,
+            "volume_units": 5400
+          }
+        ],
+        "final_terms": {
+          "unit_price": 388768,
+          "payment_days": 45,
+          "volume_units": 5400
+        },
+        "clause_changes": [
+          {
+            "clause": "7. Exclusivity",
+            "change": "Delete the exclusivity clause entirely, or limit it to the specific frame specification only",
+            "why": "Exclusivity removes our leverage and prevents dual-sourcing if the supplier slips on delivery or price"
+          },
+          {
+            "clause": "6. Price review",
+            "change": "Allow at most one review per 12 months, triggered only above a stated steel-index threshold, with a cap on the pass-through and a matching right to renegotiate downward",
+            "why": "An open-ended index clause lets the supplier raise costs unilaterally and erodes the fixed-price protection"
+          },
+          {
+            "clause": "5. Late delivery penalty",
+            "change": "Make the penalty mutual, applying equally to late payment by the buyer, and keep or raise the cap with a right to terminate after repeated misses",
+            "why": "A one-sided penalty gives the supplier no incentive to fix chronic delays and leaves us without a remedy"
+          },
+          {
+            "clause": "8. Term and renewal",
+            "change": "Reduce the auto-renewal cancellation notice from 60 days to 30 days and add a price re-opener at each renewal",
+            "why": "A long notice period locks us in before we can test the market or respond to volume changes"
+          }
+        ],
+        "script": "We value the relationship and want to close quickly. To start, we propose IDR 374,920 per frame, 60-day payment terms, and a committed volume of 4,800 frames over the term. If 60 days is difficult, we can move to 45 days provided the exclusivity clause is removed so we can dual-source. We can also raise the commitment to 5,400 frames if you cap the steel-index review to once a year with a ceiling and share any increase with us. At IDR 388,768 per frame, we need the late-delivery penalty to be mutual, the auto-renewal notice shortened to 30 days, and the penalty cap retained. Your quarter-end timing works for us - we can sign this week on these terms.",
+        "why": "The opening anchors below target while keeping volume loose, then trades payment timing, volume and finally price for structural protections. The final terms stay inside every walk-away limit and keep leverage through dual-sourcing and a capped price review. Timing pressure from the supplier's quarter-end is used to push for a fast close.",
+        "status": "ok",
+        "_parsed_from_text": true
+      }
+    },
+    "token-unlock-sell-plan": {
+      "kind": "prompt",
+      "all_ok": true,
+      "checks": [
+        {
+          "id": "total_matches",
+          "status": "pass"
+        },
+        {
+          "id": "daily_market_cap",
+          "status": "pass"
+        },
+        {
+          "id": "lowest_price_respected",
+          "status": "pass"
+        },
+        {
+          "id": "within_window",
+          "status": "pass"
+        }
+      ],
+      "answer": {
+        "plan_status": "ok",
+        "reason": "Plan fits within the liquidity limits.",
+        "schedule": [
+          {
+            "day": 1,
+            "market_amount": 144000,
+            "otc_amount": 280000,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 2,
+            "market_amount": 213473,
+            "otc_amount": 280000,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 3,
+            "market_amount": 213473,
+            "otc_amount": 280000,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 4,
+            "market_amount": 213473,
+            "otc_amount": 280000,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 5,
+            "market_amount": 213473,
+            "otc_amount": 280000,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 6,
+            "market_amount": 213473,
+            "otc_amount": 280000,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 7,
+            "market_amount": 213473,
+            "otc_amount": 280000,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 8,
+            "market_amount": 213473,
+            "otc_amount": 280000,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 9,
+            "market_amount": 213473,
+            "otc_amount": 280000,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 10,
+            "market_amount": 213473,
+            "otc_amount": 280000,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 11,
+            "market_amount": 213473,
+            "otc_amount": 0,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 12,
+            "market_amount": 213473,
+            "otc_amount": 0,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 13,
+            "market_amount": 213473,
+            "otc_amount": 0,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 14,
+            "market_amount": 213473,
+            "otc_amount": 0,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 15,
+            "market_amount": 213473,
+            "otc_amount": 0,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 16,
+            "market_amount": 213473,
+            "otc_amount": 0,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 17,
+            "market_amount": 213473,
+            "otc_amount": 0,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 18,
+            "market_amount": 213473,
+            "otc_amount": 0,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 19,
+            "market_amount": 213473,
+            "otc_amount": 0,
+            "limit_price_usd": 0.485
+          },
+          {
+            "day": 20,
+            "market_amount": 213486,
+            "otc_amount": 0,
+            "limit_price_usd": 0.485
+          }
+        ],
+        "market_total": 4200000,
+        "otc_total": 2800000,
+        "total": 7000000,
+        "expected_avg_price_usd": 0.485,
+        "notes": [
+          "OTC blocks are sold on days 1-10.",
+          "Market sales stay within the daily volume cap.",
+          "Limit price is the higher of the minimum price and 97% of the current price."
+        ],
+        "status": "ok",
+        "_parsed_from_text": true
+      },
+      "infeasible": {
+        "status": "infeasible",
+        "reason": "The daily market amount on days 2-10 would be 450,666.67 tokens, above the 240,000-token cap (12% of 2,000,000). Extend the window by 8 days (to 18 days) or increase OTC by at least 1,896,000 tokens.",
+        "checks": "0 pass, 0 fail, 0 cannot check, 4 n/a"
+      }
+    },
+    "term-sheet-dilution": {
+      "kind": "prompt",
+      "all_ok": true,
+      "checks": [
+        {
+          "id": "ownership_sums_to_one",
+          "status": "pass"
+        },
+        {
+          "id": "shares_add_up",
+          "status": "pass"
+        },
+        {
+          "id": "existing_shares_kept",
+          "status": "pass"
+        },
+        {
+          "id": "post_money_arithmetic",
+          "status": "pass"
+        },
+        {
+          "id": "investor_pct_arithmetic",
+          "status": "pass"
+        },
+        {
+          "id": "price_arithmetic",
+          "status": "pass"
+        },
+        {
+          "id": "founder_floor_or_flag",
+          "status": "pass"
+        }
+      ],
+      "answer": {
+        "pre_money": 8000000,
+        "investment": 2000000,
+        "post_money": 10000000,
+        "price_per_share": 0.8,
+        "new_pool_shares": 1000000,
+        "investor_shares": 2500000,
+        "total_shares_post": 12500000,
+        "ownership": [
+          {
+            "holder": "Founder A (fictional)",
+            "shares": 4200000,
+            "pct": 0.336
+          },
+          {
+            "holder": "Founder B (fictional)",
+            "shares": 3000000,
+            "pct": 0.24
+          },
+          {
+            "holder": "Angel round (fictional)",
+            "shares": 1300000,
+            "pct": 0.104
+          },
+          {
+            "holder": "Employee option pool",
+            "shares": 1500000,
+            "pct": 0.12
+          },
+          {
+            "holder": "Garuda Seed Partners",
+            "shares": 2500000,
+            "pct": 0.2
+          }
+        ],
+        "founders_pct": 0.576,
+        "investor_pct": 0.2,
+        "flags": [
+          "founder_below_floor"
+        ],
+        "negotiation_points": [
+          {
+            "point": "Move the 1,000,000-share pool increase into the post-money instead of the pre-money.",
+            "effect": "Removes the pool increase from pre-money dilution and raises founder ownership versus the term sheet."
+          },
+          {
+            "point": "Size the option pool to a 12-month hiring plan rather than a fixed 12% of post-money.",
+            "effect": "Reduces new pool shares and dilution, giving founders back ownership."
+          },
+          {
+            "point": "Raise the pre-money valuation from USD 8,000,000 while keeping the USD 2,000,000 investment.",
+            "effect": "Lowers the investor's ownership percentage and dilution, improving founder ownership."
+          }
+        ],
+        "summary": "The proposed Series A gives the founders 57.6% fully diluted, below their 60% floor, mainly because the 12% pool increase is taken out of the pre-money. The investor would own 20% at USD 0.80 per share, and the total post-financing shares would be 12,500,000.",
+        "status": "ok",
+        "_parsed_from_text": true
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "token": "NUSA (fictional)",
+  "unlock_date": "2026-12-01",
+  "tokens_to_sell": 7000000,
+  "days_window": 20,
+  "avg_daily_volume_tokens": 2000000,
+  "max_pct_of_volume": 0.12,
+  "min_price_usd": 0.42,
+  "current_price_usd": 0.5
+}

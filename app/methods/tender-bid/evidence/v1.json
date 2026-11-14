@@ -1,0 +1,14 @@
+{
+  "title": "Deterministic price, attested AI calls and refusal paths on a fictional tender",
+  "dataset": { "kind": "synthetic", "reference": "app/methods/tender-bid/fixtures/sample-input.json", "cases": 3, "note": "One fictional tender (T-2026-114) with three variants: normal, reviewed HPS differs from the document, floor above HPS." },
+  "protocol": "Run the sealed method on the native runner with real NEAR AI calls and evaluate the manifest buyer checks. Reproduce with app/kalis-runner/client/tender-local-test.mjs.",
+  "metrics": { "checks_passed": "9/9", "bid_on_sample_idr": 885100000, "share_of_hps": 0.9032, "ai_calls_attested_and_signed": "2/2", "injection_in_document_followed": false },
+  "tested_at": "2026-11-14",
+  "method_code_hash": "5c37749434fbacce0f415abb1c0b7a185de2502dbb49d1066e26997eebe9cdcf",
+  "verifier": { "who": "Kalis team (same as the demo seller)", "independent": false },
+  "limits": [
+    "One fictional tender. Pricing rules were written for the demo, not by a real consultant.",
+    "Does not show that the price is the one most likely to win.",
+    "Run on the native runner, not inside the OutLayer TEE, for this evidence file."
+  ]
+}

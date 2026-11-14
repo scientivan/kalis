@@ -1,0 +1,159 @@
+{
+  "at": "2026-11-14T02:35:13.099Z",
+  "pass": 8,
+  "fail": 0,
+  "prompt_answer": {
+    "status": "ok",
+    "text": "{\"counter_salary\":35200000,\"signing_bonus\":0,\"non_salary_asks\":[\"learning budget\",\"remote days\"],\"reply\":\"Thank you for the offer for the Backend Engineer role. I’m excited about the team and the scope of the work. Based on the responsibilities and market data for similar backend roles, I’d like to propose a monthly salary of IDR 35,200,000. I’d also like to ask for a dedicated learning budget and more remote flexibility—ideally at least three remote days per week. I believe these adjustments would make the package competitive and set me up to contribute strongly.\",\"why\":\"The counter is IDR 35,200,000 because that is the strongest market benchmark and it stays within a reasonable premium over the offer, so no separate signing bonus is needed. The two non-salary asks target the clearest gaps in the package: there is no learning budget and only one remote day.\"}"
+  },
+  "prompt_report": {
+    "ai_calls": [
+      {
+        "ok": true,
+        "proof": {
+          "attested_signers": 2,
+          "fresh_nonce": "c93c13db2f76af0a25c1cf1bee2a3f937ee943b86989efd9211340600ad7198b",
+          "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "request_sha256": "efa8af7f64f03dd3d4f0798d3e13601e81e9744500b5e6b78827256b8615a3da",
+          "response_sha256": "5b8cd089e8f8449fbdec4a4b80b16aa6ccc668e0d0ba50c95222ebfd12bf5af6",
+          "signature_valid": true
+        }
+      }
+    ],
+    "all_ok": true,
+    "kind": "prompt",
+    "method_fuel_used": 0,
+    "method_steps": {
+      "all_ok": true,
+      "declared": [
+        "ask_model",
+        "leak_check"
+      ],
+      "failed": [],
+      "in_order": true,
+      "missing": [],
+      "reported": [
+        {
+          "detail": "deepseek-ai/DeepSeek-V4.1-Flash-1017 answered",
+          "id": "ask_model",
+          "ok": true
+        },
+        {
+          "detail": "answer repeats no 8 prompt words in a row",
+          "id": "leak_check",
+          "ok": true
+        }
+      ],
+      "undeclared": []
+    },
+    "runner_stages": [
+      {
+        "detail": "method opened, sha256 493deb1398d4e913ae8eb4afdb08fd6a79e1ba9f8cc7745f19ca65f026ce2002",
+        "id": "open_method",
+        "ok": true
+      },
+      {
+        "detail": "217 bytes of buyer data opened",
+        "id": "open_data",
+        "ok": true
+      },
+      {
+        "detail": "prompt method may only use deepseek-ai/DeepSeek-V4.1-Flash-1017; it cannot reach any other network, storage or the chain",
+        "id": "check_imports",
+        "ok": true
+      },
+      {
+        "detail": "deepseek-ai/DeepSeek-V4.1-Flash-1017 answered, attestation and response signature checked",
+        "id": "run_method",
+        "ok": true
+      },
+      {
+        "detail": "model answer received",
+        "id": "read_answer",
+        "ok": true
+      },
+      {
+        "detail": "50000000 fuel spent so a prompt run uses the same fuel as a wasm run",
+        "id": "pad_fuel",
+        "ok": true
+      },
+      {
+        "detail": "answer sealed to the buyer's one-time key",
+        "id": "seal_answer",
+        "ok": true
+      }
+    ]
+  },
+  "wasm_ai_report": {
+    "ai_calls": [
+      {
+        "ok": true,
+        "proof": {
+          "attested_signers": 2,
+          "fresh_nonce": "b08c2db6cf9d284cd41fb3ffbb9ac1db2da63a8bd732b7fca90ff2b18948f5e2",
+          "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "request_sha256": "fbe30c41119180db71382cdb9f3f21074bc5266817f78d31b356066c19db31b1",
+          "response_sha256": "e333e4f02dd8cf123e5b71125a4a9a49dc6482335c8564418ff916330c9e1f2b",
+          "signature_valid": true
+        }
+      }
+    ],
+    "all_ok": true,
+    "kind": "wasm",
+    "method_fuel_used": 379778,
+    "method_steps": {
+      "all_ok": true,
+      "declared": [
+        "ask_ai"
+      ],
+      "failed": [],
+      "in_order": true,
+      "missing": [],
+      "reported": [
+        {
+          "detail": "deepseek-ai/DeepSeek-V4.1-Flash-1017 answered",
+          "id": "ask_ai",
+          "ok": true
+        }
+      ],
+      "undeclared": []
+    },
+    "runner_stages": [
+      {
+        "detail": "method opened, sha256 aa12c0c8d42503448683855d937d3224da9086aca43fd0a10eed27e55b87c921",
+        "id": "open_method",
+        "ok": true
+      },
+      {
+        "detail": "92 bytes of buyer data opened",
+        "id": "open_data",
+        "ok": true
+      },
+      {
+        "detail": "method's only import is kalis.ai_chat, limited to 1 model(s) from its manifest; it cannot reach any other network, storage or the chain",
+        "id": "check_imports",
+        "ok": true
+      },
+      {
+        "detail": "method finished using 379778 of 50000000 fuel",
+        "id": "run_method",
+        "ok": true
+      },
+      {
+        "detail": "method answer is valid JSON",
+        "id": "read_answer",
+        "ok": true
+      },
+      {
+        "detail": "remaining 49620222 fuel spent on 331 discarded reruns so every run uses 50000000",
+        "id": "pad_fuel",
+        "ok": true
+      },
+      {
+        "detail": "answer sealed to the buyer's one-time key",
+        "id": "seal_answer",
+        "ok": true
+      }
+    ]
+  }
+}

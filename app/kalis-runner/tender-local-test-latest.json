@@ -1,0 +1,164 @@
+{
+  "at": "2026-11-14T02:26:18.032Z",
+  "pass": 9,
+  "fail": 0,
+  "answer": {
+    "bid_price": 885100000,
+    "bid_security": 17702000,
+    "checklist": [
+      {
+        "item": "Company registration and tax number",
+        "note": "ready",
+        "ok": true
+      },
+      {
+        "item": "Product brochure and test certificate",
+        "note": "ready",
+        "ok": true
+      },
+      {
+        "item": "Signed price schedule",
+        "note": "ready",
+        "ok": true
+      },
+      {
+        "item": "Delivery time",
+        "note": "you deliver in 25 days, the tender allows 30",
+        "ok": true
+      },
+      {
+        "item": "Warranty",
+        "note": "you offer 3 years, the tender requires 2",
+        "ok": true
+      }
+    ],
+    "floor_price": 885080000.0000001,
+    "hps": 980000000,
+    "reasons": "The tender price is IDR 885,100,000 for furniture. The price reflects adjustments of -1.0% because the last tender was lost on price, +0.5% for delivering at least five days early, and +0.5% for at least one extra warranty year. The buyer notes state that the last furniture tender was lost on price by about 4% and that the 3-year warranty should be kept because buyers liked it. The price is 90.3% of the HPS, the floor was applied, two past tenders were used, and no checklist items are missing.",
+    "share_of_hps": 0.9031632653061225,
+    "status": "ok",
+    "tender_id": "T-2026-114",
+    "warnings": [
+      "Your minimum margin sets the price. The usual winning range for this category is lower, so your chance may be smaller."
+    ]
+  },
+  "report": {
+    "ai_calls": [
+      {
+        "ok": true,
+        "proof": {
+          "attested_signers": 2,
+          "fresh_nonce": "bfa7b863e39692946e3ea30a948fead8bf217e037def6816bb2e53e345fdecc0",
+          "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "request_sha256": "102b9123797840bd537f291ddde6302afc078fc587991fc9e4cf9e4d004713aa",
+          "response_sha256": "e2416f17138fd3aa4bc425422dd3f69827e998bf4308382a505674f81a3c0f6f",
+          "signature_valid": true
+        }
+      },
+      {
+        "ok": true,
+        "proof": {
+          "attested_signers": 2,
+          "fresh_nonce": "737a122fcb61ae3ac66889c2cbd0efc8d0e5919278c91821c463985402f2baac",
+          "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "request_sha256": "d58f95f054be8058e795d0fd0fcb3b5c2931833b0b4c8756b72d584edb8417d9",
+          "response_sha256": "7015d630c1ee3334c6d5c5fbaaf6535deef4fbbcfc4ebef62d3c615dac437b10",
+          "signature_valid": true
+        }
+      }
+    ],
+    "all_ok": true,
+    "kind": "wasm",
+    "method_fuel_used": 2701933,
+    "method_steps": {
+      "all_ok": true,
+      "declared": [
+        "read_requirements",
+        "match_review",
+        "check_inputs",
+        "price_bid",
+        "build_checklist",
+        "write_reasons",
+        "self_check"
+      ],
+      "failed": [],
+      "in_order": true,
+      "missing": [],
+      "reported": [
+        {
+          "detail": "model read tender T-2026-114",
+          "id": "read_requirements",
+          "ok": true
+        },
+        {
+          "detail": "the model's reading matches your reviewed requirements",
+          "id": "match_review",
+          "ok": true
+        },
+        {
+          "detail": "category furniture, 2 past tenders",
+          "id": "check_inputs",
+          "ok": true
+        },
+        {
+          "detail": "target ratio 0.8875, 2 history points, floor applied",
+          "id": "price_bid",
+          "ok": true
+        },
+        {
+          "detail": "5 items, 0 not ready",
+          "id": "build_checklist",
+          "ok": true
+        },
+        {
+          "detail": "model wrote the reasons",
+          "id": "write_reasons",
+          "ok": true
+        },
+        {
+          "detail": "bid is above your floor and not above HPS",
+          "id": "self_check",
+          "ok": true
+        }
+      ],
+      "undeclared": []
+    },
+    "runner_stages": [
+      {
+        "detail": "method opened, sha256 5c37749434fbacce0f415abb1c0b7a185de2502dbb49d1066e26997eebe9cdcf",
+        "id": "open_method",
+        "ok": true
+      },
+      {
+        "detail": "1719 bytes of buyer data opened",
+        "id": "open_data",
+        "ok": true
+      },
+      {
+        "detail": "method's only import is kalis.ai_chat, limited to 1 model(s) from its manifest; it cannot reach any other network, storage or the chain",
+        "id": "check_imports",
+        "ok": true
+      },
+      {
+        "detail": "method finished using 2701933 of 50000000 fuel",
+        "id": "run_method",
+        "ok": true
+      },
+      {
+        "detail": "method answer is valid JSON",
+        "id": "read_answer",
+        "ok": true
+      },
+      {
+        "detail": "remaining 47298067 fuel spent on 98 discarded reruns so every run uses 50000000",
+        "id": "pad_fuel",
+        "ok": true
+      },
+      {
+        "detail": "answer sealed to the buyer's one-time key",
+        "id": "seal_answer",
+        "ok": true
+      }
+    ]
+  }
+}

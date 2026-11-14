@@ -1,0 +1,554 @@
+{
+  "manifest_version": 5,
+  "method_id": "tender-bid",
+  "kind": "wasm",
+  "listing": {
+    "title": "Price a tender bid above your minimum margin",
+    "outcome": "A bid price with the reasons behind it, the bid security amount and a checklist of the tender's mandatory documents.",
+    "category": "Procurement",
+    "seller": {
+      "display_name": "Rani Hartono (demo seller)",
+      "role": "Public procurement consultant",
+      "demo": true
+    },
+    "urgency": "The tender closes soon, and if your cost price or margin reaches a competitor you either lose the tender or win it at a loss.",
+    "limits": [
+      "Indonesian public tenders priced in IDR",
+      "One tender per run",
+      "Pricing rules were written for this demo, not by a real consultant",
+      "Cannot prove the price is the one most likely to win"
+    ],
+    "sample_output": "Synthetic example: bid IDR 885,100,000 (90.3% of HPS), bid security IDR 17,702,000, 5 of 5 checklist items ready.",
+    "not_advice": true
+  },
+  "inputs": {
+    "documents": [
+      "image",
+      "pdf"
+    ],
+    "fields": [
+      {
+        "id": "document_text",
+        "label": "Tender document text",
+        "type": "text",
+        "required": true,
+        "private": false,
+        "source": "document",
+        "help": "Text read from the tender scan by document protection. Public tender documents only."
+      },
+      {
+        "id": "requirements",
+        "label": "Tender requirements you reviewed",
+        "type": "object",
+        "required": true,
+        "private": false,
+        "source": "document",
+        "fields": [
+          {
+            "id": "hps",
+            "label": "Owner estimate (HPS)",
+            "type": "money",
+            "unit": "IDR",
+            "required": true,
+            "min": 1
+          },
+          {
+            "id": "delivery_days_max",
+            "label": "Maximum delivery time",
+            "type": "integer",
+            "unit": "days",
+            "required": true,
+            "min": 1
+          },
+          {
+            "id": "warranty_years_min",
+            "label": "Minimum warranty",
+            "type": "number",
+            "unit": "years",
+            "required": true,
+            "min": 0
+          },
+          {
+            "id": "bid_security_pct",
+            "label": "Bid security",
+            "type": "percent",
+            "required": true,
+            "min": 0,
+            "max": 0.2
+          },
+          {
+            "id": "mandatory_documents",
+            "label": "Mandatory documents",
+            "type": "array",
+            "required": true,
+            "items": {
+              "type": "string"
+            },
+            "min_items": 1
+          }
+        ]
+      },
+      {
+        "id": "category",
+        "label": "Category",
+        "type": "enum",
+        "required": true,
+        "enum": [
+          "furniture",
+          "it_equipment",
+          "construction",
+          "catering",
+          "other"
+        ]
+      },
+      {
+        "id": "cost_price",
+        "label": "Your cost price",
+        "type": "money",
+        "unit": "IDR",
+        "required": true,
+        "private": true,
+        "min": 1,
+        "source": "connector:sheets_mock.read_range",
+        "help": "Never leaves your device unsealed."
+      },
+      {
+        "id": "min_margin",
+        "label": "Your minimum margin",
+        "type": "percent",
+        "required": true,
+        "private": true,
+        "min": 0,
+        "max": 0.9
+      },
+      {
+        "id": "company",
+        "label": "Your offer",
+        "type": "object",
+        "required": true,
+        "private": true,
+        "fields": [
+          {
+            "id": "delivery_days",
+            "label": "Your delivery time",
+            "type": "integer",
+            "unit": "days",
+            "required": true,
+            "min": 1
+          },
+          {
+            "id": "warranty_years",
+            "label": "Your warranty",
+            "type": "number",
+            "unit": "years",
+            "required": true,
+            "min": 0
+          },
+          {
+            "id": "documents_available",
+            "label": "Documents you have",
+            "type": "array",
+            "required": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      {
+        "id": "history",
+        "label": "Past tenders (win and loss)",
+        "type": "array",
+        "required": false,
+        "private": true,
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "category",
+              "label": "Category",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "hps",
+              "label": "HPS",
+              "type": "money",
+              "unit": "IDR",
+              "required": true
+            },
+            {
+              "id": "our_bid",
+              "label": "Your bid",
+              "type": "money",
+              "unit": "IDR",
+              "required": true
+            },
+            {
+              "id": "winning_bid",
+              "label": "Winning bid",
+              "type": "money",
+              "unit": "IDR",
+              "required": true
+            },
+            {
+              "id": "won",
+              "label": "You won",
+              "type": "boolean",
+              "required": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "memory_notes",
+        "label": "Approved notes from earlier tenders",
+        "type": "array",
+        "required": false,
+        "private": true,
+        "source": "memory",
+        "items": {
+          "type": "string"
+        }
+      }
+    ],
+    "sample": "fixtures/sample-input.json"
+  },
+  "ai": {
+    "allowed": [
+      "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+    ],
+    "proprietary": false
+  },
+  "steps": [
+    {
+      "id": "read_requirements",
+      "what": "The private AI model reads the tender document (instructions inside it are ignored)"
+    },
+    {
+      "id": "match_review",
+      "what": "Stop if the model's reading differs from the requirements you reviewed"
+    },
+    {
+      "id": "check_inputs",
+      "what": "Check your cost price, margin and offer"
+    },
+    {
+      "id": "price_bid",
+      "what": "Compute the bid from the seller's private rules, never below your floor or above HPS"
+    },
+    {
+      "id": "build_checklist",
+      "what": "Check mandatory documents, delivery time and warranty"
+    },
+    {
+      "id": "write_reasons",
+      "what": "The private AI model explains the price from the computed numbers, without your cost price"
+    },
+    {
+      "id": "self_check",
+      "what": "Re-check the bid against your floor and HPS"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "sheets_mock",
+      "operations": [
+        "read_range"
+      ],
+      "what": "Read your cost sheet from a spreadsheet connection you control. Labelled mock."
+    }
+  ],
+  "outbound": [
+    {
+      "host": "localhost:8787",
+      "path": "/mock/portal/submit",
+      "what": "Submit the bid summary to the mock procurement portal after you approve the exact text"
+    }
+  ],
+  "memory": {
+    "read": true,
+    "write": "proposals only, user approves"
+  },
+  "browser": {
+    "enabled": true,
+    "domains": [
+      "localhost:8787"
+    ],
+    "actions": [
+      "open",
+      "download"
+    ]
+  },
+  "outputs": {
+    "status_field": "status",
+    "unverifiable_status": [],
+    "fields": [
+      {
+        "id": "status",
+        "label": "Result",
+        "type": "enum",
+        "display": "badge",
+        "enum": [
+          "ok",
+          "infeasible",
+          "error"
+        ]
+      },
+      {
+        "id": "bid_price",
+        "label": "Bid price",
+        "type": "money",
+        "unit": "IDR",
+        "display": "money"
+      },
+      {
+        "id": "share_of_hps",
+        "label": "Share of HPS",
+        "type": "percent",
+        "display": "percent"
+      },
+      {
+        "id": "bid_security",
+        "label": "Bid security",
+        "type": "money",
+        "unit": "IDR",
+        "display": "money"
+      },
+      {
+        "id": "checklist",
+        "label": "Checklist",
+        "type": "array",
+        "display": "table",
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "item",
+              "label": "Item",
+              "type": "string"
+            },
+            {
+              "id": "ok",
+              "label": "Ready",
+              "type": "boolean"
+            },
+            {
+              "id": "note",
+              "label": "Note",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      {
+        "id": "warnings",
+        "label": "Warnings",
+        "type": "array",
+        "display": "list",
+        "items": {
+          "type": "string"
+        }
+      },
+      {
+        "id": "reasons",
+        "label": "Why this price",
+        "type": "text",
+        "display": "text"
+      },
+      {
+        "id": "floor_price",
+        "label": "Your floor price",
+        "type": "money",
+        "unit": "IDR",
+        "display": "money",
+        "private": true
+      },
+      {
+        "id": "reason",
+        "label": "Why no bid",
+        "type": "text",
+        "display": "text"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "price_floor",
+      "description": "Bid is at least your cost price plus your minimum margin",
+      "when": {
+        "==": [
+          {
+            "var": "answer.status"
+          },
+          "ok"
+        ]
+      },
+      "rule": {
+        ">=": [
+          {
+            "var": "answer.bid_price"
+          },
+          {
+            "*": [
+              {
+                "var": "input.cost_price"
+              },
+              {
+                "+": [
+                  1,
+                  {
+                    "var": "input.min_margin"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "message": "The bid is below your cost price plus your minimum margin.",
+      "tolerance": 1
+    },
+    {
+      "id": "under_hps",
+      "description": "Bid is not above the owner estimate (HPS)",
+      "when": {
+        "==": [
+          {
+            "var": "answer.status"
+          },
+          "ok"
+        ]
+      },
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.bid_price"
+          },
+          {
+            "var": "input.requirements.hps"
+          }
+        ]
+      },
+      "message": "The bid is above HPS, so the committee would reject it.",
+      "tolerance": 1
+    },
+    {
+      "id": "bid_security",
+      "description": "Bid security equals the tender's percentage of the bid",
+      "when": {
+        "==": [
+          {
+            "var": "answer.status"
+          },
+          "ok"
+        ]
+      },
+      "rule": {
+        "==": [
+          {
+            "var": "answer.bid_security"
+          },
+          {
+            "*": [
+              {
+                "var": "answer.bid_price"
+              },
+              {
+                "var": "input.requirements.bid_security_pct"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "The bid security does not match the tender's percentage.",
+      "tolerance": 1
+    },
+    {
+      "id": "checklist_covers_documents",
+      "description": "Checklist lists every mandatory document plus delivery and warranty",
+      "when": {
+        "==": [
+          {
+            "var": "answer.status"
+          },
+          "ok"
+        ]
+      },
+      "rule": {
+        ">=": [
+          {
+            "count": [
+              {
+                "var": "answer.checklist"
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "count": [
+                  {
+                    "var": "input.requirements.mandatory_documents"
+                  }
+                ]
+              },
+              2
+            ]
+          }
+        ]
+      },
+      "message": "The checklist is missing some of the tender's mandatory documents."
+    },
+    {
+      "id": "infeasible_is_real",
+      "description": "A 'no bid' answer is only given when your floor is above HPS",
+      "when": {
+        "==": [
+          {
+            "var": "answer.status"
+          },
+          "infeasible"
+        ]
+      },
+      "rule": {
+        ">": [
+          {
+            "*": [
+              {
+                "var": "input.cost_price"
+              },
+              {
+                "+": [
+                  1,
+                  {
+                    "var": "input.min_margin"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "var": "input.requirements.hps"
+          }
+        ]
+      },
+      "message": "The method refused to bid although your floor is below HPS."
+    }
+  ],
+  "seller_secrets": [
+    "pricing rules: category ratios, history weighting, delivery and warranty adjustments"
+  ],
+  "disclosures": [
+    "The AI model reads the document and writes the reasons. The price is computed by the seller's code, so the same data gives the same price.",
+    "Uploaded documents are read by the Kalis backend before sealing. Use public tender documents only.",
+    "Pricing rules are a demo written by the Kalis team. Not procurement or financial advice."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5, seller WASM in wasmi, AI only through kalis.ai_chat",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

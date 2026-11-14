@@ -1,0 +1,516 @@
+{
+  "manifest_version": 5,
+  "method_id": "defi-liquidation-guard",
+  "kind": "wasm",
+  "listing": {
+    "title": "Rescue a DeFi loan before it gets liquidated",
+    "outcome": "How much to repay and how much collateral to add so your loan reaches a safe health factor and survives a 20% price drop.",
+    "category": "DeFi risk",
+    "seller": {
+      "display_name": "Bima Pratama (demo seller)",
+      "role": "DeFi risk analyst",
+      "demo": true
+    },
+    "urgency": "Prices are falling and the position can be liquidated within hours. Publishing its size invites liquidation hunters.",
+    "limits": [
+      "One lending position per run, one debt asset",
+      "Prices you provide are used as they are; the method does not fetch prices",
+      "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+    ],
+    "sample_output": "Synthetic example: repay 3,200 USDC and add 0.8 ETH. Health factor goes from 1.44 to 1.70, and stays at 1.36 if ETH and WBTC fall 20%.",
+    "not_advice": true
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "collateral",
+        "label": "Collateral",
+        "type": "array",
+        "required": true,
+        "source": "connector:wallet_mock.read_loans",
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "asset",
+              "label": "Asset",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "amount",
+              "label": "Amount",
+              "type": "number",
+              "required": true,
+              "min": 0,
+              "private": true
+            },
+            {
+              "id": "price",
+              "label": "Price",
+              "type": "money",
+              "unit": "USD",
+              "required": true,
+              "min": 0
+            },
+            {
+              "id": "liquidation_threshold",
+              "label": "Liquidation threshold",
+              "type": "percent",
+              "required": true,
+              "min": 0,
+              "max": 1
+            },
+            {
+              "id": "stable",
+              "label": "Stablecoin",
+              "type": "boolean"
+            }
+          ],
+          "min_items": 1,
+          "max_items": 10
+        }
+      },
+      {
+        "id": "debt",
+        "label": "Debt",
+        "type": "object",
+        "required": true,
+        "source": "connector:wallet_mock.read_loans",
+        "fields": [
+          {
+            "id": "asset",
+            "label": "Asset",
+            "type": "string",
+            "required": true
+          },
+          {
+            "id": "amount",
+            "label": "Amount",
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "private": true
+          },
+          {
+            "id": "price",
+            "label": "Price",
+            "type": "money",
+            "unit": "USD",
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": "wallet",
+        "label": "Funds you can use",
+        "type": "object",
+        "required": true,
+        "source": "connector:wallet_mock.read_loans",
+        "fields": [
+          {
+            "id": "stable_available",
+            "label": "Stablecoins in your wallet",
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "private": true
+          },
+          {
+            "id": "topup",
+            "label": "Asset you can add as collateral",
+            "type": "object",
+            "fields": [
+              {
+                "id": "asset",
+                "label": "Asset",
+                "type": "string",
+                "required": true
+              },
+              {
+                "id": "amount",
+                "label": "Amount",
+                "type": "number",
+                "required": true,
+                "min": 0,
+                "private": true
+              },
+              {
+                "id": "price",
+                "label": "Price",
+                "type": "money",
+                "unit": "USD",
+                "required": true,
+                "min": 0
+              },
+              {
+                "id": "liquidation_threshold",
+                "label": "Liquidation threshold",
+                "type": "percent",
+                "required": true,
+                "min": 0,
+                "max": 1
+              },
+              {
+                "id": "stable",
+                "label": "Stablecoin",
+                "type": "boolean"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "target_health_factor",
+        "label": "Target health factor",
+        "type": "number",
+        "required": true,
+        "min": 1.01,
+        "max": 5,
+        "help": "The method uses 1.5 if you ask for less."
+      }
+    ],
+    "sample": {
+      "fictional": true,
+      "ref": "fixtures/sample-input.json"
+    }
+  },
+  "ai": {
+    "allowed": [],
+    "proprietary": false
+  },
+  "steps": [
+    {
+      "id": "read_position",
+      "what": "Read the loan position"
+    },
+    {
+      "id": "check_inputs",
+      "what": "Check amounts, prices and thresholds, compute the health factor now"
+    },
+    {
+      "id": "plan_repay",
+      "what": "Decide how much debt to repay"
+    },
+    {
+      "id": "plan_collateral",
+      "what": "Decide how much collateral to add"
+    },
+    {
+      "id": "stress_test",
+      "what": "Re-check the plan against the target and a 20% price drop"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "wallet_mock",
+      "operations": [
+        "read_loans"
+      ],
+      "what": "Read the lending position from a wallet you connect. Labelled mock, no real wallet."
+    }
+  ],
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "outputs": {
+    "status_field": "status",
+    "unverifiable_status": [
+      "infeasible"
+    ],
+    "fields": [
+      {
+        "id": "status",
+        "label": "Result",
+        "type": "enum",
+        "enum": [
+          "ok",
+          "infeasible"
+        ],
+        "display": "badge"
+      },
+      {
+        "id": "actions",
+        "label": "What to do",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "repay_amount",
+        "label": "Repay",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "topup_amount",
+        "label": "Add as collateral",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "health_factor_before",
+        "label": "Health factor now",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "health_factor_after",
+        "label": "Health factor after",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "stressed_health_factor_after",
+        "label": "After a 20% drop",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "target_used",
+        "label": "Target used",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "debt_after",
+        "label": "Debt after",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "reason",
+        "label": "Why it is not possible",
+        "type": "text",
+        "display": "text"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "health_factor_reaches_target",
+      "description": "Health factor after the plan is at least your target",
+      "when": {
+        "==": [
+          {
+            "var": "answer.status"
+          },
+          "ok"
+        ]
+      },
+      "rule": {
+        ">=": [
+          {
+            "var": "answer.health_factor_after"
+          },
+          {
+            "var": "input.target_health_factor"
+          }
+        ]
+      },
+      "message": "The plan does not bring the health factor up to your target.",
+      "tolerance": 0.0001
+    },
+    {
+      "id": "repay_within_wallet",
+      "description": "Repay amount is not more than the stablecoins in your wallet",
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.repay_amount"
+          },
+          {
+            "var": "input.wallet.stable_available"
+          }
+        ]
+      },
+      "message": "The plan repays more than you have in your wallet."
+    },
+    {
+      "id": "collateral_within_wallet",
+      "description": "Added collateral is not more than you hold",
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.topup_amount"
+          },
+          {
+            "var": "input.wallet.topup.amount"
+          }
+        ]
+      },
+      "message": "The plan adds more collateral than you hold."
+    },
+    {
+      "id": "health_factor_before_recomputed",
+      "description": "Your device recomputes the current health factor",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "/": [
+                    {
+                      "reduce": [
+                        {
+                          "var": "input.collateral"
+                        },
+                        {
+                          "+": [
+                            {
+                              "var": "accumulator"
+                            },
+                            {
+                              "*": [
+                                {
+                                  "var": "current.amount"
+                                },
+                                {
+                                  "var": "current.price"
+                                },
+                                {
+                                  "var": "current.liquidation_threshold"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        0
+                      ]
+                    },
+                    {
+                      "*": [
+                        {
+                          "var": "input.debt.amount"
+                        },
+                        {
+                          "var": "input.debt.price"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "var": "answer.health_factor_before"
+                }
+              ]
+            }
+          },
+          0.001
+        ]
+      },
+      "message": "The method's current health factor does not match your own position."
+    },
+    {
+      "id": "health_factor_after_recomputed",
+      "description": "Your device recomputes the health factor after the plan",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "/": [
+                    {
+                      "+": [
+                        {
+                          "reduce": [
+                            {
+                              "var": "input.collateral"
+                            },
+                            {
+                              "+": [
+                                {
+                                  "var": "accumulator"
+                                },
+                                {
+                                  "*": [
+                                    {
+                                      "var": "current.amount"
+                                    },
+                                    {
+                                      "var": "current.price"
+                                    },
+                                    {
+                                      "var": "current.liquidation_threshold"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            0
+                          ]
+                        },
+                        {
+                          "*": [
+                            {
+                              "var": "answer.topup_amount"
+                            },
+                            {
+                              "*": [
+                                {
+                                  "var": "input.wallet.topup.price"
+                                },
+                                {
+                                  "var": "input.wallet.topup.liquidation_threshold"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "*": [
+                        {
+                          "-": [
+                            {
+                              "var": "input.debt.amount"
+                            },
+                            {
+                              "var": "answer.repay_amount"
+                            }
+                          ]
+                        },
+                        {
+                          "var": "input.debt.price"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "var": "answer.health_factor_after"
+                }
+              ]
+            }
+          },
+          0.001
+        ]
+      },
+      "message": "The health factor the method reports does not follow from its own repay and collateral amounts."
+    }
+  ],
+  "seller_secrets": [
+    "minimum target, stress scenario and wallet-use rules"
+  ],
+  "disclosures": [
+    "Not financial advice. The plan uses the prices you provide and does not place any transaction.",
+    "The 20% stress test is the seller's assumption, not a forecast.",
+    "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

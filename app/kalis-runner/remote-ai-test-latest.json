@@ -1,0 +1,59 @@
+{
+  "at": "2026-11-14T01:06:53.714Z",
+  "runner": "2f5773282fded8db08759228b3a3f3f564d3be485af8275fe32889c62d700232",
+  "results": [
+    {
+      "name": "prompt method",
+      "call_id": "6a5723b6-338d-4999-938e-662c5cda558b",
+      "instructions": 1760514725,
+      "time_ms": 45588,
+      "plaintext_seen_by_outlayer": [],
+      "report_all_ok": true,
+      "answer": {
+        "status": "ok",
+        "text": "{\"counter_salary\":35200000,\"signing_bonus\":0,\"non_salary_asks\":[\"Remote days: increase from 1 to 3 per week\",\"Learning budget: IDR 12,000,000 per year\"],\"reply\":\"Thank you for the offer. I’m excited about the Backend Engineer role. Could we adjust the base salary to IDR 35,200,000 per month? I’d also like to ask for 3 remote days per week and an annual learning budget of IDR 12,000,000 to support continued growth in the role. I’m confident we can find a package that works well for both sides.\",\"why\":\"The counter salary is set from the strongest market benchmark and stays within the maximum allowed uplift. The signing bonus is 0 because the salary ask does not need to be capped.\"}"
+      },
+      "ai_calls": [
+        {
+          "ok": true,
+          "proof": {
+            "attested_signers": 2,
+            "fresh_nonce": "a75c15f2f9cd7cfc0cca93c835fb912e3b4412dab85cbdff26e9ba1c31175053",
+            "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+            "request_sha256": "efa8af7f64f03dd3d4f0798d3e13601e81e9744500b5e6b78827256b8615a3da",
+            "response_sha256": "b9c65af826ac21a76696f31d25d5816137d0db603846a11731b6527b04c2cf93",
+            "signature_valid": true
+          }
+        }
+      ],
+      "completion_signature_valid": true,
+      "executed_build_ok": true
+    },
+    {
+      "name": "wasm method calling AI",
+      "call_id": "59cfe371-e9bb-49b7-903a-7a83e00c3f01",
+      "instructions": 440125413,
+      "time_ms": 8786,
+      "plaintext_seen_by_outlayer": [],
+      "report_all_ok": true,
+      "answer": {
+        "answer": "OK"
+      },
+      "ai_calls": [
+        {
+          "ok": true,
+          "proof": {
+            "attested_signers": 2,
+            "fresh_nonce": "55a2f711e3370d79ba7b69f6bd7e9440f4f496133b114044bfc38ca7acb4b02b",
+            "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+            "request_sha256": "fbe30c41119180db71382cdb9f3f21074bc5266817f78d31b356066c19db31b1",
+            "response_sha256": "70ea33e2c8a3839b0505d830eb1154d7c6fa596c1f3fb8d7dad2d49bd5dd8171",
+            "signature_valid": true
+          }
+        }
+      ],
+      "completion_signature_valid": true,
+      "executed_build_ok": true
+    }
+  ]
+}

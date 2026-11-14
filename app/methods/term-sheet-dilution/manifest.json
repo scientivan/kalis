@@ -1,0 +1,469 @@
+{
+  "manifest_version": 5,
+  "method_id": "term-sheet-dilution",
+  "kind": "prompt",
+  "listing": {
+    "title": "Check your dilution before you sign the term sheet",
+    "outcome": "Your post-money ownership table, whether founders stay above your floor, and the terms worth pushing back on.",
+    "category": "Startup fundraising",
+    "seller": {
+      "display_name": "Laura Mendes (demo seller)",
+      "role": "Startup fundraising advisor",
+      "demo": true
+    },
+    "urgency": "The term sheet expires in 72 hours. Your cap table and the offer must not reach other investors.",
+    "limits": [
+      "Priced equity rounds with one lead investor",
+      "No convertible notes or SAFEs",
+      "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+    ],
+    "sample_output": "Synthetic example: post-money USD 10M, founders 57.6% after a 12% pool, below a 60% floor; first ask is to move the pool into the post-money.",
+    "not_advice": true
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "company",
+        "label": "Company",
+        "type": "string",
+        "required": true
+      },
+      {
+        "id": "cap_table",
+        "label": "Cap table",
+        "type": "array",
+        "required": true,
+        "source": "connector:sheets_mock.read_range",
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "holder",
+              "label": "Holder",
+              "type": "string",
+              "required": true,
+              "private": true
+            },
+            {
+              "id": "class",
+              "label": "Class",
+              "type": "enum",
+              "enum": [
+                "common",
+                "preferred",
+                "options"
+              ]
+            },
+            {
+              "id": "shares",
+              "label": "Shares",
+              "type": "integer",
+              "required": true,
+              "min": 0,
+              "private": true
+            },
+            {
+              "id": "founder",
+              "label": "Founder",
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      {
+        "id": "term_sheet_text",
+        "label": "Term sheet",
+        "type": "text",
+        "required": true,
+        "private": true,
+        "source": "connector:docs_mock.read_document"
+      },
+      {
+        "id": "founders_floor_pct",
+        "label": "Lowest founder ownership you accept",
+        "type": "percent",
+        "required": true,
+        "min": 0,
+        "max": 1,
+        "private": true
+      }
+    ],
+    "alternative_sources": [
+      "file_import:xlsx",
+      "file_import:docx"
+    ],
+    "sample": {
+      "fictional": true,
+      "ref": "fixtures/sample-input.json"
+    }
+  },
+  "ai": {
+    "allowed": [
+      "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+    ],
+    "proprietary": false
+  },
+  "steps": [
+    {
+      "id": "ask_model",
+      "what": "Send the sealed method and your data to the private model and check its attestation and signature"
+    },
+    {
+      "id": "leak_check",
+      "what": "Withhold the answer if it repeats the seller's method text"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "sheets_mock",
+      "operations": [
+        "read_range"
+      ],
+      "what": "Read the cap table from a spreadsheet you connect. Labelled mock."
+    },
+    {
+      "id": "docs_mock",
+      "operations": [
+        "read_document"
+      ],
+      "what": "Read the term sheet from a document you connect. Labelled mock."
+    }
+  ],
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "outputs": {
+    "parse": "json_in_text",
+    "status_field": null,
+    "unverifiable_status": [],
+    "fields": [
+      {
+        "id": "pre_money",
+        "label": "Pre-money valuation",
+        "type": "money",
+        "display": "money",
+        "unit": "USD"
+      },
+      {
+        "id": "investment",
+        "label": "Investment",
+        "type": "money",
+        "display": "money",
+        "unit": "USD"
+      },
+      {
+        "id": "new_pool_shares",
+        "label": "New option pool shares",
+        "type": "integer",
+        "display": "number"
+      },
+      {
+        "id": "investor_shares",
+        "label": "Investor shares",
+        "type": "integer",
+        "display": "number"
+      },
+      {
+        "id": "total_shares_post",
+        "label": "Total shares after the round",
+        "type": "integer",
+        "display": "number"
+      },
+      {
+        "id": "ownership",
+        "label": "Ownership after the round",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "founders_pct",
+        "label": "Founders after the round",
+        "type": "percent",
+        "display": "percent"
+      },
+      {
+        "id": "investor_pct",
+        "label": "Investor after the round",
+        "type": "percent",
+        "display": "percent"
+      },
+      {
+        "id": "post_money",
+        "label": "Post-money valuation",
+        "type": "money",
+        "unit": "USD",
+        "display": "money"
+      },
+      {
+        "id": "price_per_share",
+        "label": "Price per share",
+        "type": "money",
+        "unit": "USD",
+        "display": "money"
+      },
+      {
+        "id": "flags",
+        "label": "Flags",
+        "type": "array",
+        "display": "list"
+      },
+      {
+        "id": "negotiation_points",
+        "label": "What to push back on",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "summary",
+        "label": "Summary",
+        "type": "text",
+        "display": "text"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "ownership_sums_to_one",
+      "description": "Ownership after the round adds up to 100%",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "sum": {
+                    "map": [
+                      {
+                        "var": "answer.ownership"
+                      },
+                      {
+                        "var": "pct"
+                      }
+                    ]
+                  }
+                },
+                1
+              ]
+            }
+          },
+          0.001
+        ]
+      },
+      "message": "The ownership table does not add up to 100%."
+    },
+    {
+      "id": "shares_add_up",
+      "description": "Shares in the table add up to the total the method reports",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "sum": {
+                    "map": [
+                      {
+                        "var": "answer.ownership"
+                      },
+                      {
+                        "var": "shares"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "var": "answer.total_shares_post"
+                }
+              ]
+            }
+          },
+          1
+        ]
+      },
+      "message": "The shares in the table do not add up to the reported total."
+    },
+    {
+      "id": "existing_shares_kept",
+      "description": "Existing holders keep at least the shares in your cap table",
+      "rule": {
+        ">=": [
+          {
+            "sum": {
+              "map": [
+                {
+                  "var": "answer.ownership"
+                },
+                {
+                  "var": "shares"
+                }
+              ]
+            }
+          },
+          {
+            "+": [
+              {
+                "sum": {
+                  "map": [
+                    {
+                      "var": "input.cap_table"
+                    },
+                    {
+                      "var": "shares"
+                    }
+                  ]
+                }
+              },
+              {
+                "var": "answer.investor_shares"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "Shares from your cap table are missing after the round."
+    },
+    {
+      "id": "post_money_arithmetic",
+      "description": "Post-money equals pre-money plus the investment",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "var": "answer.post_money"
+                },
+                {
+                  "+": [
+                    {
+                      "var": "answer.pre_money"
+                    },
+                    {
+                      "var": "answer.investment"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          1
+        ]
+      },
+      "message": "Post-money is not pre-money plus the investment."
+    },
+    {
+      "id": "investor_pct_arithmetic",
+      "description": "Investor ownership equals the investment divided by post-money",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "var": "answer.investor_pct"
+                },
+                {
+                  "/": [
+                    {
+                      "var": "answer.investment"
+                    },
+                    {
+                      "var": "answer.post_money"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          0.002
+        ]
+      },
+      "message": "The investor's share does not match investment divided by post-money."
+    },
+    {
+      "id": "price_arithmetic",
+      "description": "Investor shares times price equals the investment",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "*": [
+                    {
+                      "var": "answer.investor_shares"
+                    },
+                    {
+                      "var": "answer.price_per_share"
+                    }
+                  ]
+                },
+                {
+                  "var": "answer.investment"
+                }
+              ]
+            }
+          },
+          {
+            "*": [
+              {
+                "var": "answer.investment"
+              },
+              0.01
+            ]
+          }
+        ]
+      },
+      "message": "Investor shares times the price do not equal the investment."
+    },
+    {
+      "id": "founder_floor_or_flag",
+      "description": "Founders stay above your floor, or the method flags it",
+      "rule": {
+        "or": [
+          {
+            ">=": [
+              {
+                "var": "answer.founders_pct"
+              },
+              {
+                "var": "input.founders_floor_pct"
+              }
+            ]
+          },
+          {
+            "in": [
+              "founder_below_floor",
+              {
+                "var": "answer.flags"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "Founders end below your floor and the method did not flag it."
+    }
+  ],
+  "seller_secrets": [
+    "dilution and negotiation priorities (the prompt)"
+  ],
+  "disclosures": [
+    "Not legal or investment advice. Read the full documents with your lawyer.",
+    "This method is a prompt. The answer comes from an AI model, so the same data can give a different answer. Check the numbers yourself.",
+    "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}
