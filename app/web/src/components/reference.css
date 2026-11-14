@@ -1087,3 +1087,41 @@ svg.i { width: 20px; height: 20px; flex: none }
 .reference .cl-grid, .reference .cl-checks { background:#fff; gap:0 }
 .reference .cl-grid > li, .reference .cl-checks > li { box-shadow:inset -1px -1px 0 var(--line) }
 .reference .cl-grid::after, .reference .cl-checks3::after { content:none }
+
+/* Buyer data sheet (data-sheet.tsx): label left, input right, one bordered sheet per group. */
+.reference .ds-cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:14px; align-items:start }
+.reference .ds-sheet { display:grid; border:1px solid var(--line2); border-radius:12px; background:#fff; overflow:hidden }
+.reference .ds-sheet > header { display:grid; gap:2px; padding:12px 14px 10px; border-bottom:1px solid var(--line); background:#fafafa }
+.reference .ds-sheet > header b { font-size:14.5px; font-weight:700 }
+.reference .ds-sheet > header span { font-size:12.5px; font-weight:500; color:var(--muted); line-height:1.4 }
+.reference .ds-rows { display:grid }
+.reference .ds-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(150px,46%); align-items:center; gap:12px; padding:8px 14px; border-top:1px solid var(--line) }
+.reference .ds-row:first-child { border-top:0 }
+.reference .ds-l { display:grid; gap:1px; min-width:0 }
+.reference .ds-l b { font-size:13.5px; font-weight:650; line-height:1.3 }
+.reference .ds-l span { font-size:12px; font-weight:500; color:var(--muted); line-height:1.35 }
+.reference .ds-box { display:flex; align-items:center; height:38px; border:1px solid var(--line2); border-radius:8px; background:#fff; overflow:hidden }
+.reference .ds-box:focus-within { outline:2px solid var(--blue); outline-offset:1px; border-color:var(--blue) }
+.reference .ds-box.priv { background:#f7f8ff; border-color:#c9d1ff }
+.reference .ds-box input { flex:1; min-width:0; height:100%; border:0; outline:0; padding:0 10px; background:transparent; font:600 14px var(--font-inter),sans-serif; color:var(--ink); font-variant-numeric:tabular-nums; text-align:right }
+.reference .ds-lock { display:grid; place-items:center; padding-left:10px; color:var(--blue) }
+.reference .ds-lock svg { width:14px; height:14px }
+.reference .ds-unit { flex:none; padding:0 10px; height:100%; display:grid; place-items:center; border-left:1px solid var(--line); background:#f4f4f4; font-size:12px; font-weight:600; color:var(--ink2); white-space:nowrap }
+.reference .ds-in { width:100%; padding:8px 10px; border:1px solid var(--line2); border-radius:8px; font:500 14px var(--font-inter),sans-serif; resize:vertical }
+.reference .ds-seg { display:inline-flex; justify-self:end; padding:3px; gap:3px; border:1px solid var(--line2); border-radius:9px; background:#f4f4f4 }
+.reference .ds-seg button { height:30px; padding:0 14px; border:0; border-radius:6px; background:transparent; font:600 13px var(--font-inter),sans-serif; color:var(--ink2); cursor:pointer }
+.reference .ds-seg button.on { background:#fff; color:var(--blue); box-shadow:0 1px 3px rgba(16,16,16,.12) }
+.reference .rp-sources { border:1px dashed var(--line2); border-radius:10px; padding:10px 12px; background:#fafafa }
+.reference .rp-sources summary { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13.5px; font-weight:600; color:var(--ink2) }
+.reference .rp-sources summary svg { width:15px; height:15px; color:var(--blue) }
+.reference .rp-sources[open] summary { margin-bottom:10px }
+.reference .rp-noquote { gap:14px }
+.reference .rp-todo { margin:0; padding:0 0 0 18px; display:grid; gap:4px; font-size:13.5px; font-weight:500; color:#b4321f }
+@media (max-width:720px) { .reference .ds-row { grid-template-columns:1fr } .reference .ds-cols { grid-template-columns:1fr } }
+.reference .ds-box input { text-align:left }
+.reference .ds-box input.num { text-align:right }
+.reference .ds-row { grid-template-columns:minmax(0,1fr) minmax(160px,50%) }
+/* Sheets flow into two balanced columns, so a short group fills the gap under another instead of starting a new row. */
+.reference .ds-cols { display:block; columns:2 340px; column-gap:14px }
+.reference .ds-cols > .ds-sheet { break-inside:avoid; margin-bottom:14px }
+.reference .rp-noquote > header { display:grid !important; gap:2px }

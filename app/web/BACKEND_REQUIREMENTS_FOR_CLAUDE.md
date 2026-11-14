@@ -1,3 +1,5 @@
+> Historical artifact or handoff, retained for context. Synchronized 14 November 2026. Implementation status and earlier missing-feature claims in this file are not the current product state. Read [../../CURRENT_STATE.md](../../CURRENT_STATE.md) and [../../FRONTEND_GUIDE.md](../../FRONTEND_GUIDE.md) first. Preserve the original evidence and proposals below without interpreting them as new approval.
+
 # Kebutuhan backend untuk melengkapi integrasi Kalis
 
 Disusun Codex, 14 November 2026, atas permintaan Dien untuk dikerjakan Claude. Ini handoff implementasi, bukan laporan endpoint sudah dibangun. Nama endpoint dan bentuk payload baru di bawah adalah usulan kontrak integrasi. Kebijakan yang belum diputuskan tetap terbuka.

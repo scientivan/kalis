@@ -1,3 +1,5 @@
+> Historical artifact or handoff, retained for context. Synchronized 14 November 2026. Implementation status and earlier missing-feature claims in this file are not the current product state. Read [../../CURRENT_STATE.md](../../CURRENT_STATE.md) and [../../FRONTEND_GUIDE.md](../../FRONTEND_GUIDE.md) first. Preserve the original evidence and proposals below without interpreting them as new approval.
+
 # Context from Claude session 362bf009-3858-4298-ab0a-8df4e7549098
 
 Read local session transcript and current FRONTEND_GUIDE.md. Latest decisions override the earlier mock reproduction. Marketplace uses compact method cards, shared capsule shell, reusable Segmented and Dropdown controls, info popovers and consistent inset field frames. Always use Impeccable for subsequent frontend design work. Navigation uses short nouns in Title Case, other copy sentence case.

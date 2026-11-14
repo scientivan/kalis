@@ -1,29 +1,29 @@
-# Backend integration
+# Integrasi backend terkini
 
-Normal application pages now default to backend mode. The banner toggle switches explicitly to an isolated mock demo. /connected/runs remains the encrypted buyer execution surface, reached from registered method versions. See COVERAGE.md for all connected operations and unsupported API boundaries.
+Diperbarui 14 November 2026. Route utama Next.js memakai backend. Catatan awal /connected-only dan mock-only sudah historis.
 
-## Start
+## Menjalankan lokal
 
-Run the existing app/backend server on 8787, then restart the Next.js server from app/web so the new API route is discovered. npm run dev -- --port 3311. For production locally, npm run build followed by npm start -- --port 3311. KALIS_BACKEND_URL is a server-only setting, default http://127.0.0.1:8787. No backend secret is copied into frontend environment variables.
+Mulai backend dari app/backend dengan npm ci lalu npm start. Mulai frontend dari app/web dengan npm ci lalu npm run dev. Port default Next.js adalah 3000 dan backend 8787. Override frontend port melalui npm run dev -- --port 3311 jika diperlukan. Atur KALIS_BACKEND_URL pada server frontend jika backend berbeda origin. Restart server setelah mengubah environment. Detail lengkap di ../../README.md dan DEPLOYMENT.md.
 
-## Connected surfaces
+Browser memakai /api/backend/api/... pada origin frontend. Proxy menerapkan allowlist endpoint dan pemeriksaan Origin untuk mutasi, meneruskan bearer session serta workspace yang valid, dan tidak meneruskan cookie browser. API.md dan kode backend adalah kontrak teknis, bukan bukti bahwa setiap alur sudah diuji dari browser.
 
-/connected/methods and /connected/runs load backend config and registry methods. The portfolio path seals synthetic JSON in the browser, requests a version-pinned escrow using demo_topup only after explicit testnet payment consent, executes with ciphertext, opens the answer locally, verifies the completion signature/key/run/data binding and compares the answer to the paid version snapshot, then displays buyer checks and settlement. Payment requests are never automatically retried. An uncertain payment response must be reconciled before creating another payment.
+## Modul yang terhubung
 
-Session secrets and original portfolio stay in memory. Only the public run reference is written to sessionStorage. Refresh loses the decryption key. The interface can inspect the previous on-chain reference but cannot recover the answer without the key. Never submit real private data while testing this integration.
+run-page.tsx menyediakan draft/consent/quote, pembayaran mock testnet atau wallet, async execution, pemeriksaan bukti dan hasil lokal, settlement, reclaim dan review. data-tools.tsx menyediakan sumber input, mock connections, dokumen dan memory. seller-editor.tsx menyediakan manifest, sealed artifact, validasi dan publication. community-workspace.tsx menyediakan issue sampai proposal, bounty, kontribusi, private test, review serta unsigned payout/publication. account-tools.tsx menyediakan profil, preferensi dan history.
 
-/connected/dao reads backend balances, proposals and bounties. DAO write endpoints are not exposed by the current API, so proposal/vote/payout in the existing demo stay mock.
+GET capabilities membedakan enabled, demo, read_only dan unavailable. Tidak ada saldo kustodian. Model proprietary belum didukung. Call unsigned harus ditandatangani akun yang tepat dan status dibaca kembali dari chain.
 
-/connected/protections is an advanced API integration panel for credentials, private-value registration, outbound review, memory, documents and browser operations. It lists backend records and can approve/reject/revoke/use/execute selected records. Outbound approval returns the exact action_hash. These operations follow backend policy, not the mock reducer. The advanced panel remains available for diagnosis. Normal Connections, Memory, Files, Activity, Browser and Community pages now call their backend endpoints directly. Files uses a PDF/image picker and base64 ingestion, explicitly disclosed as plaintext upload to the backend, not encrypted document upload.
+## Privasi dan persistence
 
-## Security boundary
+Modul crypto.js, checks.js dan file-import.js di browser identik byte per byte dengan backend pada audit. Sealing dan answer opening dilakukan pada browser, answer key hanya di memori tab.
 
-The Next proxy has an explicit API path allowlist and requires matching Origin for writes. It forwards only JSON and a validated demo workspace identifier. Browser cookies and backend signing keys are not forwarded. Workspace IDs are demo identities, not authentication. No public deployment is authorized.
+Batas penting ada pada run-page.tsx pay. Nilai field private juga dikirim plaintext ke protections/private-values untuk outbound detection dan disimpan backend. Jadi jalur UI keseluruhan belum memenuhi janji bahwa operator hanya melihat ciphertext. Lima protections, dokumen, notes dan connector berjalan di backend biasa. Tidak mengubah implementasi ini dalam tugas sinkronisasi.
 
-Copied browser crypto source is app/backend/src/kalis-crypto.js, with noble versions pinned to the same versions as the backend. Keep this copy aligned during integration. Certificate root validation is not implemented. Attestation comparisons alone do not establish full Intel-chain verification or universal method quality.
+Private test case disegel di browser dan hanya dievaluasi runner, grant terpisah dari izin menjalankan metode. Tidak menyamakan evaluator baseline/candidate dengan penilaian kualitas metode di dunia nyata.
 
-## Verification
+## Bukti
 
-Typecheck and production build pass. npm test runs 23 TypeScript tests (20 existing plus 3 proxy checks) and three browser-crypto tests. Direct read-only backend health/config/method requests succeeded. No paid run, settlement, protection mutation or testnet spending was performed by Codex.
+Audit GET health/capabilities/config/methods/community config/dao/issues/proposals/bounties berhasil. Browser tanpa login membuka 14 halaman, dan proxy health memberi HTTP 200. Snapshot ada di ../../audit/2026-11-14-doc-sync/. Build dan 31 tes frontend sesi yang sama lulus sebelum perubahan dokumentasi.
 
-Existing server 3311 was still running the old application and returned the old catch-all page for the new API URL. A replacement process could not bind port 3312 (EPERM). Restarting the existing frontend is required before browser end-to-end verification. Do not describe a live paid integration or all existing pages as verified.
+Bukti pembayaran dan DAO testnet historis ada di BUILD_STATUS.md 6.11–6.18. Laporan Chrome oleh Claude dan run portofolio oleh Dien tetap diberi atribusi. Audit ini tidak sign in, membuat data, memanggil AI berbayar, menandatangani transaksi, settle atau deploy. Full authenticated browser E2E belum dibuktikan ulang.

@@ -1,3 +1,5 @@
+> Historical artifact or handoff, retained for context. Synchronized 14 November 2026. Implementation status and earlier missing-feature claims in this file are not the current product state. Read [../../CURRENT_STATE.md](../../CURRENT_STATE.md) and [../../FRONTEND_GUIDE.md](../../FRONTEND_GUIDE.md) first. Preserve the original evidence and proposals below without interpreting them as new approval.
+
 # Coverage of RANCANGAN_PRODUK.md in the Next.js app
 
 Audit date 14 November 2026. Source of truth for requirements is `../../RANCANGAN_PRODUK.md` (section 0 and the highest-numbered sections win). Every row below runs on mock data in the browser (`src/lib/domain.ts`, storage key `kalis-mock-v3`). Nothing calls `app/backend/` yet.

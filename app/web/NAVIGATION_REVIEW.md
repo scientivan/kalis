@@ -1,19 +1,19 @@
-# Navigation and product use cases
+# Navigasi aplikasi terkini
 
-Account is now accessed from the connected wallet menu, alongside Sign out. The separate Account rail link is removed. Connected account text contrasts against the blue surface.
+Audit 14 November 2026 berdasarkan shell.tsx, page.tsx dan browser tanpa login. Usulan lima tujuan dan Account rail pada laporan lama sudah digantikan. FRONTEND_GUIDE.md bagian terbaru tetap acuan persetujuan desain.
 
-Proposed further consolidation, not yet implemented
+| Role | Parent | Child dan alamat |
+|---|---|---|
+| Consumer | Marketplace | Methods di /marketplace |
+| Consumer | Jobs | Ongoing di /runs/ongoing, Results di /runs/results |
+| Consumer | Data | Connections di /connections, Documents di /workspace/files, Notes di /workspace/memory |
+| Author | Methods | Create di /marketplace/publish, Published di /marketplace/mine |
+| Kedua role | Community | Fund di /community, Proposals di /community/proposals, Bounties di /community/bounties, Issues di /community/issues |
+| Kedua role | Activity | History di /activity |
+| Menu wallet | Account dan Sign out | Account di /account, sign-out action |
 
-| Destination | Related product tasks | Existing routes retained as tabs or subpages |
-| --- | --- | --- |
-| Marketplace | Find methods, inspect inputs, checks, reviews and experts | Marketplace, method detail, expert |
-| Runs | Prepare, consent, quote, pay, execute, check results, settle, reclaim, rate, approve outbound actions | Runs, Approvals |
-| Data | Control inputs, connector scopes, documents and saved notes | Connections, Documents, Notes |
-| Listings | Create, seal, validate and publish methods, manage versions and earnings | Listings, publish |
-| Community | Fund, proposals, council votes, issues, bounties, contributions, private tests and payouts | Fund, Bounties |
-| Wallet menu | Profile, balance, preferences and sign out | Account |
-| Activity | Cross-cutting history across runs, data protections and community | Activity, notifications |
+Consumer dan Author menyusun navigasi, bukan permission. Permissions tetap diverifikasi backend dan chain. Label Create teramati di kode/browser, sedangkan panduan sebelumnya menyebut Drafts. Perbedaan ini dicatat, bukan diasumsikan sebagai persetujuan pengguna baru.
 
-Basis is RANCANGAN_PRODUK sections 0, 47–52, escrow, bounty and five-protection decisions, plus current API and route structure. Keep Approvals discoverable with a pending count when available, even if nested under Runs. Keep private-case grants distinct from ordinary run consent. Do not remove any supported task when merging entry points.
+Ongoing memuat outbound approvals. /approvals membuka permukaan Ongoing yang sama. /runs dan /workspace tetap alias Ongoing, /balance alias Account. Method detail dan tab di /marketplace/id/tab, expert di /experts/account, dan run di /runs/id. /connected serta fallback KalisApp mempertahankan permukaan lama, bukan navigasi utama.
 
-Recommend agreeing this map before replacing remaining rail links because Data and Community introduce broader destination names. Current change only merges Account into the wallet menu as explicitly requested.
+Parent/child rail, ukuran, ekspansi dan perilaku responsif mengikuti FRONTEND_GUIDE.md. Audit ini tidak merancang ulang navigasi atau menghapus route. Browser tanpa login membuka seluruh 14 tujuan utama, bukan bukti izin atau transaksi akun.

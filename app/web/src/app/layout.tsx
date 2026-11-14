@@ -6,6 +6,7 @@ import { NearAuthProvider } from '../lib/near/auth';
 import '@near-wallet-selector/modal-ui/styles.css';
 import './globals.css';
 export const metadata: Metadata = {
+  metadataBase: new URL("https://app.calis.scientivan.dev"),
   title: 'Kalis',
   description: 'Private methods, shared progress. Connected testnet workspace with a separate mock demo.',
 };

@@ -1,46 +1,19 @@
-# Frontend gap audit
+# Gap frontend dan bukti yang masih diperlukan
 
-Source inspection against API.md, 14 November 2026. No runtime or browser verification in this audit. A route existing is not evidence that its whole workflow is implemented.
+Diperbarui 14 November 2026 dari source, API lokal dan 14 halaman browser tanpa login. Daftar gap lama yang menganggap editor, wallet request, async execution atau community writes belum ada sudah digantikan. Cakupan saat ini ada di COVERAGE.md dan ../../CURRENT_STATE.md.
 
-| Area | Existing | Missing or incomplete |
-| --- | --- | --- |
-| Buyer preparation | Typed manifest fields, synthetic sample | Connector selection/use, local Office import, document extraction review, note recall, private-value registration, source provenance |
-| Checkout | Browser seal, direct test-top-up run creation | Draft/consent/quote, prompt-specific consent, model narrowing, detailed costs, wallet contract-call signing, idempotency and operation recovery |
-| Execution | Synchronous execute and local opening/checks | Async operation polling, actual event track, AI-call evidence, richer manifest output display |
-| Jobs | List derived from latest 50 transaction entries | Paginated job/status retrieval, full Results coverage, timeout reclaim action, review eligibility gating |
-| Seller | Draft creation, published/draft lists, cover upload | Draft detail/editor, manifest validation, artefact sealing/upload, prompt warning acceptance, wallet publication/confirmation, version publication |
-| Connections | Read and revoke | Create connection, scope/expiry picker, effective_state and allowed_actions handling |
-| Documents | Metadata list | Upload/import/extraction review and document detail/proof linked to preparation |
-| Notes | Read, accept, reject, delete | Create/edit and permission/use history |
-| Proposals | DAO proposal list | Issue-linked proposal form, budget/acceptance/reviewer, signing, voting, chain confirmation |
-| Bounties | Bounty list | Detail, claim, contribution package, candidate submission, test, review, payout and improved-version publication |
-| Issues | Issue list | Create/report, detail, close and proposal links |
-| Private tests | No dedicated current UI | Case sealing, explicit grants, limits/expiry, revoke and test report |
-| Account | Sign-in, payment/earning lists | Profile/preferences editing, complete pagination and action/status states |
-| Method detail | Listing, input/check/version/review tabs | Version test evidence and contribution-package access need integration |
-| Cross-cutting | Shared design shell and controls | Capability gating, consistent allowed_actions, loading/error/retry coverage, authenticated/mobile verification |
+| Gap | Bukti | Tindak lanjut yang belum dilakukan |
+|---|---|---|
+| Privasi terhadap operator | run-page.tsx pay mengirim field private ke protections/private-values, outbound.js menyimpan values | Selaraskan implementasi dengan keputusan privasi. Jangan mengklaim seluruh buyer flow ciphertext-only |
+| Bukti browser berotorisasi | UI signing tersedia, audit ini tanpa login | Verifikasi login, wallet payment, publikasi, proposal/bond/vote/claim/payout dengan otorisasi transaksi tersendiri |
+| Bounty legacy | Tiga record yang teramati tanpa evaluator lokal | Jangan presentasikan sebagai alur kontribusi privat siap jalan. Tentukan migrasi atau skenario baru secara terpisah |
+| Reviewer yang ditunjuk | Form menetapkan reviewer, backend menerima council selain kontributor | Putuskan apakah reviewer eksklusif atau council mana pun yang memenuhi syarat, lalu selaraskan kode dan copy |
+| Policy revoke selama test | Kode menahan hasil setelah revoke, keputusan sebelumnya usulan | Minta keputusan produk sebelum menyebutnya policy disetujui |
+| Penyimpanan dan restart | Decryption key hanya dalam memori tab, JSON persistence backend | Buktikan recovery yang dibutuhkan. Server tidak dapat mengembalikan kunci jawaban |
+| Mobile dan aksesibilitas | Audit 14 halaman hanya viewport browser default | Audit mobile, keyboard/focus dan dialog wallet secara khusus |
+| Bukti per versi | Data aktif sembilan metode, receipt historis tidak seluruhnya versi terbaru | Pertahankan receipt per versi. Jangan menganggap catalog presence bukti run berbayar |
+| Klaim mutu dan rating | Seed review testnet dan verdict/checks tersedia | Jangan memakai rating demo atau safe sebagai bukti pelanggan, kualitas atau profit |
 
-Recommended implementation order
+Trial, licensing, royalti, sengketa mutu dan pemeringkatan pengklaim tetap keputusan terbuka. Proprietary AI, fiat nyata dan saldo kustodian tidak tersedia. Catatan hasil Claude dan laporan pengguna tetap bukti teratribusi, bukan pengujian ulang Codex.
 
-1. Complete buyer preparation, quote/payment recovery, async execution and reclaim. Prove tender browser-to-settle.
-2. Complete seller draft-to-publication and version management.
-3. Complete Issues to Proposals to Bounties to contribution/test/review/payout flow.
-4. Complete Account editing and cross-cutting validation.
-
-Keep backend ownership separate. Record missing contracts in BACKEND_REQUESTS.md, never invent endpoints. Only claim tested behavior after actual verification. Compliance gate found no conflict for this source audit.
-
-## Status after the 14 November 2026 integration pass (Claude Code)
-
-Verified in Chrome against the live backend, signed in as `scientivanmsk.testnet` through a seeded session fixture:
-
-| Area | State |
-| --- | --- |
-| Jobs | Ongoing and Results list real runs. Execute is async with polling. A slow OutLayer call is now resumed by pressing Run privately again (backend keeps `pending_call_id`), no second payment |
-| Methods | Drafts list and editor open with manifest, price, community share, sealed artefact and wallet publication. Published stays empty until the owner signs the publish calls |
-| Connections, Documents, Notes | Create, list, revoke and edit work. Records now follow the signed-in account instead of a per-tab demo workspace (backend fix in `src/protections/routes.js`) |
-| Issues, Proposals, Bounties, Fund | Lists, forms and detail work. Proposal waits for the proposer's wallet signature and bond |
-| Account, Activity | Payments, earnings and the activity feed show seeded testnet records |
-| Labels | Raw codes such as `awaiting_signature` and method ids are replaced by plain labels and marketplace titles (`src/lib/labels.ts`) |
-
-Not verified: the full wallet signing path in a real browser wallet (publish, proposal bond, bounty claim, wallet-paid run), and mobile layout.
-Known chain data: bounty 0 on `kalis-fund.sputnik-v2.testnet` has "rtk make" in its description, inserted by a shell hook when it was created. It is closed and cannot be edited on chain.
+Pekerjaan yang diminta sekarang hanya sinkronisasi dokumen. Tidak ada perbaikan fitur, transaksi atau deployment dilakukan. Setelah itu pembahasan inovasi Social Money dimulai dari mekanisme yang sudah tersedia.

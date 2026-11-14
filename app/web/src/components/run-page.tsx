@@ -16,6 +16,7 @@ import { PageInfo, Dropdown } from "./controls";
 import { Fx, StepRail, Msg } from "./form-kit";
 import { ManifestInput, type ManifestField } from "./manifest-fields";
 import { statusLabel } from "../lib/labels";
+import { Sheet, SheetRow } from "./data-sheet";
 
 type Field = { id: string; label: string; type?: string; unit?: string; required?: boolean; private?: boolean; help?: string; enum?: string[]; items?: { type?: string }; display?: string; source?: string; min?: number; max?: number };
 type Manifest = { inputs?: { fields?: Field[]; sample?: Record<string, unknown> }; outputs?: { fields?: Field[]; status_field?: string }; steps?: { id: string; what: string }[]; buyer_checks?: unknown[]; ai?: { allowed?: string[] }; listing?: { outcome?: string } };
@@ -231,10 +232,11 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
   };
   const privateFields = fields.filter(f => f.private && !complex(f)), plainFields = fields.filter(f => !f.private && !complex(f)), groups = fields.filter(complex);
   const groupValue = (f: Field) => { try { return JSON.parse(values[f.id] || ""); } catch { return undefined; } };
+  const objectGroups = groups.filter(g => g.type === "object"), listGroups = groups.filter(g => g.type !== "object");
+  // Every single value and every object group shares one page as a sheet; lists keep their own page because they grow.
   const dataPages = [
-    ...(privateFields.length ? [{ id: "d:private", title: "Private Values", hint: "Sealed on this device before anything is sent" }] : []),
-    ...(plainFields.length ? [{ id: "d:details", title: "Other Details", hint: "Also sealed, used to shape the answer" }] : []),
-    ...groups.map(g => ({ id: `d:${g.id}`, title: g.label, hint: g.help || (g.type === "array" ? "A list you can add rows to" : `${((g as ManifestField).fields || []).length} related values`) })),
+    ...(privateFields.length || plainFields.length || objectGroups.length ? [{ id: "d:sheet", title: "Your Data", hint: "Sealed on this device before anything is sent" }] : []),
+    ...listGroups.map(g => ({ id: `d:${g.id}`, title: g.label, hint: g.help || "A list you can add rows to" })),
   ];
   const page = dataPages[Math.min(dataPage, Math.max(0, dataPages.length - 1))];
   const railId = current === "Your data" ? page?.id || "Your data" : current;
@@ -267,23 +269,30 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
       <div className="se-body">
         <StepRail label="Run steps" steps={[...dataPages, ...STAGES.slice(1).map(s => ({ id: s, title: STAGE_TITLE[s], hint: STAGE_HINT[s] }))]} current={railId} done={Object.fromEntries([...dataPages.map(p => [p.id, stage > 0 || !!quote]), ...STAGES.map((s, i) => [s, i < stage || (s === "Result" && !!answer)])])} disabled={Object.fromEntries(STAGES.map(s => [s, !reachable(s)]))} onPick={id => { const i = dataPages.findIndex(p => p.id === id); if (i >= 0) { setDataPage(i); setView("Your data"); } else allowed(id); }} />
         <div className="se-panel">
-          <div className="se-panel-head"><h3>{current === "Your data" && page ? page.title : STAGE_TITLE[current]}</h3><p>{current === "Your data" && page ? `${page.hint}. Part ${dataPage + 1} of ${dataPages.length} of your data.` : `${STAGE_HINT[current]}.`}</p></div>
+          <div className="se-panel-head"><h3>{current === "Your data" && page ? page.title : STAGE_TITLE[current]}</h3><p>{current === "Your data" && page ? dataPages.length > 1 ? `${page.hint}. Part ${dataPage + 1} of ${dataPages.length} of your data.` : `${page.hint}.` : `${STAGE_HINT[current]}.`}</p></div>
           <div className="se-split">
             <div className="se-fields">
               {current === "Your data" && <>
-                {dataPage === 0 && <PreparationSources methodId={d.method_id} runId={runId || undefined} fields={fields} onValue={(fieldId,value,source)=>{setValues(old=>({...old,[fieldId]:typeof value === "string" ? value : JSON.stringify(value)}));setSources(old=>({...old,[fieldId]:source}));}}/>}
-                {page?.id === "d:private" && <div className="rp-grid">{privateFields.map(fieldInput)}</div>}
-                {page?.id === "d:details" && <div className="rp-grid">{plainFields.map(fieldInput)}</div>}
-                {groups.filter(f => page?.id === `d:${f.id}`).map(f => { const mf = f as ManifestField; const gv = groupValue(f); const obj = gv && typeof gv === "object" && !Array.isArray(gv) ? gv as Record<string, unknown> : {};
-                  return mf.type === "object" ? <div className="rp-grid" key={f.id}>{(mf.fields || []).map(child => <ManifestInput key={child.id} field={child} value={obj[child.id]} onChange={next => setField(f.id, JSON.stringify({ ...obj, [child.id]: next }))} />)}</div>
-                    : <ManifestInput key={f.id} field={{ ...mf, label: "Items", help: undefined }} value={gv} onChange={next => setField(f.id, next === undefined ? "" : JSON.stringify(next))} />; })}
+                {dataPage === 0 && <details className="rp-sources"><summary>{icon("link")}Fill values from a connected app, a document or a note</summary><PreparationSources methodId={d.method_id} runId={runId || undefined} fields={fields} onValue={(fieldId,value,source)=>{setValues(old=>({...old,[fieldId]:typeof value === "string" ? value : JSON.stringify(value)}));setSources(old=>({...old,[fieldId]:source}));}}/></details>}
+                {page?.id === "d:sheet" && <div className="ds-cols">
+                  {!!privateFields.length && <Sheet title="Private Values" note="Locked values are sealed here and never shown to the expert.">{privateFields.map(f => <SheetRow key={f.id} field={f} value={values[f.id] || ""} onChange={x => setField(f.id, x)} />)}</Sheet>}
+                  {!!plainFields.length && <Sheet title="Other Details" note="Also sealed, used to shape the answer.">{plainFields.map(f => <SheetRow key={f.id} field={f} value={values[f.id] || ""} onChange={x => setField(f.id, x)} />)}</Sheet>}
+                  {objectGroups.map(f => { const mf = f as ManifestField; const gv = groupValue(f); const obj = gv && typeof gv === "object" && !Array.isArray(gv) ? gv as Record<string, unknown> : {};
+                    const toRaw = (c: ManifestField, x: unknown) => x === undefined || x === null ? "" : c.type === "percent" && typeof x === "number" ? String(Number((x * 100).toPrecision(12))) : String(x);
+                    const fromRaw = (c: ManifestField, raw: string): unknown => { if (raw === "") return undefined; if (c.type === "boolean") return raw === "true"; if (["number", "integer", "money", "percent"].includes(c.type || "")) { const n = Number(raw); return Number.isFinite(n) ? c.type === "percent" ? n / 100 : n : raw; } return raw; };
+                    return <Sheet key={f.id} title={f.label} note={f.help}>{(mf.fields || []).map(child => <SheetRow key={child.id} field={child as never} value={toRaw(child, obj[child.id])} onChange={raw => setField(f.id, JSON.stringify({ ...obj, [child.id]: fromRaw(child, raw) }))} />)}</Sheet>; })}
+                </div>}
+                {listGroups.filter(f => page?.id === `d:${f.id}`).map(f => { const mf = f as ManifestField; const gv = groupValue(f);
+                  return <ManifestInput key={f.id} field={{ ...mf, label: "Items", help: undefined }} value={gv} onChange={next => setField(f.id, next === undefined ? "" : JSON.stringify(next))} />; })}
               </>}
               {current === "Pay" && <>
                 <Dropdown label="Payment" value={payment} onChange={setPayment} options={[{value:"demo_topup",label:"Test top-up (no real money)"},{value:"wallet",label:"NEAR wallet"}]}/>
                 {quote ? <section className="se-box"><header><b>{icon("coins")}Cost of This Run</b><span>This quote is valid until {new Date(quote.expires_at).toLocaleTimeString()}.</span></header>
                   <dl className="rp-dl">{Object.entries({"Method price":quote.method_price,"Storage deposit":quote.storage_deposit,"Infrastructure, paid by Kalis":quote.infra_fee,"Network fee, at most":quote.gas,"Most you can pay":quote.max_total}).map(([label,money])=><div key={label}><dt>{label}</dt><dd>{money?.display || "Unavailable"}</dd></div>)}</dl></section>
-                  : <p className="se-empty">Go back to Your Data and press See the cost first.</p>}
-                <div className="se-note">{icon("info")}<span>Wallet payment needs your connected NEAR testnet account. A submitted payment is never retried automatically.</span></div>
+                  : <section className="se-box rp-noquote"><header><b>{icon("coins")}Cost of This Run</b><span>{termsOk ? "Get the exact cost before anything is paid. Nothing leaves this device yet." : "Finish Before You Pay on the Your Data step first."}</span></header>
+                    {!termsOk && <ul className="rp-todo">{!input.ok && <li>{input.message}</li>}{v?.method_kind?.kind === "prompt" && !promptConsent && <li>Accept the AI prompt notice.</li>}{!consent && <li>Tick that you checked your data and agree to pay {price} into escrow.</li>}</ul>}
+                    <div className="se-actions">{!termsOk && <button className="view" onClick={() => { setDataPage(0); setView("Your data"); }}>Go to Your Data</button>}<button className="primary-btn" disabled={!!busy || !termsOk} onClick={prepareQuote}>{busy || "See the Cost"}</button></div></section>}
+                {payment === "wallet" && <div className="se-note">{icon("info")}<span>{auth.session ? `Your wallet ${auth.session.account_id} signs the payment after you review it. A submitted payment is never retried automatically.` : "Sign in with your NEAR testnet account to pay from your wallet."}</span></div>}
               </>}
               {current === "Run" && <section className="se-box"><header><b>{icon("play")}{busy ? "Running in the Locked Chip" : "Steps That Will Run"}</b><span>{busy ? "This can take up to four minutes. Keep this tab open." : "Keep this tab open. The key that opens your answer lives only here."}</span></header>
                 <ol className={`steps ${busy ? "live" : ""}`}>{(m.steps || []).map((s, i) => <li key={s.id} style={{ "--i": i } as React.CSSProperties}><span className="sn">{i + 1}</span><span>{s.what}</span></li>)}</ol></section>}
@@ -331,7 +340,7 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
             <span>{escrowText}</span>
             {current === "Your data" && dataPage < dataPages.length - 1 && <button className="primary-btn" onClick={() => setDataPage(dataPage + 1)}>Continue</button>}
             {current === "Your data" && dataPage >= dataPages.length - 1 && <button className="primary-btn" disabled={!!busy || !termsOk} onClick={prepareQuote}>{busy || "See the cost"}</button>}
-            {current === "Pay" && <button className="primary-btn" disabled={!!busy || !consent || !!runId || !!paymentAttempt.current || (payment === "wallet" && !auth.session)} onClick={pay}>{icon("lock")}{busy || (payment === "wallet" ? "Seal and review payment" : "Seal and pay")}</button>}
+            {current === "Pay" && <button className="primary-btn" disabled={!!busy || !consent || !quote || !!runId || !!paymentAttempt.current || (payment === "wallet" && !auth.session)} title={!quote ? "See the cost first" : undefined} onClick={pay}>{icon("lock")}{busy || (payment === "wallet" ? "Seal and review payment" : "Seal and pay")}</button>}
             {current === "Run" && <button className="primary-btn" disabled={!!busy || chain?.status !== "Paid" || !secrets.has(runId) || !!answer} onClick={execute}>{icon("play")}{busy || "Run privately"}</button>}
             {current === "Result" && answer && !settled && <button className="primary-btn" disabled={!!busy} onClick={settle}>{busy || "Release payment"}</button>}
           </footer>
