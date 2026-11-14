@@ -24,7 +24,10 @@ async function proxy(
       },
       { status: 404 },
     );
-  if (req.method !== "GET" && req.headers.get("origin") !== req.nextUrl.origin)
+  // nextUrl.origin reports "localhost" in dev even when the page is served from 127.0.0.1, so also accept the Host header origin.
+  const origin = req.headers.get("origin");
+  const hostOrigin = `${req.nextUrl.protocol}//${req.headers.get("host") || ""}`;
+  if (req.method !== "GET" && origin !== req.nextUrl.origin && origin !== hostOrigin)
     return NextResponse.json(
       {
         error: {
