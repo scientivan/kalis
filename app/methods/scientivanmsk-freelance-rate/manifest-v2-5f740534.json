@@ -1,0 +1,329 @@
+{
+  "manifest_version": 5,
+  "method_id": "scientivanmsk-freelance-rate",
+  "kind": "prompt",
+  "listing": {
+    "title": "Set a freelance day rate above your floor",
+    "outcome": "A day rate to propose, the project fee it gives, two scope terms and a reply you can send to the client.",
+    "category": "Career",
+    "seller": {
+      "display_name": "Kalis demo seller",
+      "role": "Demo account on NEAR testnet",
+      "demo": true
+    },
+    "urgency": "The client wants your rate today, and if your floor rate leaks it becomes the price.",
+    "limits": [
+      "Demo method on testnet",
+      "Fictional sample data only",
+      "Day rates only, not monthly salaries"
+    ],
+    "sample_output": "Synthetic example: propose IDR 4,200,000 per day for 10 days (IDR 42,000,000), ask for 50% upfront and a 2 round revision limit.",
+    "not_advice": false
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "service",
+        "label": "Service or project",
+        "type": "string",
+        "required": true,
+        "private": false
+      },
+      {
+        "id": "currency",
+        "label": "Currency",
+        "type": "string",
+        "required": true,
+        "private": false,
+        "help": "For example IDR or USD."
+      },
+      {
+        "id": "client_offer_rate",
+        "label": "Day rate the client offered",
+        "type": "money",
+        "unit": "per day",
+        "required": true,
+        "private": true,
+        "min": 0
+      },
+      {
+        "id": "floor_rate",
+        "label": "Lowest day rate you would accept",
+        "type": "money",
+        "unit": "per day",
+        "required": true,
+        "private": true,
+        "min": 0,
+        "help": "Never shown in the reply."
+      },
+      {
+        "id": "market_rate",
+        "label": "Typical day rate for this work",
+        "type": "money",
+        "unit": "per day",
+        "required": false,
+        "private": false,
+        "min": 0
+      },
+      {
+        "id": "days",
+        "label": "Estimated working days",
+        "type": "integer",
+        "required": true,
+        "private": false,
+        "min": 1,
+        "max": 365
+      },
+      {
+        "id": "client_type",
+        "label": "Client type",
+        "type": "string",
+        "required": false,
+        "private": false,
+        "help": "For example startup, agency or enterprise."
+      }
+    ],
+    "sample": {
+      "_label": "fictional",
+      "service": "Brand identity design",
+      "currency": "IDR",
+      "client_offer_rate": 3000000,
+      "floor_rate": 3500000,
+      "market_rate": 4000000,
+      "days": 10,
+      "client_type": "startup"
+    }
+  },
+  "ai": {
+    "allowed": [
+      "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+    ],
+    "proprietary": false
+  },
+  "steps": [
+    {
+      "id": "ask_model",
+      "what": "Send the sealed method and your data to the private model and check its attestation and signature"
+    },
+    {
+      "id": "leak_check",
+      "what": "Withhold the answer if it repeats the seller's method text"
+    }
+  ],
+  "connectors": [],
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "outputs": {
+    "parse": "json_in_text",
+    "fields": [
+      {
+        "id": "proposed_rate",
+        "label": "Day rate to propose",
+        "type": "money",
+        "unit": "per day",
+        "display": "money"
+      },
+      {
+        "id": "project_fee",
+        "label": "Project fee at that rate",
+        "type": "money",
+        "display": "money"
+      },
+      {
+        "id": "terms",
+        "label": "Scope and payment terms",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "display": "list"
+      },
+      {
+        "id": "reply",
+        "label": "Reply you can send",
+        "type": "text",
+        "display": "markdown"
+      },
+      {
+        "id": "why",
+        "label": "Why this rate",
+        "type": "text",
+        "display": "text"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "answer_parsed",
+      "description": "The model answered in the promised format",
+      "rule": {
+        "!": [
+          {
+            "var": [
+              "answer._parse_error",
+              ""
+            ]
+          }
+        ]
+      },
+      "pass_message": "The model answered in the promised format.",
+      "message": "The model's answer is not in the promised JSON format, so nothing else can be checked."
+    },
+    {
+      "id": "at_or_above_floor",
+      "description": "The proposed day rate is at least your floor rate",
+      "tolerance": 0.5,
+      "rule": {
+        ">=": [
+          {
+            "var": "answer.proposed_rate"
+          },
+          {
+            "var": "input.floor_rate"
+          }
+        ]
+      },
+      "pass_message": "The proposed rate of {{answer.proposed_rate:int}} per day is at or above your floor rate.",
+      "message": "The proposed rate of {{answer.proposed_rate:int}} per day is below your floor rate. Do not send it."
+    },
+    {
+      "id": "at_or_above_offer",
+      "description": "The proposed day rate is not below what the client already offered",
+      "tolerance": 0.5,
+      "rule": {
+        ">=": [
+          {
+            "var": "answer.proposed_rate"
+          },
+          {
+            "var": "input.client_offer_rate"
+          }
+        ]
+      },
+      "pass_message": "The proposed rate is not below the client's offer.",
+      "message": "The proposed rate is below the client's own offer, so it gives money away."
+    },
+    {
+      "id": "cap_60pct",
+      "description": "The proposed day rate is at most 60% above the higher of the offer and your floor",
+      "tolerance": 0.5,
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.proposed_rate"
+          },
+          {
+            "*": [
+              {
+                "max": [
+                  {
+                    "var": "input.client_offer_rate"
+                  },
+                  {
+                    "var": "input.floor_rate"
+                  }
+                ]
+              },
+              1.6
+            ]
+          }
+        ]
+      },
+      "pass_message": "The proposed rate stays within the 60% cap the method promises.",
+      "message": "The proposed rate is more than 60% above the higher of the offer and your floor, which the method says it caps."
+    },
+    {
+      "id": "fee_matches_rate",
+      "description": "The project fee equals the day rate times the estimated days",
+      "tolerance": 1,
+      "rule": {
+        "==": [
+          {
+            "var": "answer.project_fee"
+          },
+          {
+            "*": [
+              {
+                "var": "answer.proposed_rate"
+              },
+              {
+                "var": "input.days"
+              }
+            ]
+          }
+        ]
+      },
+      "pass_message": "The project fee of {{answer.project_fee:int}} equals the day rate times {{input.days}} days.",
+      "message": "The project fee of {{answer.project_fee:int}} is not the day rate times {{input.days}} days."
+    },
+    {
+      "id": "reply_hides_floor",
+      "description": "The reply does not reveal your floor rate",
+      "rule": {
+        "!": [
+          {
+            "in": [
+              {
+                "digits": [
+                  {
+                    "var": "input.floor_rate"
+                  }
+                ]
+              },
+              {
+                "digits": [
+                  {
+                    "var": "answer.reply"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "pass_message": "The reply does not contain your floor rate.",
+      "message": "The reply contains your floor rate. Do not send it."
+    },
+    {
+      "id": "two_terms",
+      "description": "Exactly two scope or payment terms",
+      "rule": {
+        "==": [
+          {
+            "count": [
+              {
+                "var": "answer.terms"
+              }
+            ]
+          },
+          2
+        ]
+      },
+      "pass_message": "The answer has two scope or payment terms.",
+      "message": "The answer does not have exactly two scope or payment terms."
+    }
+  ],
+  "seller_secrets": [
+    "rate negotiation rules (the prompt)"
+  ],
+  "disclosures": [
+    "This method is a prompt. The answer comes from an AI model, so the same data can give a different answer.",
+    "The runner cannot prove the model followed every rule. Check the numbers yourself.",
+    "Checks cover your floor, the offer, the cap and the fee arithmetic only. They cannot judge whether the client will accept."
+  ],
+  "runtime": {
+    "runner": "platform runner, prompt method: the runner sends the sealed seller prompt and your data to one private model",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

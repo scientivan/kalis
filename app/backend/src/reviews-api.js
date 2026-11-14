@@ -27,6 +27,10 @@ async function eligibility(p, runId) {
   if (row.principal !== p.id) return { ...base, eligible: false, reason: "not_your_run", message: "Only the buyer who created the run can review it." };
   const exec = readExecution(runId);
   if (!exec?.output) return { ...base, method_id: row.method_id, version: row.version, eligible: false, reason: "not_executed", message: "The run has not been executed yet, so there is nothing to review." };
+  if (p.kind === "near_account" && p.account_id) {
+    const method = await getMethod(row.method_id).catch(() => null);
+    if (method?.owner && method.owner === p.account_id) return { ...base, method_id: row.method_id, version: row.version, eligible: false, reason: "own_method", message: "You own this method, so you cannot review it. Reviews come from other buyers." };
+  }
   const onChain = await chainRun(runId).catch(() => null);
   if (existing) return { ...base, method_id: row.method_id, version: row.version, run_status: onChain?.status || null, eligible: false, reason: "already_reviewed", message: "This run already has a review." };
   return { ...base, method_id: row.method_id, version: row.version, run_status: onChain?.status || null, eligible: true, reason: "executed_run", message: "You ran this method, so you can rate it once." };

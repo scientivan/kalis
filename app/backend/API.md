@@ -187,10 +187,10 @@ Rules (RANCANGAN 65.4): one rating 1–5 per run; the caller must be the princip
 |---|---|---|
 | `GET /api/methods/:id/reviews` | `cursor`, `limit` (1–100), `version` | `{ items: [Review], next_cursor, order: "created_at desc", summary }` |
 | `GET /api/methods/:id/rating-summary` | `version` optional | `{ method_id, scope, count, average (2 decimals or null), distribution {1..5}, label, note }` |
-| `GET /api/runs/:id/review-eligibility` | caller identity | `{ run_id, eligible, reason, message, method_id, version, run_status, existing_review_id }`. `reason`: `executed_run`, `not_executed`, `not_your_run`, `unknown_run`, `already_reviewed` |
+| `GET /api/runs/:id/review-eligibility` | caller identity | `{ run_id, eligible, reason, message, method_id, version, run_status, existing_review_id }`. `reason`: `executed_run`, `not_executed`, `not_your_run`, `unknown_run`, `already_reviewed`, `own_method` (the signed-in account owns the method on chain) |
 | `POST /api/methods/:id/reviews` | `{ run_id, rating, comment?, privacy_acknowledged: true, idempotency_key? }` (or `Idempotency-Key` header) | `{ review, summary, replayed }` |
 
-`Review` = `{ id, method_id, version, run_id, rating, comment, author, author_kind, purchase_verified: true, run_status, created_at }`. `author` is the NEAR account when signed in, otherwise "Demo buyer <6 hex>". Comments are at most 1000 characters and contain only what the buyer typed. Errors: `bad_rating`, `comment_too_long`, `privacy_not_acknowledged` (400), `not_your_run`, `not_executed`, `unknown_run` (403), `already_reviewed` (409, `details.existing_review_id`), `wrong_method` (409), `idempotency_conflict` (409). No edit, delete or moderation yet (not decided).
+`Review` = `{ id, method_id, version, run_id, rating, comment, author, author_kind, purchase_verified: true, run_status, created_at }`. `author` is the NEAR account when signed in, otherwise "Demo buyer <6 hex>". Comments are at most 1000 characters and contain only what the buyer typed. Errors: `bad_rating`, `comment_too_long`, `privacy_not_acknowledged` (400), `not_your_run`, `not_executed`, `unknown_run`, `own_method` (403), `already_reviewed` (409, `details.existing_review_id`), `wrong_method` (409), `idempotency_conflict` (409). No edit, delete or moderation yet (not decided).
 
 ## Transactions, earnings, balance, activity
 

@@ -1,0 +1,347 @@
+{
+  "manifest_version": 5,
+  "method_id": "scientivanmsk-freelance-rate",
+  "kind": "prompt",
+  "listing": {
+    "title": "Set a freelance day rate above your floor",
+    "outcome": "A counter salary, a signing bonus, two non-salary asks and a reply you can send.",
+    "category": "Career",
+    "seller": {
+      "display_name": "Kalis demo seller",
+      "role": "Demo account on NEAR testnet",
+      "demo": true
+    },
+    "urgency": "HR wants your answer in 48 hours, and if your lowest acceptable number leaks it becomes the offer.",
+    "limits": [
+      "Demo method on testnet",
+      "Fictional sample data only"
+    ],
+    "sample_output": "Synthetic example: counter IDR 35,200,000 per month, ask for 3 remote days and a learning budget.",
+    "not_advice": false
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "role",
+        "label": "Role",
+        "type": "string",
+        "required": true,
+        "private": false
+      },
+      {
+        "id": "offer_salary",
+        "label": "Offered salary",
+        "type": "money",
+        "unit": "IDR per month",
+        "required": true,
+        "private": true,
+        "min": 0
+      },
+      {
+        "id": "currency",
+        "label": "Currency and period",
+        "type": "string",
+        "required": true,
+        "private": false
+      },
+      {
+        "id": "walk_away",
+        "label": "Lowest salary you would accept",
+        "type": "money",
+        "unit": "IDR per month",
+        "required": true,
+        "private": true,
+        "min": 0,
+        "help": "Never shown in the reply."
+      },
+      {
+        "id": "competing_offer",
+        "label": "Best competing offer",
+        "type": "money",
+        "unit": "IDR per month",
+        "required": false,
+        "private": true,
+        "min": 0
+      },
+      {
+        "id": "market_median",
+        "label": "Market median for the role",
+        "type": "money",
+        "unit": "IDR per month",
+        "required": false,
+        "private": false,
+        "min": 0
+      },
+      {
+        "id": "offer_has",
+        "label": "What the offer already includes",
+        "type": "object",
+        "required": false,
+        "private": false,
+        "fields": [
+          {
+            "id": "remote_days",
+            "label": "Remote days per week",
+            "type": "integer",
+            "min": 0,
+            "max": 5
+          },
+          {
+            "id": "learning_budget",
+            "label": "Learning budget per year",
+            "type": "money",
+            "unit": "IDR"
+          },
+          {
+            "id": "leave_days",
+            "label": "Leave days per year",
+            "type": "integer",
+            "min": 0
+          }
+        ]
+      }
+    ],
+    "sample": {
+      "_label": "fictional",
+      "role": "Backend engineer",
+      "offer_salary": 30000000,
+      "currency": "IDR per month",
+      "walk_away": 28000000,
+      "competing_offer": 31000000,
+      "market_median": 32000000,
+      "offer_has": {
+        "remote_days": 1,
+        "learning_budget": 0,
+        "leave_days": 12
+      }
+    }
+  },
+  "ai": {
+    "allowed": [
+      "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+    ],
+    "proprietary": false
+  },
+  "steps": [
+    {
+      "id": "ask_model",
+      "what": "Send the sealed method and your data to the private model and check its attestation and signature"
+    },
+    {
+      "id": "leak_check",
+      "what": "Withhold the answer if it repeats the seller's method text"
+    }
+  ],
+  "connectors": [],
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "outputs": {
+    "parse": "json_in_text",
+    "fields": [
+      {
+        "id": "counter_salary",
+        "label": "Counter salary",
+        "type": "money",
+        "unit": "IDR per month",
+        "display": "money"
+      },
+      {
+        "id": "signing_bonus",
+        "label": "Signing bonus",
+        "type": "money",
+        "unit": "IDR",
+        "display": "money"
+      },
+      {
+        "id": "non_salary_asks",
+        "label": "Non-salary asks",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "display": "list"
+      },
+      {
+        "id": "reply",
+        "label": "Reply you can send",
+        "type": "text",
+        "display": "markdown"
+      },
+      {
+        "id": "why",
+        "label": "Why these numbers",
+        "type": "text",
+        "display": "text"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "answer_parsed",
+      "description": "The model answered in the promised format",
+      "rule": {
+        "!": [
+          {
+            "var": [
+              "answer._parse_error",
+              ""
+            ]
+          }
+        ]
+      },
+      "pass_message": "The model answered in the promised format.",
+      "message": "The model's answer is not in the promised JSON format, so nothing else can be checked."
+    },
+    {
+      "id": "above_walk_away",
+      "description": "The counter is at least your walk-away number plus 8%",
+      "tolerance": 0.5,
+      "rule": {
+        ">=": [
+          {
+            "var": "answer.counter_salary"
+          },
+          {
+            "*": [
+              {
+                "var": "input.walk_away"
+              },
+              1.08
+            ]
+          }
+        ]
+      },
+      "pass_message": "The counter of {{answer.counter_salary:int}} is at least your walk-away number plus 8%.",
+      "message": "The counter of {{answer.counter_salary:int}} is below your walk-away number plus 8%."
+    },
+    {
+      "id": "cap_25pct",
+      "description": "The counter is at most 25% above the offer",
+      "tolerance": 0.5,
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.counter_salary"
+          },
+          {
+            "*": [
+              {
+                "var": "input.offer_salary"
+              },
+              1.25
+            ]
+          }
+        ]
+      },
+      "pass_message": "The counter is within 25% of the offer.",
+      "message": "The counter is more than 25% above the offer, which the method says it caps."
+    },
+    {
+      "id": "reply_hides_walk_away",
+      "description": "The reply does not reveal your walk-away number",
+      "rule": {
+        "!": [
+          {
+            "in": [
+              {
+                "digits": [
+                  {
+                    "var": "input.walk_away"
+                  }
+                ]
+              },
+              {
+                "digits": [
+                  {
+                    "var": "answer.reply"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "pass_message": "The reply does not contain your walk-away number.",
+      "message": "The reply contains your walk-away number. Do not send it."
+    },
+    {
+      "id": "reply_hides_competing_offer",
+      "description": "The reply does not reveal your competing offer",
+      "when": {
+        "!!": [
+          {
+            "var": [
+              "input.competing_offer",
+              0
+            ]
+          }
+        ]
+      },
+      "rule": {
+        "!": [
+          {
+            "in": [
+              {
+                "digits": [
+                  {
+                    "var": "input.competing_offer"
+                  }
+                ]
+              },
+              {
+                "digits": [
+                  {
+                    "var": "answer.reply"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "pass_message": "The reply does not contain your competing offer.",
+      "message": "The reply contains your competing offer amount. Do not send it."
+    },
+    {
+      "id": "two_asks",
+      "description": "Exactly two non-salary asks",
+      "rule": {
+        "==": [
+          {
+            "count": [
+              {
+                "var": "answer.non_salary_asks"
+              }
+            ]
+          },
+          2
+        ]
+      },
+      "pass_message": "The answer has two non-salary asks.",
+      "message": "The answer does not have exactly two non-salary asks."
+    }
+  ],
+  "seller_secrets": [
+    "negotiation rules (the prompt)"
+  ],
+  "disclosures": [
+    "This method is a prompt. The answer comes from an AI model, so the same data can give a different answer.",
+    "The runner cannot prove the model followed every rule. Check the numbers yourself.",
+    "Checks cover your limits only. They cannot judge whether the reply will work."
+  ],
+  "runtime": {
+    "runner": "platform runner, prompt method: the runner sends the sealed seller prompt and your data to one private model",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}
