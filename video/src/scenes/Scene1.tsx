@@ -8,13 +8,17 @@ import { KMark } from "../lib/KMark";
 // Sari (consumer) cannot use expertise without exposing her portfolio. The dashed line between them
 // closes into the Kalis mark at "Until now", which is the bridge into scene 2.
 const CUES: Cue[] = [
-  { from: 0.05, to: 4.72, text: "Arif spent years building a portfolio rebalancing strategy." },
-  { from: 4.72, to: 9.29, text: "He wants to sell it, but the moment he shares the rules, anyone can copy them." },
-  { from: 9.29, to: 15.85, text: "Sari wants the best plan for her portfolio, but she won't hand her balances and positions to a stranger." },
-  { from: 15.85, to: 18.59, text: "So the expertise never meets the data." },
-  { from: 18.59, to: 21, text: "Until now." },
+  { from: 0.05, to: 2.67, text: "Arif spent years building a portfolio rebalancing strategy." },
+  { from: 2.67, to: 5.58, text: "He wants to sell it, but the moment he shares the rules, anyone can copy them." },
+  { from: 5.58, to: 9.92, text: "Sari wants the best plan for her portfolio, but she won't hand her balances and positions to a stranger." },
+  { from: 9.92, to: 11.96, text: "So the expertise never meets the data." },
+  { from: 11.96, to: 14, text: "Until now." },
 ];
-const s = (f: number) => Math.round(f * 30);
+// Animation beats were authored against the first voiceover (19.7 s). The 1.5x Ava voiceover is
+// 12.8 s, so each beat is mapped piecewise onto the new sentence boundaries.
+const OLD = [0, 4.72, 9.29, 15.85, 18.59, 19.68];
+const NEW = [0, 2.67, 5.58, 9.92, 11.96, 12.79];
+const s = (t: number) => Math.round(interpolate(t, OLD, NEW, { extrapolateRight: "extend" }) * 30);
 
 const useEnter = (at: number, dy = 24) => {
   const frame = useCurrentFrame();
