@@ -1,0 +1,51 @@
+{
+  "method_id": "token-scam-screen",
+  "seller": "yoga-prasetyo.scientivan.testnet",
+  "seller_account_tx": "3qCTWY1nNqx99HH66eGa4dNJeH5PoJhFKb3NV5UoLWjG",
+  "register_tx": "AvwWrKq3svfWetn5ML5N1M3waviwcZzpRe8qK53uw4F2",
+  "publish_tx_by_version": {
+    "1": "9v6TrtNtBpFoNmUtyN9E5jhRdBn6HTjJ5oJEm8ian88U"
+  },
+  "buyer": "auth-test.scientivan.testnet",
+  "payment": "wallet, the buyer signs pay_for_run",
+  "runs": [
+    {
+      "fixture": "attack-input.json",
+      "version": 1,
+      "run_id": "run-mwgsj65u-d2b17c68",
+      "pay_tx": "DpXgyeneeRUdmCG4jYYz8LmPWagiN8cThmEmSHmceeJm",
+      "call_id": "970b6606-0080-476d-8f08-a21141a1524a",
+      "settle_tx": "A7DrVZaayAy4kmW276EnTKdm4rYJ1M4JNARv3e3UR1ti",
+      "settle_status": "Released",
+      "verdict": "BLOCK",
+      "buyer_checks": {
+        "pass": 7,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 0
+      },
+      "rating": 5,
+      "review_id": "review-mwgslcte-4722a1ce",
+      "executed_wasm_sha256": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d"
+    },
+    {
+      "fixture": "sample-input.json",
+      "version": 1,
+      "run_id": "run-mwgslcy6-f1a2769d",
+      "pay_tx": "5CecGLsCnQpNVUK4DLhu4NKEHm6pfYLSQvCfTd2amN4c",
+      "call_id": "011357a2-96be-4233-b595-d2d852463608",
+      "settle_tx": "7b3UfxuezrE38RiWW8j3bjtALsRTgecjnjgSPZKViJ2",
+      "settle_status": "Released",
+      "verdict": "WARN",
+      "buyer_checks": {
+        "pass": 3,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 4
+      },
+      "rating": 5,
+      "review_id": "review-mwgsolzv-7968c1ab",
+      "executed_wasm_sha256": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "method_id": "perp-risk-limit-fit",
+  "seller": "rizky-saputra.scientivan.testnet",
+  "seller_account_tx": "C94sAovyc1nZUpL8UF6NyukL9coQNYz16HGwSwitjJCw",
+  "register_tx": "6psJxTNKhm4p2bB8bzySdNPjfPGjotCEcJnesiFPUyj4",
+  "publish_tx_by_version": {
+    "1": "2EVTKqJ8Muumxvm2UshokfHSmGE9B533X9QYTbjTtQvg",
+    "2": "4Q74tP9rDjon8Vx2CEkssxeCzJJcPGDfi3dwAhvATDDx"
+  },
+  "buyer": "auth-test.scientivan.testnet",
+  "payment": "wallet, the buyer signs pay_for_run",
+  "runs": [
+    {
+      "fixture": "sample-input.json",
+      "version": 1,
+      "run_id": "run-mwgs3awt-3f288b11",
+      "pay_tx": "6422fZ8iND1ZP13K43Ykwhhr7qHhgxwBuiGUTUReXjoV",
+      "call_id": "52dd1fe9-3b8a-4f89-9d52-85286de19af0",
+      "settle_tx": "6jrW1KXdodt7bn4b9339KL9E5NzsfMiGfHvQUcWRr4Yx",
+      "settle_status": "Released",
+      "verdict": "resize",
+      "buyer_checks": {
+        "pass": 5,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 2
+      },
+      "rating": 5,
+      "review_id": "review-mwgs4cbf-6703ac76",
+      "executed_wasm_sha256": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d"
+    },
+    {
+      "fixture": "sample-input.json",
+      "version": 2,
+      "run_id": "run-mwgsfx27-646b9c3f",
+      "pay_tx": "8eJYYTDohsJ3EiARuDEz2X7Uv9cpXD4FSgHNFLNtomhy",
+      "call_id": "6c0905a8-8af2-457b-86ba-205e8190e39c",
+      "settle_tx": "7BYjxL7RNNaVDstEjm6yoCG4LwPa7WzHWRuS7Lcy6dnH",
+      "settle_status": "Released",
+      "verdict": "BLOCK",
+      "buyer_checks": {
+        "pass": 8,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 0
+      },
+      "rating": 5,
+      "review_id": "review-mwgsj5p1-4de1d8f4",
+      "executed_wasm_sha256": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d"
+    }
+  ]
+}

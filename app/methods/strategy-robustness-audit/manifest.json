@@ -1,0 +1,461 @@
+{
+  "manifest_version": 5,
+  "method_id": "strategy-robustness-audit",
+  "kind": "wasm",
+  "listing": {
+    "title": "Find out if your trading strategy survives fees and new data",
+    "outcome": "A robust, fragile or not-enough-data verdict for your strategy, from your own trade history, with every check behind it: unseen-period results, costs, drawdown, nearby settings and dependence on a few lucky trades.",
+    "category": "Strategy review",
+    "seller": {
+      "display_name": "Nadia Rahman (demo seller)",
+      "role": "Quant strategy reviewer",
+      "demo": true
+    },
+    "urgency": "You are about to put more capital behind the strategy. Sending your trade log to a reviewer reveals your edge, your sizes and your account.",
+    "limits": [
+      "Up to 2,000 trades per run, one strategy",
+      "Uses the trades and costs you provide; it does not replay market data",
+      "A robust verdict does not predict future returns",
+      "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+    ],
+    "sample_output": "Synthetic example: 64 trades, net 0.49% per trade in the first 45 but only 0.06% in the last 19, and the 22-bar setting loses money after costs. Verdict fragile.",
+    "not_advice": true
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "starting_capital",
+        "label": "Starting capital",
+        "type": "money",
+        "unit": "USD",
+        "required": true,
+        "min": 0,
+        "private": true
+      },
+      {
+        "id": "fee_bps_per_side",
+        "label": "Fee per side (basis points)",
+        "type": "number",
+        "required": true,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "id": "slippage_bps_per_side",
+        "label": "Slippage per side (basis points)",
+        "type": "number",
+        "required": true,
+        "min": 0,
+        "max": 200
+      },
+      {
+        "id": "max_drawdown_limit_pct",
+        "label": "Largest drawdown you accept",
+        "type": "percent",
+        "required": true,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "id": "trades",
+        "label": "Trade history",
+        "type": "array",
+        "required": true,
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "date",
+              "label": "Date",
+              "type": "date",
+              "required": true
+            },
+            {
+              "id": "notional",
+              "label": "Size",
+              "type": "money",
+              "unit": "USD",
+              "required": true,
+              "min": 0,
+              "private": true
+            },
+            {
+              "id": "gross_return_pct",
+              "label": "Return before costs",
+              "type": "percent",
+              "required": true,
+              "private": true
+            }
+          ],
+          "min_items": 1,
+          "max_items": 2000
+        }
+      },
+      {
+        "id": "param_variants",
+        "label": "Nearby parameter settings",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "label",
+              "label": "Setting",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "trades",
+              "label": "Trades",
+              "type": "integer",
+              "required": true,
+              "min": 0
+            },
+            {
+              "id": "avg_gross_return_pct",
+              "label": "Average return before costs",
+              "type": "percent",
+              "required": true,
+              "private": true
+            }
+          ],
+          "min_items": 0,
+          "max_items": 20
+        }
+      }
+    ],
+    "sample": {
+      "fictional": true,
+      "ref": "fixtures/sample-input.json"
+    }
+  },
+  "ai": {
+    "allowed": [],
+    "proprietary": false
+  },
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "steps": [
+    {
+      "id": "read_history",
+      "what": "Read your trade history and costs"
+    },
+    {
+      "id": "check_inputs",
+      "what": "Sort trades by date and split them into a fitted part and an unseen part"
+    },
+    {
+      "id": "apply_costs",
+      "what": "Apply fees and slippage to every trade"
+    },
+    {
+      "id": "drawdown",
+      "what": "Build the net equity curve and measure drawdown and concentration"
+    },
+    {
+      "id": "parameter_sensitivity",
+      "what": "Check whether nearby settings still hold after costs"
+    },
+    {
+      "id": "grade",
+      "what": "Grade the strategy and list every failed check"
+    }
+  ],
+  "connectors": [],
+  "outputs": {
+    "status_field": "verdict",
+    "unverifiable_status": [],
+    "fields": [
+      {
+        "id": "verdict",
+        "label": "Verdict",
+        "type": "enum",
+        "enum": [
+          "robust",
+          "fragile",
+          "insufficient_data"
+        ],
+        "display": "badge"
+      },
+      {
+        "id": "failed",
+        "label": "Checks it failed",
+        "type": "array",
+        "display": "list"
+      },
+      {
+        "id": "checks",
+        "label": "Every check",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "in_sample_trades",
+        "label": "Trades in the fitted part",
+        "type": "integer",
+        "display": "number"
+      },
+      {
+        "id": "out_of_sample_trades",
+        "label": "Trades in the unseen part",
+        "type": "integer",
+        "display": "number"
+      },
+      {
+        "id": "net_expectancy_in_sample_pct",
+        "label": "Net per trade, fitted part (%)",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "net_expectancy_out_of_sample_pct",
+        "label": "Net per trade, unseen part (%)",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "cost_per_trade_pct",
+        "label": "Cost per trade (%)",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "max_drawdown_pct",
+        "label": "Largest drawdown",
+        "type": "number",
+        "display": "percent"
+      },
+      {
+        "id": "total_net_pnl",
+        "label": "Net result after costs (USD)",
+        "type": "number",
+        "display": "money"
+      },
+      {
+        "id": "top3_share_of_net_profit",
+        "label": "Share of profit from the best three trades",
+        "type": "number",
+        "display": "percent"
+      },
+      {
+        "id": "param_variants",
+        "label": "Nearby settings",
+        "type": "array",
+        "display": "table"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "split_covers_every_trade",
+      "description": "The fitted and unseen parts together hold every trade you gave",
+      "rule": {
+        "==": [
+          {
+            "+": [
+              {
+                "var": "answer.in_sample_trades"
+              },
+              {
+                "var": "answer.out_of_sample_trades"
+              }
+            ]
+          },
+          {
+            "count": [
+              {
+                "var": "input.trades"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "Some of your trades were left out of the audit."
+    },
+    {
+      "id": "costs_not_below_yours",
+      "description": "The cost per trade is at least your own fees and slippage on both sides",
+      "rule": {
+        ">=": [
+          {
+            "var": "answer.cost_per_trade_pct"
+          },
+          {
+            "/": [
+              {
+                "*": [
+                  2,
+                  {
+                    "+": [
+                      {
+                        "var": "input.fee_bps_per_side"
+                      },
+                      {
+                        "var": "input.slippage_bps_per_side"
+                      }
+                    ]
+                  }
+                ]
+              },
+              100
+            ]
+          }
+        ]
+      },
+      "message": "The audit used lower costs than you pay.",
+      "tolerance": 1e-06
+    },
+    {
+      "id": "net_result_recomputed",
+      "description": "Your device recomputes the net result after the method's costs",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "reduce": [
+                    {
+                      "var": "input.trades"
+                    },
+                    {
+                      "+": [
+                        {
+                          "var": "accumulator"
+                        },
+                        {
+                          "*": [
+                            {
+                              "var": "current.notional"
+                            },
+                            {
+                              "-": [
+                                {
+                                  "var": "current.gross_return_pct"
+                                },
+                                {
+                                  "/": [
+                                    {
+                                      "var": "answer.cost_per_trade_pct"
+                                    },
+                                    100
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    0
+                  ]
+                },
+                {
+                  "var": "answer.total_net_pnl"
+                }
+              ]
+            }
+          },
+          1
+        ]
+      },
+      "message": "The net result does not follow from your trades and the stated cost."
+    },
+    {
+      "id": "robust_has_no_failed_check",
+      "description": "A robust verdict comes with no failed check",
+      "when": {
+        "==": [
+          {
+            "var": "answer.verdict"
+          },
+          "robust"
+        ]
+      },
+      "rule": {
+        "==": [
+          {
+            "count": [
+              {
+                "var": "answer.failed"
+              }
+            ]
+          },
+          0
+        ]
+      },
+      "message": "The strategy is called robust although a check failed."
+    },
+    {
+      "id": "failed_check_is_not_robust",
+      "description": "A failed check never comes with a robust verdict",
+      "when": {
+        ">": [
+          {
+            "count": [
+              {
+                "var": "answer.failed"
+              }
+            ]
+          },
+          0
+        ]
+      },
+      "rule": {
+        "!=": [
+          {
+            "var": "answer.verdict"
+          },
+          "robust"
+        ]
+      },
+      "message": "A check failed but the verdict is still robust."
+    },
+    {
+      "id": "robust_within_your_drawdown",
+      "description": "A robust verdict keeps drawdown within your limit",
+      "when": {
+        "==": [
+          {
+            "var": "answer.verdict"
+          },
+          "robust"
+        ]
+      },
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.max_drawdown_pct"
+          },
+          {
+            "var": "input.max_drawdown_limit_pct"
+          }
+        ]
+      },
+      "message": "The strategy is called robust but its drawdown is above your limit."
+    }
+  ],
+  "seller_secrets": [
+    "split ratio, slippage haircut, minimum sample sizes and the decay and concentration thresholds"
+  ],
+  "disclosures": [
+    "Not financial advice. A robust verdict says the record held up under these checks, not that it will make money.",
+    "Past trades can hide risks that never happened in the sample.",
+    "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

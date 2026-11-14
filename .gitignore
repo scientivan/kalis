@@ -10,6 +10,10 @@ app/methods/*/seller-private/
 # Seller rule source for demo WASM methods (only the sealed blob and binary are published)
 app/guests/defi-liquidation-guard/
 app/guests/cash-runway-13w/
+app/guests/perp-risk-limit-fit/
+app/guests/strategy-robustness-audit/
+app/guests/large-swap-split/
+app/guests/token-scam-screen/
 
 # build output and local tooling
 .next/

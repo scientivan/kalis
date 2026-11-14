@@ -1,0 +1,39 @@
+{
+  "_note": "Synthetic demo data. Every account, venue balance and number here is invented.",
+  "equity": 80000,
+  "positions": [
+    {
+      "venue": "Hyperliquid",
+      "market": "BTC-PERP",
+      "asset_class": "btc",
+      "side": "long",
+      "notional": 90000,
+      "leverage": 4,
+      "maintenance_margin": 0.005
+    },
+    {
+      "venue": "OKX",
+      "market": "ETH-PERP",
+      "asset_class": "eth",
+      "side": "short",
+      "notional": 30000,
+      "leverage": 3,
+      "maintenance_margin": 0.01
+    }
+  ],
+  "proposed": {
+    "venue": "Binance",
+    "market": "SOL-PERP",
+    "asset_class": "alt",
+    "side": "long",
+    "notional": 60000,
+    "leverage": 8,
+    "maintenance_margin": 0.01
+  },
+  "limits": {
+    "max_gross_leverage": 3,
+    "max_stress_loss_pct": 0.25,
+    "min_liquidation_distance_pct": 0.2,
+    "max_asset_share_pct": 0.6
+  }
+}

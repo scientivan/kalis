@@ -1,0 +1,550 @@
+{
+  "manifest_version": 5,
+  "method_id": "perp-risk-limit-fit",
+  "kind": "wasm",
+  "listing": {
+    "title": "Check a leveraged trade against your risk limits before you open it",
+    "outcome": "Whether a planned perp position fits your leverage, stress-loss, liquidation and concentration limits across every venue, and the largest size and leverage that still fit.",
+    "category": "Trading risk",
+    "seller": {
+      "display_name": "Rizky Saputra (demo seller)",
+      "role": "Derivatives risk consultant",
+      "demo": true
+    },
+    "urgency": "You want to open the position today. Showing your positions on every exchange to a consultant or a public tool exposes your book and your liquidation levels.",
+    "limits": [
+      "One planned position per run, up to 20 open positions",
+      "Prices and margins you provide are used as they are; the method does not read any exchange",
+      "Checks your limits only. It does not say whether the trade is a good idea",
+      "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+    ],
+    "sample_output": "Synthetic example: the 60,000 USD SOL long breaks your 25% stress-loss limit and sits too close to liquidation at 8x. Up to 35,700 USD at 1.5x fits.",
+    "not_advice": true
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "equity",
+        "label": "Account equity across venues",
+        "type": "money",
+        "unit": "USD",
+        "required": true,
+        "min": 0,
+        "private": true
+      },
+      {
+        "id": "positions",
+        "label": "Open positions",
+        "type": "array",
+        "required": true,
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "venue",
+              "label": "Venue",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "market",
+              "label": "Market",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "asset_class",
+              "label": "Asset class",
+              "type": "enum",
+              "required": true,
+              "enum": [
+                "btc",
+                "eth",
+                "alt",
+                "stable"
+              ]
+            },
+            {
+              "id": "side",
+              "label": "Side",
+              "type": "enum",
+              "required": true,
+              "enum": [
+                "long",
+                "short"
+              ]
+            },
+            {
+              "id": "notional",
+              "label": "Position size",
+              "type": "money",
+              "unit": "USD",
+              "required": true,
+              "min": 0,
+              "private": true
+            },
+            {
+              "id": "leverage",
+              "label": "Leverage",
+              "type": "number",
+              "required": true,
+              "min": 1,
+              "max": 100
+            },
+            {
+              "id": "maintenance_margin",
+              "label": "Maintenance margin",
+              "type": "percent",
+              "required": true,
+              "min": 0,
+              "max": 0.5
+            }
+          ],
+          "min_items": 0,
+          "max_items": 20
+        }
+      },
+      {
+        "id": "proposed",
+        "label": "Planned position",
+        "type": "object",
+        "required": true,
+        "fields": [
+          {
+            "id": "venue",
+            "label": "Venue",
+            "type": "string",
+            "required": true
+          },
+          {
+            "id": "market",
+            "label": "Market",
+            "type": "string",
+            "required": true
+          },
+          {
+            "id": "asset_class",
+            "label": "Asset class",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "btc",
+              "eth",
+              "alt",
+              "stable"
+            ]
+          },
+          {
+            "id": "side",
+            "label": "Side",
+            "type": "enum",
+            "required": true,
+            "enum": [
+              "long",
+              "short"
+            ]
+          },
+          {
+            "id": "notional",
+            "label": "Position size",
+            "type": "money",
+            "unit": "USD",
+            "required": true,
+            "min": 0,
+            "private": true
+          },
+          {
+            "id": "leverage",
+            "label": "Leverage",
+            "type": "number",
+            "required": true,
+            "min": 1,
+            "max": 100
+          },
+          {
+            "id": "maintenance_margin",
+            "label": "Maintenance margin",
+            "type": "percent",
+            "required": true,
+            "min": 0,
+            "max": 0.5
+          }
+        ]
+      },
+      {
+        "id": "limits",
+        "label": "Your risk limits",
+        "type": "object",
+        "required": true,
+        "fields": [
+          {
+            "id": "max_gross_leverage",
+            "label": "Highest total leverage",
+            "type": "number",
+            "required": true,
+            "min": 0.1,
+            "max": 50
+          },
+          {
+            "id": "max_stress_loss_pct",
+            "label": "Largest loss in a stress move",
+            "type": "percent",
+            "required": true,
+            "min": 0,
+            "max": 1
+          },
+          {
+            "id": "min_liquidation_distance_pct",
+            "label": "Smallest distance to liquidation",
+            "type": "percent",
+            "required": true,
+            "min": 0,
+            "max": 1
+          },
+          {
+            "id": "max_asset_share_pct",
+            "label": "Largest share in one asset class",
+            "type": "percent",
+            "required": true,
+            "min": 0,
+            "max": 1
+          }
+        ]
+      }
+    ],
+    "sample": {
+      "fictional": true,
+      "ref": "fixtures/sample-input.json"
+    }
+  },
+  "ai": {
+    "allowed": [],
+    "proprietary": false
+  },
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "steps": [
+    {
+      "id": "read_book",
+      "what": "Read open positions, the planned position and your limits"
+    },
+    {
+      "id": "check_inputs",
+      "what": "Check sizes, leverage, margins and asset classes"
+    },
+    {
+      "id": "stress_book",
+      "what": "Stress the whole book with the planned position added"
+    },
+    {
+      "id": "check_liquidation_buffer",
+      "what": "Compare the distance to liquidation with the stress move"
+    },
+    {
+      "id": "size_that_fits",
+      "what": "Find the largest size and leverage that fit every limit"
+    }
+  ],
+  "connectors": [],
+  "outputs": {
+    "status_field": "status",
+    "unverifiable_status": [],
+    "fields": [
+      {
+        "id": "status",
+        "label": "Result",
+        "type": "enum",
+        "enum": [
+          "fits",
+          "resize",
+          "blocked"
+        ],
+        "display": "badge"
+      },
+      {
+        "id": "violations",
+        "label": "Limits it breaks",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "max_notional_that_fits",
+        "label": "Largest size that fits (USD)",
+        "type": "number",
+        "display": "money"
+      },
+      {
+        "id": "max_leverage_that_fits",
+        "label": "Highest leverage that fits",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "gross_leverage_after",
+        "label": "Total leverage after",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "stress_loss_pct_after",
+        "label": "Stress loss after",
+        "type": "number",
+        "display": "percent"
+      },
+      {
+        "id": "liquidation_distance_pct",
+        "label": "Distance to liquidation",
+        "type": "number",
+        "display": "percent"
+      },
+      {
+        "id": "required_liquidation_distance_pct",
+        "label": "Distance needed",
+        "type": "number",
+        "display": "percent"
+      },
+      {
+        "id": "largest_asset_share_after",
+        "label": "Largest asset class share",
+        "type": "number",
+        "display": "percent"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "gross_leverage_recomputed",
+      "description": "Your device recomputes total leverage after the plan",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "/": [
+                    {
+                      "+": [
+                        {
+                          "reduce": [
+                            {
+                              "var": "input.positions"
+                            },
+                            {
+                              "+": [
+                                {
+                                  "var": "accumulator"
+                                },
+                                {
+                                  "var": "current.notional"
+                                }
+                              ]
+                            },
+                            0
+                          ]
+                        },
+                        {
+                          "var": "input.proposed.notional"
+                        }
+                      ]
+                    },
+                    {
+                      "var": "input.equity"
+                    }
+                  ]
+                },
+                {
+                  "var": "answer.gross_leverage_after"
+                }
+              ]
+            }
+          },
+          0.001
+        ]
+      },
+      "message": "The total leverage the method reports does not match your own positions."
+    },
+    {
+      "id": "liquidation_distance_recomputed",
+      "description": "Your device recomputes the distance to liquidation",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "-": [
+                    {
+                      "/": [
+                        1,
+                        {
+                          "var": "input.proposed.leverage"
+                        }
+                      ]
+                    },
+                    {
+                      "var": "input.proposed.maintenance_margin"
+                    }
+                  ]
+                },
+                {
+                  "var": "answer.liquidation_distance_pct"
+                }
+              ]
+            }
+          },
+          0.001
+        ]
+      },
+      "message": "The distance to liquidation does not follow from your leverage and margin."
+    },
+    {
+      "id": "buffer_at_least_your_minimum",
+      "description": "The distance the method requires is at least your own minimum",
+      "rule": {
+        ">=": [
+          {
+            "var": "answer.required_liquidation_distance_pct"
+          },
+          {
+            "var": "input.limits.min_liquidation_distance_pct"
+          }
+        ]
+      },
+      "message": "The method required less distance to liquidation than your limit.",
+      "tolerance": 0.0001
+    },
+    {
+      "id": "size_not_above_plan",
+      "description": "The size that fits is not larger than your plan",
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.max_notional_that_fits"
+          },
+          {
+            "var": "input.proposed.notional"
+          }
+        ]
+      },
+      "message": "The method suggests a bigger position than you planned."
+    },
+    {
+      "id": "fitting_size_keeps_leverage_limit",
+      "description": "The size that fits keeps total leverage within your limit",
+      "rule": {
+        "<=": [
+          {
+            "/": [
+              {
+                "+": [
+                  {
+                    "reduce": [
+                      {
+                        "var": "input.positions"
+                      },
+                      {
+                        "+": [
+                          {
+                            "var": "accumulator"
+                          },
+                          {
+                            "var": "current.notional"
+                          }
+                        ]
+                      },
+                      0
+                    ]
+                  },
+                  {
+                    "var": "answer.max_notional_that_fits"
+                  }
+                ]
+              },
+              {
+                "var": "input.equity"
+              }
+            ]
+          },
+          {
+            "var": "input.limits.max_gross_leverage"
+          }
+        ]
+      },
+      "message": "The size that fits still breaks your leverage limit.",
+      "tolerance": 0.0001
+    },
+    {
+      "id": "fits_means_no_violation",
+      "description": "A plan marked as fitting breaks no limit",
+      "when": {
+        "==": [
+          {
+            "var": "answer.status"
+          },
+          "fits"
+        ]
+      },
+      "rule": {
+        "==": [
+          {
+            "count": [
+              {
+                "var": "answer.violations"
+              }
+            ]
+          },
+          0
+        ]
+      },
+      "message": "The plan is marked as fitting but lists a broken limit."
+    },
+    {
+      "id": "fits_within_leverage",
+      "description": "A plan marked as fitting stays within your total leverage",
+      "when": {
+        "==": [
+          {
+            "var": "answer.status"
+          },
+          "fits"
+        ]
+      },
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.gross_leverage_after"
+          },
+          {
+            "var": "input.limits.max_gross_leverage"
+          }
+        ]
+      },
+      "message": "The plan is marked as fitting but exceeds your leverage limit.",
+      "tolerance": 0.0001
+    }
+  ],
+  "seller_secrets": [
+    "stress move per asset class, liquidation buffer multiple and leverage cap for small caps"
+  ],
+  "disclosures": [
+    "Not financial advice. The method checks your own limits and does not say whether to trade.",
+    "Stress moves are the seller's assumption, not a forecast. Real moves can be larger.",
+    "No order is placed and no exchange is contacted.",
+    "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

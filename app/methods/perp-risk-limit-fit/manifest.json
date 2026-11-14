@@ -1,0 +1,623 @@
+{
+  "manifest_version": 5,
+  "method_id": "perp-risk-limit-fit",
+  "kind": "wasm",
+  "listing": {
+    "title": "Let a trading agent place orders only inside your spending and risk policy",
+    "outcome": "ALLOW, WARN or BLOCK for every order your trading agent proposes, checked against your per-trade and daily caps, approved venues and assets, leverage and liquidation buffer, with the reason for each block. Withdrawals and prompt-injected orders are always blocked.",
+    "category": "Agent security",
+    "seller": {
+      "display_name": "Rizky Saputra (demo seller)",
+      "role": "Derivatives risk consultant",
+      "demo": true
+    },
+    "urgency": "Your agent wants to trade now. Giving it full exchange keys, or sending your positions and limits to a policy service, exposes your whole account.",
+    "limits": [
+      "Up to 50 orders per batch",
+      "Uses the positions and policy you provide; the method does not read any exchange",
+      "Checks the policy only. It does not say whether a trade is a good idea",
+      "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+    ],
+    "sample_output": "Synthetic example: of four agent orders, the BTC order is allowed, the ETH order warns at 85% of the per-trade cap, the 12x SOL order is blocked, and a prompt-injected withdrawal is blocked.",
+    "not_advice": true
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "equity",
+        "label": "Account equity across venues",
+        "type": "money",
+        "unit": "USD",
+        "required": true,
+        "min": 0,
+        "private": true
+      },
+      {
+        "id": "positions",
+        "label": "Open positions",
+        "type": "array",
+        "required": true,
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "venue",
+              "label": "Venue",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "market",
+              "label": "Market",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "asset_class",
+              "label": "Asset class",
+              "type": "enum",
+              "required": true,
+              "enum": [
+                "btc",
+                "eth",
+                "alt",
+                "stable"
+              ]
+            },
+            {
+              "id": "side",
+              "label": "Side",
+              "type": "enum",
+              "required": true,
+              "enum": [
+                "long",
+                "short"
+              ]
+            },
+            {
+              "id": "notional",
+              "label": "Size",
+              "type": "money",
+              "unit": "USD",
+              "required": true,
+              "min": 0,
+              "private": true
+            }
+          ],
+          "min_items": 0,
+          "max_items": 50
+        }
+      },
+      {
+        "id": "policy",
+        "label": "Your policy for the agent",
+        "type": "object",
+        "required": true,
+        "fields": [
+          {
+            "id": "per_trade_cap_usd",
+            "label": "Largest single order",
+            "type": "money",
+            "unit": "USD",
+            "required": true,
+            "min": 0,
+            "private": true
+          },
+          {
+            "id": "daily_cap_usd",
+            "label": "Daily spending cap",
+            "type": "money",
+            "unit": "USD",
+            "required": true,
+            "min": 0,
+            "private": true
+          },
+          {
+            "id": "spent_today_usd",
+            "label": "Already spent today",
+            "type": "money",
+            "unit": "USD",
+            "required": true,
+            "min": 0,
+            "private": true
+          },
+          {
+            "id": "allowed_venues",
+            "label": "Approved venues",
+            "type": "array",
+            "required": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "id": "allowed_asset_classes",
+            "label": "Approved asset classes",
+            "type": "array",
+            "required": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "id": "max_leverage",
+            "label": "Highest leverage per order",
+            "type": "number",
+            "required": true,
+            "min": 1,
+            "max": 100
+          },
+          {
+            "id": "max_gross_leverage",
+            "label": "Highest total leverage",
+            "type": "number",
+            "required": true,
+            "min": 0.1,
+            "max": 50
+          },
+          {
+            "id": "min_liquidation_distance_pct",
+            "label": "Smallest distance to liquidation",
+            "type": "percent",
+            "required": true,
+            "min": 0,
+            "max": 1
+          }
+        ]
+      },
+      {
+        "id": "agent_orders",
+        "label": "Orders the agent proposes",
+        "type": "array",
+        "required": true,
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "id",
+              "label": "Order",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "action",
+              "label": "Action",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "venue",
+              "label": "Venue",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "market",
+              "label": "Market",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "asset_class",
+              "label": "Asset class",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "side",
+              "label": "Side",
+              "type": "string"
+            },
+            {
+              "id": "notional",
+              "label": "Size",
+              "type": "money",
+              "unit": "USD",
+              "required": true,
+              "min": 0
+            },
+            {
+              "id": "leverage",
+              "label": "Leverage",
+              "type": "number",
+              "min": 1
+            },
+            {
+              "id": "maintenance_margin",
+              "label": "Maintenance margin",
+              "type": "percent",
+              "min": 0,
+              "max": 0.5
+            },
+            {
+              "id": "agent_reason",
+              "label": "Agent's reason",
+              "type": "text"
+            }
+          ],
+          "min_items": 1,
+          "max_items": 50
+        }
+      }
+    ],
+    "sample": {
+      "fictional": true,
+      "ref": "fixtures/sample-input.json"
+    }
+  },
+  "ai": {
+    "allowed": [],
+    "proprietary": false
+  },
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "steps": [
+    {
+      "id": "read_batch",
+      "what": "Read positions, your policy and the agent's orders"
+    },
+    {
+      "id": "check_inputs",
+      "what": "Check equity, policy and order values"
+    },
+    {
+      "id": "apply_policy",
+      "what": "Give every order ALLOW, WARN or BLOCK with reasons"
+    },
+    {
+      "id": "decide",
+      "what": "Give the batch the strictest verdict"
+    }
+  ],
+  "connectors": [],
+  "outputs": {
+    "status_field": "verdict",
+    "unverifiable_status": [],
+    "fields": [
+      {
+        "id": "verdict",
+        "label": "Verdict",
+        "type": "enum",
+        "enum": [
+          "ALLOW",
+          "WARN",
+          "BLOCK"
+        ],
+        "display": "badge"
+      },
+      {
+        "id": "decisions",
+        "label": "Verdict per order",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "allowed_count",
+        "label": "Allowed",
+        "type": "integer",
+        "display": "number"
+      },
+      {
+        "id": "warned_count",
+        "label": "Need your approval",
+        "type": "integer",
+        "display": "number"
+      },
+      {
+        "id": "blocked_count",
+        "label": "Blocked",
+        "type": "integer",
+        "display": "number"
+      },
+      {
+        "id": "approved_open_notional_usd",
+        "label": "Approved new exposure (USD)",
+        "type": "number",
+        "display": "money"
+      },
+      {
+        "id": "budget_left_usd",
+        "label": "Budget left today (USD)",
+        "type": "number",
+        "display": "money"
+      },
+      {
+        "id": "gross_leverage_after",
+        "label": "Total leverage after",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "note",
+        "label": "What happens next",
+        "type": "text",
+        "display": "text"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "every_order_decided",
+      "description": "Every order the agent proposed has a verdict",
+      "rule": {
+        "==": [
+          {
+            "count": [
+              {
+                "var": "answer.decisions"
+              }
+            ]
+          },
+          {
+            "count": [
+              {
+                "var": "input.agent_orders"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "Some agent orders have no verdict."
+    },
+    {
+      "id": "orders_echoed_unchanged",
+      "description": "The orders judged are the orders the agent proposed",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "reduce": [
+                    {
+                      "var": "answer.decisions"
+                    },
+                    {
+                      "+": [
+                        {
+                          "var": "accumulator"
+                        },
+                        {
+                          "var": "current.notional"
+                        }
+                      ]
+                    },
+                    0
+                  ]
+                },
+                {
+                  "reduce": [
+                    {
+                      "var": "input.agent_orders"
+                    },
+                    {
+                      "+": [
+                        {
+                          "var": "accumulator"
+                        },
+                        {
+                          "var": "current.notional"
+                        }
+                      ]
+                    },
+                    0
+                  ]
+                }
+              ]
+            }
+          },
+          0.001
+        ]
+      },
+      "message": "The judged orders differ from the agent's orders."
+    },
+    {
+      "id": "passed_orders_on_approved_venues",
+      "description": "Every order that is not blocked is on one of your approved venues",
+      "rule": {
+        "none": [
+          {
+            "filter": [
+              {
+                "var": "answer.decisions"
+              },
+              {
+                "!=": [
+                  {
+                    "var": "verdict"
+                  },
+                  "BLOCK"
+                ]
+              }
+            ]
+          },
+          {
+            "!": {
+              "in": [
+                {
+                  "var": "venue"
+                },
+                {
+                  "var": "input.policy.allowed_venues"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "message": "An order on a venue you did not approve was let through."
+    },
+    {
+      "id": "passed_orders_within_trade_cap",
+      "description": "No order that passes is above your per-trade cap",
+      "rule": {
+        "none": [
+          {
+            "filter": [
+              {
+                "var": "answer.decisions"
+              },
+              {
+                "!=": [
+                  {
+                    "var": "verdict"
+                  },
+                  "BLOCK"
+                ]
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "notional"
+              },
+              {
+                "var": "input.policy.per_trade_cap_usd"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "An order above your per-trade cap was let through."
+    },
+    {
+      "id": "passed_orders_within_leverage",
+      "description": "No order that passes is above your leverage cap",
+      "rule": {
+        "none": [
+          {
+            "filter": [
+              {
+                "var": "answer.decisions"
+              },
+              {
+                "!=": [
+                  {
+                    "var": "verdict"
+                  },
+                  "BLOCK"
+                ]
+              }
+            ]
+          },
+          {
+            ">": [
+              {
+                "var": "leverage"
+              },
+              {
+                "var": "input.policy.max_leverage"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "An order above your leverage cap was let through."
+    },
+    {
+      "id": "only_open_or_close_pass",
+      "description": "Only open and close actions can pass; withdrawals and transfers are blocked",
+      "rule": {
+        "none": [
+          {
+            "filter": [
+              {
+                "var": "answer.decisions"
+              },
+              {
+                "!=": [
+                  {
+                    "var": "verdict"
+                  },
+                  "BLOCK"
+                ]
+              }
+            ]
+          },
+          {
+            "!": {
+              "in": [
+                {
+                  "var": "action"
+                },
+                [
+                  "open",
+                  "close"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "message": "A withdrawal or transfer was let through."
+    },
+    {
+      "id": "daily_cap_kept",
+      "description": "Approved new exposure plus what you spent today stays within your daily cap",
+      "rule": {
+        "<=": [
+          {
+            "+": [
+              {
+                "var": "answer.approved_open_notional_usd"
+              },
+              {
+                "var": "input.policy.spent_today_usd"
+              }
+            ]
+          },
+          {
+            "var": "input.policy.daily_cap_usd"
+          }
+        ]
+      },
+      "message": "The approved orders exceed your daily cap.",
+      "tolerance": 0.001
+    },
+    {
+      "id": "blocked_order_blocks_batch",
+      "description": "If any order is blocked, the batch verdict is BLOCK",
+      "when": {
+        ">": [
+          {
+            "var": "answer.blocked_count"
+          },
+          0
+        ]
+      },
+      "rule": {
+        "==": [
+          {
+            "var": "answer.verdict"
+          },
+          "BLOCK"
+        ]
+      },
+      "message": "An order was blocked but the batch is not."
+    }
+  ],
+  "seller_secrets": [
+    "prompt-injection markers, stress moves, liquidation buffer multiple, small-cap leverage cap and warning thresholds"
+  ],
+  "disclosures": [
+    "Not financial advice. The method enforces your policy and does not pick trades.",
+    "Your agent never holds the keys. A BLOCK means the signer must refuse; WARN needs your approval; nothing is signed or sent by the method.",
+    "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

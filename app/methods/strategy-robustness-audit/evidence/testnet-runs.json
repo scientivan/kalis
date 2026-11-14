@@ -1,0 +1,32 @@
+{
+  "method_id": "strategy-robustness-audit",
+  "seller": "nadia-rahman.scientivan.testnet",
+  "seller_account_tx": "42CZEfdofJtLaTreTtxT7FeDfxSVR3c7QRRbhaj8gB4n",
+  "register_tx": "FbmPTr1sTSjzVBF4p7XEmG21V9zhGqGbRb1YyyRxdnta",
+  "publish_tx_by_version": {
+    "1": "8mhuN9wxWtBFsPhih67aAkZMu3sftmdPDqXLnSugSvAA"
+  },
+  "buyer": "auth-test.scientivan.testnet",
+  "payment": "wallet, the buyer signs pay_for_run",
+  "runs": [
+    {
+      "fixture": "sample-input.json",
+      "version": 1,
+      "run_id": "run-mwgs4cpj-83455604",
+      "pay_tx": "EdkT4MLLwpKqCAREE6LoPQEVVLLrZFXSsnkLkzXPc4aM",
+      "call_id": "092f4c0a-b29c-4304-ad11-cb79ec298559",
+      "settle_tx": "H6nXk5auRNG1Fuc6PXwXWaJttBwRy1zCN2DtLy7kQSqB",
+      "settle_status": "Released",
+      "verdict": "fragile",
+      "buyer_checks": {
+        "pass": 4,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 2
+      },
+      "rating": 5,
+      "review_id": "review-mwgs50kf-bf2de6a4",
+      "executed_wasm_sha256": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d"
+    }
+  ]
+}

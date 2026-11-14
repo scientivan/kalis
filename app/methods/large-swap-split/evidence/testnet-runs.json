@@ -1,0 +1,52 @@
+{
+  "method_id": "large-swap-split",
+  "seller": "dewi-anggraini.scientivan.testnet",
+  "seller_account_tx": "6J3JzVrH6LZp1TqZKsnSa95gdEGpb8r1Vr9bjz98xW7E",
+  "register_tx": "6Jqh1DyxQwHKzpMmSaS7gVBvQggBQS8zibPuowksFzAp",
+  "publish_tx_by_version": {
+    "1": "HvY3ijihdWACFic4pUH7DeZeQhjz1fya6anctxFEVYKg",
+    "2": "FnMxZjBdV3D7tn8cwQ9aTAqyY87bnzUKxFK9F17KNsH8"
+  },
+  "buyer": "auth-test.scientivan.testnet",
+  "payment": "wallet, the buyer signs pay_for_run",
+  "runs": [
+    {
+      "fixture": "sample-input.json",
+      "version": 1,
+      "run_id": "run-mwgs50xe-dbce46ae",
+      "pay_tx": "nTpZZMjbnX3zftrhvSwdKCjdDFeZDYyJ4unsLrcXmQF",
+      "call_id": "b9fe12ca-7367-4b99-9398-0d2118819f14",
+      "settle_tx": "21yRDmRW2YiXCNJSha8kJVNveE8qAdYWZGHS8pb7gs6F",
+      "settle_status": "Released",
+      "verdict": "partial",
+      "buyer_checks": {
+        "pass": 6,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 0
+      },
+      "rating": 5,
+      "review_id": "review-mwgs8qp0-3b230557",
+      "executed_wasm_sha256": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d"
+    },
+    {
+      "fixture": "sample-input.json",
+      "version": 2,
+      "run_id": "run-mwgsomhw-e7f88b40",
+      "pay_tx": "A75FGaWHphtZqpdvxUKMdZ3cgfJGu9MftHL7DHbrGyYS",
+      "call_id": "65358d88-f7b0-4e90-b9f9-f7919c156362",
+      "settle_tx": "379XRQjrvkLXCUv76XFRxPxt6cnVBMgr28jvBPRFTwa2",
+      "settle_status": "Released",
+      "verdict": "WARN",
+      "buyer_checks": {
+        "pass": 9,
+        "fail": 0,
+        "cannot_check": 0,
+        "not_applicable": 1
+      },
+      "rating": 5,
+      "review_id": "review-mwgsrwsd-09ee6241",
+      "executed_wasm_sha256": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d"
+    }
+  ]
+}

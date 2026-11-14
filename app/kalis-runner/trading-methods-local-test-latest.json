@@ -1,0 +1,184 @@
+{
+  "at": "2026-11-14T19:16:27.129Z",
+  "pass": 19,
+  "fail": 0,
+  "results": {
+    "perp-risk-limit-fit/sample-input.json": {
+      "status": "BLOCK",
+      "checks": [
+        {
+          "id": "every_order_decided",
+          "status": "pass"
+        },
+        {
+          "id": "orders_echoed_unchanged",
+          "status": "pass"
+        },
+        {
+          "id": "passed_orders_on_approved_venues",
+          "status": "pass"
+        },
+        {
+          "id": "passed_orders_within_trade_cap",
+          "status": "pass"
+        },
+        {
+          "id": "passed_orders_within_leverage",
+          "status": "pass"
+        },
+        {
+          "id": "only_open_or_close_pass",
+          "status": "pass"
+        },
+        {
+          "id": "daily_cap_kept",
+          "status": "pass"
+        },
+        {
+          "id": "blocked_order_blocks_batch",
+          "status": "pass"
+        }
+      ]
+    },
+    "strategy-robustness-audit/sample-input.json": {
+      "status": "fragile",
+      "checks": [
+        {
+          "id": "split_covers_every_trade",
+          "status": "pass"
+        },
+        {
+          "id": "costs_not_below_yours",
+          "status": "pass"
+        },
+        {
+          "id": "net_result_recomputed",
+          "status": "pass"
+        },
+        {
+          "id": "robust_has_no_failed_check",
+          "status": "not_applicable"
+        },
+        {
+          "id": "failed_check_is_not_robust",
+          "status": "pass"
+        },
+        {
+          "id": "robust_within_your_drawdown",
+          "status": "not_applicable"
+        }
+      ]
+    },
+    "large-swap-split/sample-input.json": {
+      "status": "WARN",
+      "checks": [
+        {
+          "id": "sold_plus_waiting_is_your_amount",
+          "status": "pass"
+        },
+        {
+          "id": "venue_rows_add_up",
+          "status": "pass"
+        },
+        {
+          "id": "received_rows_add_up",
+          "status": "pass"
+        },
+        {
+          "id": "no_venue_above_your_cap",
+          "status": "pass"
+        },
+        {
+          "id": "slippage_recomputed",
+          "status": "pass"
+        },
+        {
+          "id": "slippage_within_your_limit",
+          "status": "pass"
+        },
+        {
+          "id": "steps_only_on_approved_venues",
+          "status": "pass"
+        },
+        {
+          "id": "plan_within_session_budget",
+          "status": "pass"
+        },
+        {
+          "id": "min_receive_below_quote",
+          "status": "pass"
+        },
+        {
+          "id": "block_has_no_steps",
+          "status": "not_applicable"
+        }
+      ]
+    },
+    "token-scam-screen/sample-input.json": {
+      "status": "WARN",
+      "checks": [
+        {
+          "id": "failed_sell_blocks",
+          "status": "not_applicable"
+        },
+        {
+          "id": "high_sell_tax_blocks",
+          "status": "not_applicable"
+        },
+        {
+          "id": "block_list_blocks",
+          "status": "not_applicable"
+        },
+        {
+          "id": "block_means_zero",
+          "status": "not_applicable"
+        },
+        {
+          "id": "amount_not_above_request",
+          "status": "pass"
+        },
+        {
+          "id": "request_echoed",
+          "status": "pass"
+        },
+        {
+          "id": "evidence_given",
+          "status": "pass"
+        }
+      ]
+    },
+    "token-scam-screen/attack-input.json": {
+      "status": "BLOCK",
+      "checks": [
+        {
+          "id": "failed_sell_blocks",
+          "status": "pass"
+        },
+        {
+          "id": "high_sell_tax_blocks",
+          "status": "pass"
+        },
+        {
+          "id": "block_list_blocks",
+          "status": "pass"
+        },
+        {
+          "id": "block_means_zero",
+          "status": "pass"
+        },
+        {
+          "id": "amount_not_above_request",
+          "status": "pass"
+        },
+        {
+          "id": "request_echoed",
+          "status": "pass"
+        },
+        {
+          "id": "evidence_given",
+          "status": "pass"
+        }
+      ]
+    }
+  }
+}

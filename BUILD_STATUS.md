@@ -375,6 +375,20 @@ Ukuran waktu. Membaca daftar catatan lewat TEE di production butuh 295,5 detik. 
 
 Batas. Aksi yang butuh TEE tetap menunggu antrean OutLayer testnet (sekitar 5 menit) dan belum diuji end-to-end di TEE pada build baru. Kepemilikan data tetap terikat satu browser. Pencegahan rollback sekarang dicek di perangkat, bukan di runner. Operator masih dapat melihat metadata seperti waktu dan ukuran request TEE.
 
+### 6.20 Empat metode Web3 trading, tiga di antaranya penjaga agent untuk AI Security & Defense (✅, 15 Nov 2026, Claude)
+
+Semua metode WASM tanpa AI, runner `823e9913…`, harga 0,08 NEAR, DAO 10%, penjual demo fiktif (sub-akun `scientivan.testnet`, kunci di keychain near-cli). Pembeli uji `auth-test.scientivan.testnet` login NEP-413 di production dan membayar `pay_for_run` dari wallet sendiri (`app/backend/scripts/buyer-wallet-runs.mjs`). Setiap run Released, semua cek pembeli lolos, attestation mencatat `executed_wasm_sha256 823e9913…`. Bukti lengkap per metode di `app/methods/<id>/evidence/testnet-runs.json`.
+
+| Metode | Penjual | Versi | Verdict run | Call OutLayer | Settle |
+|---|---|---|---|---|---|
+| perp-risk-limit-fit (penjaga order agent) | `rizky-saputra` | v2 | BLOCK (o4 withdraw ter-inject) | `6c0905a8-8af2-457b-86ba-205e8190e39c` | `7BYjxL7R...` |
+| token-scam-screen (serangan honeypot) | `yoga-prasetyo` | v1 | BLOCK | `970b6606-0080-476d-8f08-a21141a1524a` | `A7DrVZaa...` |
+| token-scam-screen (token normal) | `yoga-prasetyo` | v1 | WARN | `011357a2-96be-4233-b595-d2d852463608` | `7b3Ufxue...` |
+| large-swap-split (rencana sandbox) | `dewi-anggraini` | v2 | WARN (KuCoin diblok) | `65358d88-f7b0-4e90-b9f9-f7919c156362` | `379XRQjr...` |
+| strategy-robustness-audit | `nadia-rahman` | v1 | fragile | `092f4c0a-b29c-4304-ad11-cb79ec298559` | `H6nXk5au...` |
+
+v1 perp-risk-limit-fit dan large-swap-split (cek batas risiko, split penjualan) juga sudah dibayar, dijalankan dan diulas sebelum reframing (call `52dd1fe9-...`, `b9fe12ca-...`). Ulasan hanya dari run Released milik pembeli. Uji lokal `trading-methods-local-test.mjs` 19/19, termasuk jawaban yang dipalsukan (meloloskan order atau token yang diblok) selalu gagal cek perangkat. Konektor Web3 di katalog (Binance, OKX, Coinbase, KuCoin, NEAR wallet, WalletConnect, TradingView) berlabel coming soon; Hyperliquid, Ref Finance dan MetaMask tidak ada di Simple Icons 13.21.0 sehingga dilewati. Batas: pencocokan prompt injection berbasis kata kunci; fakta on-chain diberikan pembeli, metode tidak membaca chain; marketplace memberi metode baru warna dan ikon default karena daftar identitas di `marketplace-next.tsx`, `tiles.tsx`, `method-detail.tsx` belum diperbarui.
+
 ### 6.5 Kontrak registry (✅)
 
 Kontrak `registry.scientivan.testnet`. Fungsi: `register_method`, `publish_version`, `get_method`, `list_methods`, `get_version`, `list_versions`. Setiap versi menyimpan `code_hash` (WASM penjual), `manifest_hash`, `runner_hash`, `parent`, `contributors`, `note`. Biaya storage dibayar pemanggil lewat deposit, sisanya dikembalikan. Event NEP-297 `method_registered` dan `version_published`.

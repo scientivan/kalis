@@ -180,10 +180,67 @@ function DayRate() {
     <T x={176} y={65} s={14} c={ORANGE}>floor $520</T>
   </>;
 }
+function PerpFit() {
+  const rows: [string, string, string][] = [["BTC long 8k", "ALLOW", BLUE], ["ETH long 17k", "WARN", YELLOW], ["SOL 12x", "BLOCK", ORANGE], ["Withdraw 15k", "BLOCK", ORANGE]];
+  return <>
+    <rect width="320" height="120" fill={YELLOW} />
+    <rect x="20" y="10" width="280" height="100" rx="8" fill={PAPER} stroke={LINE} />
+    <T x={32} y={28}>Agent orders</T>
+    {rows.map(([n, v, c], i) => <g key={n}>
+      <T x={32} y={48 + i * 18} s={12}>{n}</T>
+      <rect x="214" y={37 + i * 18} width="72" height="15" rx="7.5" fill={c} stroke={c === YELLOW ? INK : c} />
+      <T x={226} y={48 + i * 18} s={12} c={c === YELLOW ? INK : PAPER}>{v}</T>
+    </g>)}
+  </>;
+}
+function ScamScreen() {
+  const rows = ["Sell fails in simulation", "Sell tax 99%", "Agent told to ignore checks"];
+  return <>
+    <rect width="320" height="120" fill={LILAC} />
+    <rect x="20" y="12" width="280" height="96" rx="8" fill={PAPER} stroke={LINE} />
+    <T x={32} y={32}>MOONPAY2</T>
+    <rect x="212" y="18" width="76" height="22" rx="11" fill={ORANGE} />
+    <T x={228} y={34} s={13} c={PAPER}>BLOCK</T>
+    {rows.map((n, i) => <g key={n}>
+      <circle cx="38" cy={53 + i * 18} r="5" fill={ORANGE} />
+      <T x={50} y={57 + i * 18} s={12}>{n}</T>
+    </g>)}
+  </>;
+}
+function Robustness() {
+  return <>
+    <rect width="320" height="120" fill={LILAC} />
+    <rect x="20" y="12" width="280" height="96" rx="8" fill={PAPER} stroke={LINE} />
+    <T x={32} y={32}>Net per trade</T>
+    <rect x="44" y="50" width="56" height="44" rx="4" fill={BLUE} />
+    <rect x="124" y="88" width="56" height="6" rx="3" fill={ORANGE} />
+    <line x1="34" x2="196" y1="94" y2="94" stroke={INK} strokeWidth="1.5" />
+    <T x={44} y={46} s={12} c={BLUE}>Fitted</T>
+    <T x={124} y={82} s={12} c={ORANGE}>Unseen</T>
+    <rect x="208" y="44" width="80" height="26" rx="13" fill={ORANGE} />
+    <T x={224} y={62} s={13} c={PAPER}>Fragile</T>
+    <T x={208} y={90} s={12}>2 checks fail</T>
+  </>;
+}
+function SwapSplit() {
+  const rows: [string, number][] = [["Binance", 0.85], ["OKX", 0.59], ["Ref pool", 0.08], ["KuCoin", 0]];
+  return <>
+    <rect width="320" height="120" fill={PINK} />
+    <rect x="20" y="12" width="280" height="96" rx="8" fill={PAPER} stroke={LINE} />
+    <T x={32} y={30}>Agent sale plan</T>
+    <rect x="212" y="18" width="76" height="18" rx="9" fill={YELLOW} stroke={INK} />
+    <T x={230} y={31} s={12}>WARN</T>
+    {rows.map(([n, v], i) => <g key={n}>
+      <T x={32} y={51 + i * 16} s={12}>{n}</T>
+      {v > 0 ? <rect x="108" y={42 + i * 16} width={Math.max(6, 170 * v)} height="10" rx="5" fill={BLUE} /> : <T x={108} y={51 + i * 16} s={12} c={ORANGE}>Blocked, not approved</T>}
+    </g>)}
+  </>;
+}
 const ART: Record<string, () => React.ReactElement> = {
   "portfolio-rebalance": Rebalance, "salary-counteroffer": Counter, "tender-bid": SealedBid, "defi-liquidation-guard": Loan,
   "cash-runway-13w": Payroll, "supplier-concession-plan": Concessions, "token-unlock-sell-plan": Unlock, "term-sheet-dilution": CapTable,
   "scientivanmsk-freelance-rate": DayRate,
+  "perp-risk-limit-fit": PerpFit, "strategy-robustness-audit": Robustness, "large-swap-split": SwapSplit, "token-scam-screen": ScamScreen,
   "upcoming-offer-counter": Offer, "upcoming-tender-margin": Tender, "upcoming-contract-check": Contract,
   "upcoming-payroll-cash": Cash, "upcoming-wrong-orders": Orders, "upcoming-bottleneck": Board,
 };

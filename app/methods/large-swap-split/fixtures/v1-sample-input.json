@@ -1,0 +1,78 @@
+{
+  "_note": "Synthetic demo data. Every account, venue balance and number here is invented. Pool reserves and order book levels are made up, not live market data.",
+  "token": "NEAR",
+  "amount": 180000,
+  "reference_price": 3.2,
+  "max_avg_slippage_bps": 60,
+  "max_venue_share": 0.5,
+  "venues": [
+    {
+      "venue": "Ref Finance NEAR/USDC pool",
+      "kind": "amm",
+      "fee_bps": 30,
+      "reserve_token": 2400000,
+      "reserve_quote": 7680000
+    },
+    {
+      "venue": "Rhea NEAR/USDT pool",
+      "kind": "amm",
+      "fee_bps": 25,
+      "reserve_token": 1100000,
+      "reserve_quote": 3520000
+    },
+    {
+      "venue": "Binance NEAR/USDT order book",
+      "kind": "book",
+      "fee_bps": 10,
+      "bids": [
+        {
+          "price": 3.199,
+          "size": 12000
+        },
+        {
+          "price": 3.196,
+          "size": 18000
+        },
+        {
+          "price": 3.19,
+          "size": 25000
+        },
+        {
+          "price": 3.182,
+          "size": 30000
+        },
+        {
+          "price": 3.17,
+          "size": 40000
+        },
+        {
+          "price": 3.15,
+          "size": 60000
+        }
+      ]
+    },
+    {
+      "venue": "OKX NEAR/USDT order book",
+      "kind": "book",
+      "fee_bps": 8,
+      "bids": [
+        {
+          "price": 3.198,
+          "size": 8000
+        },
+        {
+          "price": 3.193,
+          "size": 15000
+        },
+        {
+          "price": 3.185,
+          "size": 20000
+        },
+        {
+          "price": 3.172,
+          "size": 30000
+        }
+      ]
+    }
+  ]
+}

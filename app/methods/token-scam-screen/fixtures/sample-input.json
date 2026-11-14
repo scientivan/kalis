@@ -1,0 +1,29 @@
+{
+  "_note": "Synthetic demo data. Every account, address, venue balance and number here is invented. A young token with some owner powers: expected WARN.",
+  "token": {
+    "symbol": "NOVA",
+    "contract": "0x4a1e00000000000000000000000000000000c0de",
+    "deployer": "0x77b200000000000000000000000000000000beef",
+    "sell_simulation_ok": true,
+    "buy_tax_pct": 1,
+    "sell_tax_pct": 2,
+    "owner_can_mint": false,
+    "owner_can_pause": true,
+    "owner_can_blacklist": false,
+    "proxy_upgradeable": false,
+    "verified_source": true,
+    "liquidity_usd": 2400000,
+    "liquidity_locked_pct": 80,
+    "lock_days_left": 200,
+    "top10_holders_pct": 48,
+    "deployer_holds_pct": 6,
+    "contract_age_days": 40
+  },
+  "block_list": [
+    "0xdead00000000000000000000000000000000f00d"
+  ],
+  "agent_request": {
+    "amount_usd": 30000,
+    "instruction": "Add NOVA to the basket at market."
+  }
+}

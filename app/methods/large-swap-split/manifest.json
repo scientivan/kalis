@@ -1,0 +1,607 @@
+{
+  "manifest_version": 5,
+  "method_id": "large-swap-split",
+  "kind": "wasm",
+  "listing": {
+    "title": "Split a large token sale across venues within your slippage limit",
+    "outcome": "A sandboxed sale plan your trading agent may run step by step: only on venues you approved, within the session budget and your slippage limit, with a minimum to receive per step, an ALLOW, WARN or BLOCK verdict and every blocked step.",
+    "category": "Agent security",
+    "seller": {
+      "display_name": "Dewi Anggraini (demo seller)",
+      "role": "Execution desk consultant",
+      "demo": true
+    },
+    "urgency": "You need to sell a large amount soon. If the size of your sale leaks before it is done, others can trade ahead of you and the price moves against you.",
+    "limits": [
+      "One token per run, up to 8 venues",
+      "Uses the pool reserves and order book levels you provide; it does not read live markets",
+      "Plans the sale only. It places no order and does not say whether to sell",
+      "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+    ],
+    "sample_output": "Synthetic example: 156,150 NEAR across two pools and two order books at 48 bps average, stopped at the 500,000 USD session budget. KuCoin is blocked because it is not approved. Verdict WARN.",
+    "not_advice": true
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "token",
+        "label": "Token",
+        "type": "string",
+        "required": true
+      },
+      {
+        "id": "amount",
+        "label": "Amount to sell",
+        "type": "number",
+        "required": true,
+        "min": 0,
+        "private": true
+      },
+      {
+        "id": "reference_price",
+        "label": "Reference price",
+        "type": "money",
+        "unit": "USD",
+        "required": true,
+        "min": 0
+      },
+      {
+        "id": "max_avg_slippage_bps",
+        "label": "Largest average slippage (basis points)",
+        "type": "number",
+        "required": true,
+        "min": 0,
+        "max": 2000
+      },
+      {
+        "id": "max_venue_share",
+        "label": "Largest share on one venue",
+        "type": "percent",
+        "required": true,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "id": "venues",
+        "label": "Venues",
+        "type": "array",
+        "required": true,
+        "items": {
+          "type": "object",
+          "fields": [
+            {
+              "id": "venue",
+              "label": "Venue",
+              "type": "string",
+              "required": true
+            },
+            {
+              "id": "kind",
+              "label": "Type",
+              "type": "enum",
+              "required": true,
+              "enum": [
+                "amm",
+                "book"
+              ]
+            },
+            {
+              "id": "fee_bps",
+              "label": "Fee (basis points)",
+              "type": "number",
+              "required": true,
+              "min": 0,
+              "max": 1000
+            },
+            {
+              "id": "reserve_token",
+              "label": "Pool token reserve",
+              "type": "number",
+              "min": 0
+            },
+            {
+              "id": "reserve_quote",
+              "label": "Pool USD reserve",
+              "type": "number",
+              "min": 0
+            },
+            {
+              "id": "bids",
+              "label": "Order book bids",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "fields": [
+                  {
+                    "id": "price",
+                    "label": "Price",
+                    "type": "money",
+                    "unit": "USD",
+                    "required": true,
+                    "min": 0
+                  },
+                  {
+                    "id": "size",
+                    "label": "Size",
+                    "type": "number",
+                    "required": true,
+                    "min": 0
+                  }
+                ],
+                "min_items": 0,
+                "max_items": 100
+              }
+            }
+          ],
+          "min_items": 1,
+          "max_items": 8
+        }
+      },
+      {
+        "id": "session",
+        "label": "Agent session",
+        "type": "object",
+        "required": true,
+        "fields": [
+          {
+            "id": "budget_usd",
+            "label": "Session budget",
+            "type": "money",
+            "unit": "USD",
+            "required": true,
+            "min": 0,
+            "private": true
+          },
+          {
+            "id": "approved_venues",
+            "label": "Approved venues",
+            "type": "array",
+            "required": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      {
+        "id": "agent_instruction",
+        "label": "Agent's instruction",
+        "type": "text"
+      }
+    ],
+    "sample": {
+      "fictional": true,
+      "ref": "fixtures/sample-input.json"
+    }
+  },
+  "ai": {
+    "allowed": [],
+    "proprietary": false
+  },
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "steps": [
+    {
+      "id": "read_venues",
+      "what": "Read the sale, your limits and each venue's liquidity"
+    },
+    {
+      "id": "check_inputs",
+      "what": "Check amounts, prices, pools and order books"
+    },
+    {
+      "id": "route_slices",
+      "what": "Send each slice of the sale to the venue that pays the most for it"
+    },
+    {
+      "id": "check_limits",
+      "what": "Re-check the average price against your slippage limit"
+    }
+  ],
+  "connectors": [],
+  "outputs": {
+    "status_field": "verdict",
+    "unverifiable_status": [],
+    "fields": [
+      {
+        "id": "verdict",
+        "label": "Verdict",
+        "type": "enum",
+        "enum": [
+          "ALLOW",
+          "WARN",
+          "BLOCK"
+        ],
+        "display": "badge"
+      },
+      {
+        "id": "blocked_steps",
+        "label": "Blocked steps",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "allocations",
+        "label": "Where to sell",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "total_sold",
+        "label": "Sold in the plan",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "unsold_amount",
+        "label": "Waits for later",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "total_received",
+        "label": "Expected USD received",
+        "type": "number",
+        "display": "money"
+      },
+      {
+        "id": "avg_price",
+        "label": "Average price",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "avg_slippage_bps",
+        "label": "Average slippage (basis points)",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "reason",
+        "label": "Why part of it waits",
+        "type": "text",
+        "display": "text"
+      },
+      {
+        "id": "status",
+        "label": "Sale covered",
+        "type": "enum",
+        "enum": [
+          "ok",
+          "partial"
+        ],
+        "display": "badge"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "sold_plus_waiting_is_your_amount",
+      "description": "What is sold plus what waits equals the amount you want to sell",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "+": [
+                    {
+                      "var": "answer.total_sold"
+                    },
+                    {
+                      "var": "answer.unsold_amount"
+                    }
+                  ]
+                },
+                {
+                  "var": "input.amount"
+                }
+              ]
+            }
+          },
+          0.001
+        ]
+      },
+      "message": "The plan does not account for your whole amount."
+    },
+    {
+      "id": "venue_rows_add_up",
+      "description": "The rows per venue add up to the total sold",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "reduce": [
+                    {
+                      "var": "answer.allocations"
+                    },
+                    {
+                      "+": [
+                        {
+                          "var": "accumulator"
+                        },
+                        {
+                          "var": "current.amount"
+                        }
+                      ]
+                    },
+                    0
+                  ]
+                },
+                {
+                  "var": "answer.total_sold"
+                }
+              ]
+            }
+          },
+          0.001
+        ]
+      },
+      "message": "The amounts per venue do not add up to the total."
+    },
+    {
+      "id": "received_rows_add_up",
+      "description": "The USD per venue adds up to the total received",
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "reduce": [
+                    {
+                      "var": "answer.allocations"
+                    },
+                    {
+                      "+": [
+                        {
+                          "var": "accumulator"
+                        },
+                        {
+                          "var": "current.received_quote"
+                        }
+                      ]
+                    },
+                    0
+                  ]
+                },
+                {
+                  "var": "answer.total_received"
+                }
+              ]
+            }
+          },
+          0.05
+        ]
+      },
+      "message": "The USD per venue does not add up to the total."
+    },
+    {
+      "id": "no_venue_above_your_cap",
+      "description": "No venue gets more than your largest share",
+      "rule": {
+        "none": [
+          {
+            "var": "answer.allocations"
+          },
+          {
+            ">": [
+              {
+                "var": "amount"
+              },
+              {
+                "+": [
+                  {
+                    "*": [
+                      {
+                        "var": "input.max_venue_share"
+                      },
+                      {
+                        "var": "input.amount"
+                      }
+                    ]
+                  },
+                  0.001
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "message": "One venue gets more than your largest share."
+    },
+    {
+      "id": "slippage_recomputed",
+      "description": "Your device recomputes the average slippage from the totals",
+      "when": {
+        ">": [
+          {
+            "var": "answer.total_sold"
+          },
+          0
+        ]
+      },
+      "rule": {
+        "<=": [
+          {
+            "abs": {
+              "-": [
+                {
+                  "*": [
+                    {
+                      "-": [
+                        1,
+                        {
+                          "/": [
+                            {
+                              "/": [
+                                {
+                                  "var": "answer.total_received"
+                                },
+                                {
+                                  "var": "answer.total_sold"
+                                }
+                              ]
+                            },
+                            {
+                              "var": "input.reference_price"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    10000
+                  ]
+                },
+                {
+                  "var": "answer.avg_slippage_bps"
+                }
+              ]
+            }
+          },
+          0.05
+        ]
+      },
+      "message": "The average slippage does not follow from the totals."
+    },
+    {
+      "id": "slippage_within_your_limit",
+      "description": "The average slippage is within your limit",
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.avg_slippage_bps"
+          },
+          {
+            "var": "input.max_avg_slippage_bps"
+          }
+        ]
+      },
+      "message": "The plan's average slippage is above your limit."
+    },
+    {
+      "id": "steps_only_on_approved_venues",
+      "description": "Every step runs on a venue you approved for the session",
+      "rule": {
+        "none": [
+          {
+            "var": "answer.allocations"
+          },
+          {
+            "!": {
+              "in": [
+                {
+                  "var": "venue"
+                },
+                {
+                  "var": "input.session.approved_venues"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "message": "A step runs on a venue you did not approve."
+    },
+    {
+      "id": "plan_within_session_budget",
+      "description": "The plan stays within the session budget at the reference price",
+      "rule": {
+        "<=": [
+          {
+            "*": [
+              {
+                "var": "answer.total_sold"
+              },
+              {
+                "var": "input.reference_price"
+              }
+            ]
+          },
+          {
+            "+": [
+              {
+                "var": "input.session.budget_usd"
+              },
+              0.01
+            ]
+          }
+        ]
+      },
+      "message": "The plan spends more than the session budget."
+    },
+    {
+      "id": "min_receive_below_quote",
+      "description": "Each step's minimum to receive is not above its quote",
+      "rule": {
+        "none": [
+          {
+            "var": "answer.allocations"
+          },
+          {
+            ">": [
+              {
+                "var": "min_received_quote"
+              },
+              {
+                "var": "received_quote"
+              }
+            ]
+          }
+        ]
+      },
+      "message": "A step's minimum to receive is above its own quote."
+    },
+    {
+      "id": "block_has_no_steps",
+      "description": "A blocked plan has no steps to run",
+      "when": {
+        "==": [
+          {
+            "var": "answer.verdict"
+          },
+          "BLOCK"
+        ]
+      },
+      "rule": {
+        "==": [
+          {
+            "count": [
+              {
+                "var": "answer.allocations"
+              }
+            ]
+          },
+          0
+        ]
+      },
+      "message": "The plan is blocked but still lists steps."
+    }
+  ],
+  "seller_secrets": [
+    "slice size, venue cap, tail-price rule, minimum-receive margin and injection markers"
+  ],
+  "disclosures": [
+    "Not financial advice. The plan does not say whether to sell, and no order is placed.",
+    "Your agent never holds the keys. A BLOCK means the signer must refuse; WARN needs your approval; nothing is signed or sent by the method.",
+    "Liquidity can change between the snapshot you provide and the moment you trade.",
+    "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

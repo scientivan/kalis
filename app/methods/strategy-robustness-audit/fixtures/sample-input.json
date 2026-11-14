@@ -1,0 +1,346 @@
+{
+  "_note": "Synthetic demo data. Every account, venue balance and number here is invented. The trades come from a fictional breakout strategy on ETH and SOL perps.",
+  "starting_capital": 25000,
+  "fee_bps_per_side": 4.5,
+  "slippage_bps_per_side": 3,
+  "max_drawdown_limit_pct": 0.12,
+  "trades": [
+    {
+      "date": "2026-01-08",
+      "notional": 6000,
+      "gross_return_pct": 0.00336
+    },
+    {
+      "date": "2026-01-12",
+      "notional": 4000,
+      "gross_return_pct": 0.01031
+    },
+    {
+      "date": "2026-01-15",
+      "notional": 6000,
+      "gross_return_pct": -0.00514
+    },
+    {
+      "date": "2026-01-18",
+      "notional": 6000,
+      "gross_return_pct": 0.00957
+    },
+    {
+      "date": "2026-01-22",
+      "notional": 6000,
+      "gross_return_pct": 0.0153
+    },
+    {
+      "date": "2026-01-26",
+      "notional": 5000,
+      "gross_return_pct": 0.00903
+    },
+    {
+      "date": "2026-01-30",
+      "notional": 5000,
+      "gross_return_pct": 0.01046
+    },
+    {
+      "date": "2026-02-01",
+      "notional": 4000,
+      "gross_return_pct": 0.01234
+    },
+    {
+      "date": "2026-02-05",
+      "notional": 6000,
+      "gross_return_pct": 0.01947
+    },
+    {
+      "date": "2026-02-09",
+      "notional": 4000,
+      "gross_return_pct": 0.01213
+    },
+    {
+      "date": "2026-02-12",
+      "notional": 4000,
+      "gross_return_pct": 0.00017
+    },
+    {
+      "date": "2026-02-15",
+      "notional": 4000,
+      "gross_return_pct": -0.00607
+    },
+    {
+      "date": "2026-02-18",
+      "notional": 4000,
+      "gross_return_pct": 0.00025
+    },
+    {
+      "date": "2026-02-20",
+      "notional": 4000,
+      "gross_return_pct": 0.01178
+    },
+    {
+      "date": "2026-02-24",
+      "notional": 4000,
+      "gross_return_pct": 0.00899
+    },
+    {
+      "date": "2026-02-27",
+      "notional": 5000,
+      "gross_return_pct": 0.00472
+    },
+    {
+      "date": "2026-03-01",
+      "notional": 4000,
+      "gross_return_pct": 0.00802
+    },
+    {
+      "date": "2026-03-03",
+      "notional": 6000,
+      "gross_return_pct": 0.02144
+    },
+    {
+      "date": "2026-03-05",
+      "notional": 4000,
+      "gross_return_pct": 0.00734
+    },
+    {
+      "date": "2026-03-07",
+      "notional": 5000,
+      "gross_return_pct": 0.00085
+    },
+    {
+      "date": "2026-03-09",
+      "notional": 4000,
+      "gross_return_pct": 0.02027
+    },
+    {
+      "date": "2026-03-13",
+      "notional": 4000,
+      "gross_return_pct": 0.02173
+    },
+    {
+      "date": "2026-03-17",
+      "notional": 5000,
+      "gross_return_pct": 0.00098
+    },
+    {
+      "date": "2026-03-19",
+      "notional": 5000,
+      "gross_return_pct": 0.0054
+    },
+    {
+      "date": "2026-03-21",
+      "notional": 6000,
+      "gross_return_pct": 0.00811
+    },
+    {
+      "date": "2026-03-23",
+      "notional": 4000,
+      "gross_return_pct": -0.00712
+    },
+    {
+      "date": "2026-03-27",
+      "notional": 6000,
+      "gross_return_pct": 0.0097
+    },
+    {
+      "date": "2026-03-31",
+      "notional": 6000,
+      "gross_return_pct": 0.00602
+    },
+    {
+      "date": "2026-04-04",
+      "notional": 4000,
+      "gross_return_pct": 0.00635
+    },
+    {
+      "date": "2026-04-08",
+      "notional": 4000,
+      "gross_return_pct": -0.0079
+    },
+    {
+      "date": "2026-04-10",
+      "notional": 6000,
+      "gross_return_pct": -0.00921
+    },
+    {
+      "date": "2026-04-12",
+      "notional": 6000,
+      "gross_return_pct": 0.01807
+    },
+    {
+      "date": "2026-04-16",
+      "notional": 4000,
+      "gross_return_pct": 0.00527
+    },
+    {
+      "date": "2026-04-20",
+      "notional": 6000,
+      "gross_return_pct": -0.01053
+    },
+    {
+      "date": "2026-04-24",
+      "notional": 6000,
+      "gross_return_pct": 0.01391
+    },
+    {
+      "date": "2026-04-28",
+      "notional": 5000,
+      "gross_return_pct": 0.01111
+    },
+    {
+      "date": "2026-05-01",
+      "notional": 4000,
+      "gross_return_pct": -0.0147
+    },
+    {
+      "date": "2026-05-05",
+      "notional": 6000,
+      "gross_return_pct": 0.02197
+    },
+    {
+      "date": "2026-05-07",
+      "notional": 5000,
+      "gross_return_pct": 0.00925
+    },
+    {
+      "date": "2026-05-10",
+      "notional": 4000,
+      "gross_return_pct": -0.00085
+    },
+    {
+      "date": "2026-05-12",
+      "notional": 4000,
+      "gross_return_pct": -0.00069
+    },
+    {
+      "date": "2026-05-14",
+      "notional": 5000,
+      "gross_return_pct": 0.00955
+    },
+    {
+      "date": "2026-05-18",
+      "notional": 5000,
+      "gross_return_pct": 0.01937
+    },
+    {
+      "date": "2026-05-20",
+      "notional": 5000,
+      "gross_return_pct": 0.01631
+    },
+    {
+      "date": "2026-05-24",
+      "notional": 5000,
+      "gross_return_pct": -0.00735
+    },
+    {
+      "date": "2026-05-26",
+      "notional": 6000,
+      "gross_return_pct": 0.00294
+    },
+    {
+      "date": "2026-05-30",
+      "notional": 4000,
+      "gross_return_pct": -0.00311
+    },
+    {
+      "date": "2026-06-02",
+      "notional": 6000,
+      "gross_return_pct": 0.00566
+    },
+    {
+      "date": "2026-06-05",
+      "notional": 6000,
+      "gross_return_pct": -0.0064
+    },
+    {
+      "date": "2026-06-07",
+      "notional": 6000,
+      "gross_return_pct": 0.01247
+    },
+    {
+      "date": "2026-06-10",
+      "notional": 4000,
+      "gross_return_pct": 0.02596
+    },
+    {
+      "date": "2026-06-12",
+      "notional": 5000,
+      "gross_return_pct": 0.01034
+    },
+    {
+      "date": "2026-06-14",
+      "notional": 4000,
+      "gross_return_pct": 0.00161
+    },
+    {
+      "date": "2026-06-16",
+      "notional": 5000,
+      "gross_return_pct": 0.00184
+    },
+    {
+      "date": "2026-06-18",
+      "notional": 5000,
+      "gross_return_pct": 0.00227
+    },
+    {
+      "date": "2026-06-21",
+      "notional": 5000,
+      "gross_return_pct": 0.00419
+    },
+    {
+      "date": "2026-06-23",
+      "notional": 5000,
+      "gross_return_pct": -0.00183
+    },
+    {
+      "date": "2026-06-25",
+      "notional": 6000,
+      "gross_return_pct": 0.00084
+    },
+    {
+      "date": "2026-06-29",
+      "notional": 5000,
+      "gross_return_pct": 0.0016
+    },
+    {
+      "date": "2026-07-02",
+      "notional": 4000,
+      "gross_return_pct": -0.00043
+    },
+    {
+      "date": "2026-07-06",
+      "notional": 6000,
+      "gross_return_pct": 0.00349
+    },
+    {
+      "date": "2026-07-08",
+      "notional": 6000,
+      "gross_return_pct": -0.00611
+    },
+    {
+      "date": "2026-07-12",
+      "notional": 5000,
+      "gross_return_pct": 0.00522
+    },
+    {
+      "date": "2026-07-15",
+      "notional": 5000,
+      "gross_return_pct": -0.01567
+    }
+  ],
+  "param_variants": [
+    {
+      "label": "Breakout lookback 18 bars",
+      "trades": 61,
+      "avg_gross_return_pct": 0.0031
+    },
+    {
+      "label": "Breakout lookback 22 bars",
+      "trades": 58,
+      "avg_gross_return_pct": 0.0012
+    },
+    {
+      "label": "Stop 1.8 ATR instead of 1.5",
+      "trades": 64,
+      "avg_gross_return_pct": 0.0029
+    }
+  ]
+}
