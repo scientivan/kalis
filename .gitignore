@@ -32,3 +32,14 @@ npm-debug.log*
 # empty git dirs from cargo init (no commits), renamed so files are tracked here
 **/.git-cargo-init/
 app/guests/wallet-allowance-guard/
+
+# Internal working docs kept locally, not published
+/AGENTS.md
+/CLAUDE.md
+/PRODUCT_MEMORY.md
+/DOCUMENTATION_INDEX.md
+/TRACK_STRATEGY_2026-11-14.md
+/DEMO_VIDEO_PLAN.md
+/DESIGN.md
+/FRONTEND_GUIDE.md
+/PRODUCT.md
