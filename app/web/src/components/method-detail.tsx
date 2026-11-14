@@ -29,8 +29,8 @@ type Detail = { method_id: string; owner: string; title: string; versions: Versi
 type Summary = { count: number; average: number | null; distribution: Record<string, number>; label: string; note?: string };
 type Review = { id: string; rating: number; comment?: string; created_at: string; version?: number };
 
-const IDS = ["tender-bid", "portfolio-rebalance", "salary-counteroffer", "cash-runway-13w", "defi-liquidation-guard", "token-unlock", "supplier-concession-plan", "term-sheet-dilution"];
-const identity = (id: string) => { const i = Math.max(0, IDS.indexOf(id)); const color = ["#FF5F04", "#0038FF", "#FF77CD", "#FEE897", "#9FA9F5", "#F44A32", "#FF5F04", "#FEE897"][i]; return { color, ink: ["#FEE897", "#9FA9F5", "#FF77CD"].includes(color) ? "#101010" : "#fff", icon: ["m-doc", "m-chart", "m-person", "m-cash", "m-shield", "m-rocket", "m-hand", "m-pie"][i] }; };
+const IDS = ["tender-bid", "portfolio-rebalance", "salary-counteroffer", "cash-runway-13w", "defi-liquidation-guard", "token-unlock-sell-plan", "supplier-concession-plan", "term-sheet-dilution", "perp-risk-limit-fit", "token-scam-screen", "large-swap-split", "strategy-robustness-audit"];
+const identity = (id: string) => { const i = Math.max(0, IDS.indexOf(id)); const color = ["#FF5F04", "#0038FF", "#FF77CD", "#FEE897", "#9FA9F5", "#F44A32", "#FF5F04", "#FEE897", "#0038FF", "#F44A32", "#9FA9F5", "#FF77CD"][i]; return { color, ink: ["#FEE897", "#9FA9F5", "#FF77CD"].includes(color) ? "#101010" : "#fff", icon: ["m-doc", "m-chart", "m-person", "m-cash", "m-shield", "m-rocket", "m-hand", "m-pie", "m-shield", "m-shield", "m-chart", "m-pie"][i] }; };
 const CONNECTOR_NAMES: Record<string, string> = { sheets: "Google Sheets", broker: "Demo broker", docs: "Google Docs", wallet: "Demo lending wallet" };
 const connectorName = (id: string) => { const k = id.replace(/_mock$/, ""); return CONNECTOR_NAMES[k] || k.charAt(0).toUpperCase() + k.slice(1); };
 const TABS = ["Overview", "Inputs", "Checks", "Versions", "Reviews"];

@@ -6,10 +6,10 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { icon } from "./shell";
 
-const IDS = ["tender-bid", "portfolio-rebalance", "salary-counteroffer", "cash-runway-13w", "defi-liquidation-guard", "token-unlock", "supplier-concession-plan", "term-sheet-dilution"];
+const IDS = ["tender-bid", "portfolio-rebalance", "salary-counteroffer", "cash-runway-13w", "defi-liquidation-guard", "token-unlock-sell-plan", "supplier-concession-plan", "term-sheet-dilution", "perp-risk-limit-fit", "token-scam-screen", "large-swap-split", "strategy-robustness-audit"];
 // ryux-ignore RX-DS-03: method identity palette copied from the approved Marketplace card (marketplace-next.tsx)
-const COLORS = ["#FF5F04", "#0038FF", "#FF77CD", "#FEE897", "#9FA9F5", "#F44A32", "#FF5F04", "#FEE897"];
-const ICONS = ["m-doc", "m-chart", "m-person", "m-cash", "m-shield", "m-rocket", "m-hand", "m-pie"];
+const COLORS = ["#FF5F04", "#0038FF", "#FF77CD", "#FEE897", "#9FA9F5", "#F44A32", "#FF5F04", "#FEE897", "#0038FF", "#F44A32", "#9FA9F5", "#FF77CD"];
+const ICONS = ["m-doc", "m-chart", "m-person", "m-cash", "m-shield", "m-rocket", "m-hand", "m-pie", "m-shield", "m-shield", "m-chart", "m-pie"];
 /** Same colour and picture a method has in the Marketplace, so a job is recognisable at a glance. */
 export function methodIdentity(id?: string | null) {
   const i = Math.max(0, IDS.indexOf(id || ""));

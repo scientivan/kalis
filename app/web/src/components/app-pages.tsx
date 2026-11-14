@@ -243,16 +243,20 @@ function useAdd(): [boolean, () => void] {
   return [open, () => { setOpen(o => !o); setTimeout(() => document.getElementById("add-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); }];
 }
 function AppsList({ connected, onConnect }: { connected: Set<string>; onConnect: (connector: string) => void }) {
-  return <Main title="Apps">
+  const [kind, setKind] = useState("All"); const [status, setStatus] = useState("Any status"); const [q, setQ] = useState("");
+  const shown = CONNECTOR_APPS.filter(a => (kind === "All" || a.category === kind.toLowerCase()) && (status === "Any status" || (status === "Ready" ? !!a.connector : !a.connector)) && `${a.name} ${a.use}`.toLowerCase().includes(q.trim().toLowerCase()));
+  const tools = <><Segmented label="App type" options={["All", "Web3", "Web2"]} value={kind} onChange={setKind}/><label className="mk-search" htmlFor="apps-q">{icon("search")}<span className="sr">Search apps</span><input id="apps-q" type="search" value={q} onChange={e => setQ(e.target.value)} placeholder="Search apps"/></label><Segmented label="Status" options={["Any status", "Ready", "Coming soon"]} value={status} onChange={setStatus}/></>;
+  return <Main title="Apps" tools={tools}>
     <div className="mcards app-cards" role="list" aria-label="Apps a method may read from">
-      {CONNECTOR_APPS.map(a => { const on = !!a.connector && connected.has(a.connector); return <article className={`mcard app-card ${a.connector ? "" : "is-soon"}`} role="listitem" key={a.id}>
-        <div className="mcard-top"><BrandLogo brand={a.brand} size={52}/><span className={`app-status ${on ? "is-on" : ""}`}>{on ? "Connected" : a.connector ? "Ready to connect" : "Coming soon"}</span></div>
+      {shown.map(a => { const on = !!a.connector && connected.has(a.connector); return <article className={`mcard app-card ${a.connector ? "" : "is-soon"}`} role="listitem" key={a.id}>
+        <div className="mcard-top">{a.brand ? <BrandLogo brand={a.brand} size={52}/> : <span className="brand-logo" style={{ width: 52, height: 52 }} aria-hidden="true">{icon(a.icon || "link")}</span>}<span className={`app-status ${on ? "is-on" : ""}`}>{on ? "Connected" : a.connector ? "Ready to connect" : "Coming soon"}</span></div>
         <h3>{a.name}</h3>
         <p className="mcard-desc">{a.use}</p>
         <div className="mcard-foot"><span className="app-mode">{a.connector ? "Mock data" : "Not available yet"}</span>{a.connector && !on ? <button className="view" onClick={() => onConnect(a.connector!)}>Connect</button> : null}</div>
       </article>; })}
     </div>
-    <StatePanel title="Every app here is a labelled mock for now" text="Kalis does not hold real Google, Notion, Slack, Zoom or Telegram access yet. Connected apps return synthetic sample data, and the others show what methods will read next."/>
+    {!shown.length && <StatePanel title="No app matches that search" text="Try another name, or set the filters back to All and Any status."/>}
+    <StatePanel title="Every app here is a labelled mock for now" text="Kalis does not hold real wallet, exchange, Google, Notion, Slack, Zoom or Telegram access yet. Connected apps return synthetic sample data, and the others show what methods will read next."/>
   </Main>;
 }
 export function ConnectionsPage() {
