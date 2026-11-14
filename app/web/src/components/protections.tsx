@@ -23,7 +23,7 @@ export function AccessList({ manifest, models }: { manifest: Manifest; models: R
       rows={[
         ['AI models', models.map(modelLabel).join('. ')],
         [
-          'Connections',
+          'Connectors',
           list(
             manifest.connectors.map((c) => c.what + ' (' + c.operations.join(', ') + ')'),
             'None. You provide the input yourself',
@@ -180,7 +180,7 @@ export function BrokerImport({ run }: { run: Run }) {
           Read positions from the mock broker
         </button>
       ) : (
-        <Go to="/connections" secondary>
+        <Go to="/connectors" secondary>
           Connect the mock broker to import positions
         </Go>
       )}

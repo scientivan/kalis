@@ -77,7 +77,7 @@ export function KalisApp() {
           <summary>{state.name}</summary>
           <nav aria-label="Your account">
             <Link href="/account">Account</Link>
-            <Link href="/connections">Connections</Link>
+            <Link href="/connectors">Connectors</Link>
             <Link href="/preferences">Permissions & preferences</Link>
           </nav>
         </details>
@@ -179,8 +179,8 @@ function Screen({ path }: { path: string }) {
   if (p[0] === "community") return <Community parts={p.slice(1)} />;
   if (p[0] === "balance") return <Balance parts={p.slice(1)} />;
   if (p[0] === "activity") return <Activity />;
-  if (["account", "connections", "preferences"].includes(p[0]))
-    return <Settings page={p[0]} />;
+  if (["account", "connections", "connectors", "preferences"].includes(p[0]))
+    return <Settings page={p[0] === "connectors" ? "connections" : p[0]} />;
   return (
     <>
       <Heading title="Page not found" />

@@ -2,16 +2,16 @@
 
 Dokumen ini mencatat apa yang **sudah** dan **belum** dikerjakan, beserta buktinya. Tujuannya agar agent atau sesi baru bisa melanjutkan tanpa salah informasi.
 
-- **Update terakhir:** 15 November 2026, migrasi lima perlindungan ke runner privat (lokal, native) oleh Codex dan Claude.
+- **Update terakhir:** 15 November 2026, runner privat aktif di TEE, vault perangkat, deployment, logo, dan label Connectors (rancangan bagian 73).
 - **Deadline submission:** 14 November 2026 23:59 UTC (15 November 06:59 WIB).
-- **Penulis update terakhir:** Claude, menyelesaikan migrasi privasi Codex tanpa transaksi atau deployment.
+- **Penulis update terakhir:** Claude.
 
 
 ## Ringkasan aktual 14 November 2026
 
 Aplikasi aktif app/web terhubung backend. GET lokal dan 14 halaman Chrome tanpa login berhasil. Katalog saat audit berisi sembilan metode. Runner aktif 823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d. Source dan bukti direkonsiliasi di CURRENT_STATE.md serta rancangan bagian 70, dengan indeks dokumen di DOCUMENTATION_INDEX.md.
 
-Jalur plaintext checkout sudah ditutup dan lima protections memakai protokol tersegel (lihat 6.19). Buktinya baru lokal mode native. Runner privat belum di-build sebagai TEE atau di-deploy. Social Money sudah punya DAO fund, issue/proposal/bounty/private evaluation/review dan unsigned payout/version, tetapi legacy bounty tanpa evaluator serta beberapa policy belum selesai. Deployment ditunda, inovasi Social Money dibahas setelah sinkronisasi.
+Jalur plaintext checkout sudah ditutup dan lima protections memakai protokol tersegel (lihat 6.19). Runner privat kini aktif di OutLayer testnet (build `cd95487f…`) dan data proteksi milik pemilik disimpan di vault perangkat (rancangan bagian 73). Social Money sudah punya DAO fund, issue/proposal/bounty/private evaluation/review dan unsigned payout/version, tetapi legacy bounty tanpa evaluator serta beberapa policy belum selesai. Deployment sudah dilakukan 15 November 2026 (app.kalis.scientivan.dev dan api.kalis.scientivan.dev, commit e07d4ef). Eksplorasi Social Money tetap ditunda.
 
 ## 0. Cara membaca dan aturan update
 
@@ -407,7 +407,7 @@ Implementasi backend di `app/backend/src/protections/`, bukti di 6.14. Semua dit
 | Portal pengadaan tender | Mock HTTP tersedia, bukan browser agent headless |
 | Portofolio, tender, karier dan metode demo lain | Data/seller demo fiktif, bukan nasabah atau saran profesional |
 | Rating dan riwayat testnet | Bisa berasal dari seed/script, bukan bukti pelanggan nyata |
-| Public deployment | Belum diaktifkan, domain/DNS ditunda |
+| Public deployment | Aktif sejak 15 November 2026. App di app.kalis.scientivan.dev, API di api.kalis.scientivan.dev, landing redirect sementara (commit e07d4ef) |
 
 
 ## 9. Buku klaim README
@@ -445,7 +445,7 @@ Status lama tentang OutLayer gagal, frontend mock-only, tender belum dibuat dan 
 2. Bahas inovasi Social Money bersama Dien dari fund/proposal/bounty/evaluation yang sudah ada. Belum memilih fitur baru atau policy.
 3. Gap privasi checkout, reviewer enforcement, revoke policy dan bounty legacy dicatat di CURRENT_STATE.md serta app/web/FRONTEND_GAPS.md untuk keputusan/perbaikan terpisah.
 4. Verifikasi wallet E2E, mobile dan aksesibilitas hanya pada lingkup yang dibutuhkan dan dengan otorisasi transaksi yang sesuai. Jangan memakai seed atau pembacaan halaman sebagai bukti pembayaran.
-5. README dan video mengikuti bukti versi aktual serta batas privasi. Deployment dan DNS tetap ditunda Dien.
+5. README dan video mengikuti bukti versi aktual serta batas privasi. Deployment dan DNS ditunda saat itu, kemudian dilakukan 15 November 2026 (rancangan bagian 73).
 
 
 ### Log historis percobaan ulang OutLayer

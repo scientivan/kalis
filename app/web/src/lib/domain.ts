@@ -770,7 +770,7 @@ export function transition(current: State, c: Command): State {
     if (c.connected) {
       const scope = c.scope ?? s.connectionScopes[c.service].scope;
       const expires = c.expires ?? s.connectionScopes[c.service].expires;
-      requireThat(text(scope), 'Describe what this connection may read.');
+      requireThat(text(scope), 'Describe what this connector may read.');
       requireThat(
         expires >= new Date().toISOString().slice(0, 10),
         'Set an expiry date that is not in the past.',
@@ -779,8 +779,8 @@ export function transition(current: State, c: Command): State {
     }
     s.connections[c.service] = c.connected;
     event(
-      (c.connected ? 'Mock connection granted: ' : 'Mock connection revoked: ') + c.service,
-      '/connections',
+      (c.connected ? 'Mock connector granted: ' : 'Mock connector revoked: ') + c.service,
+      '/connectors',
     );
   }
   if (c.type === 'OUTBOUND') {
@@ -823,7 +823,7 @@ export function transition(current: State, c: Command): State {
     requireThat(['draft', 'approved'].includes(r.status), 'Funded work cannot change its input.');
     requireThat(
       r.version.manifest.connectors.some((x) => x.id === 'broker'),
-      'This method does not use a broker connection.',
+      'This method does not use a broker connector.',
     );
     requireThat(s.connections.broker, 'Connect the mock broker first.');
     r.input = 'Synthetic holdings from the mock broker: A 7, B 1, C 1. Cash 0. Limits as saved.';

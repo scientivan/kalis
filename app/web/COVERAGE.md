@@ -9,7 +9,7 @@ Sinkronisasi 14 November 2026. Menggantikan matriks status sebelum integrasi. Ac
 | Jobs | /runs/ongoing, /runs/results, app-pages.tsx | Daftar paginated, fase, approval di Ongoing, hasil pembayaran | Halaman tanpa login terbuka. Daftar akun terautentikasi tidak diuji ulang |
 | Buyer | /runs/new dan /runs/id, run-page.tsx | Input, provenance/review, consent, quote, model narrowing, sealing, demo/wallet payment, idempotency/recovery, async polling, output/checks/proof, settlement/reclaim/rating | Kode tersedia, bukti run historis terpisah. Tidak melakukan pembayaran ulang |
 | Seller | /marketplace/publish, /marketplace/mine, seller-editor.tsx | Create/draft, lima langkah editor, manifest, harga/DAO, sealing, validation, wallet signing dan chain confirmation | Sign-in gate terlihat. Publikasi wallet penuh belum diuji ulang |
-| Connections | /connections, data-tools.tsx | Create mock credential, scope/expiry, revoke, use | Halaman terbuka, mutasi tidak dijalankan |
+| Connectors (dulu Connections) | /connectors dan /connections, data-tools.tsx | Create mock credential, scope/expiry, revoke, use | Halaman terbuka, mutasi tidak dijalankan |
 | Documents | /workspace/files | Upload, extraction review, metadata/detail | Halaman terbuka, tidak upload atau memanggil AI |
 | Notes | /workspace/memory | Propose, review, edit/delete dan recall | Halaman terbuka, mutasi tidak dijalankan |
 | Fund | /community | Treasury, available funds, council/policy | Browser dan GET dao/community config berhasil |

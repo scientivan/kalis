@@ -6,7 +6,7 @@ Audit 14 November 2026 berdasarkan shell.tsx, page.tsx dan browser tanpa login. 
 |---|---|---|
 | Consumer | Marketplace | Methods di /marketplace |
 | Consumer | Jobs | Ongoing di /runs/ongoing, Results di /runs/results |
-| Consumer | Data | Connections di /connections, Documents di /workspace/files, Notes di /workspace/memory |
+| Consumer | Data | Connectors di /connectors (sebelumnya Connections di /connections, URL lama tetap berlaku), Documents di /workspace/files, Notes di /workspace/memory |
 | Author | Methods | Create di /marketplace/publish, Published di /marketplace/mine |
 | Kedua role | Community | Fund di /community, Proposals di /community/proposals, Bounties di /community/bounties, Issues di /community/issues |
 | Kedua role | Activity | History di /activity |

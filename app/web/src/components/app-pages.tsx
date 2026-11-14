@@ -258,20 +258,20 @@ export function ConnectionsPage() {
   const [rev, setRev] = useState(0); const [err, setErr] = useState(""); const [adding, toggle] = useAdd(); const [pick, setPick] = useState<string | undefined>();
   const r = useApi<Cred[] | { items: Cred[] }>("protections/credentials", rev);
   const items = Array.isArray(r.data) ? r.data : r.data?.items || [];
-  return <Page active="Connections" title="Connections" onRefresh={() => setRev(n => n + 1)} info={{ title: "Apps a method may read from", points: [["link", "Read-only access, for a limited time, that you can revoke."], ["lock", "Methods never get your token. They get only what they declared."], ["info", "Private connections use the sealed runner. This browser holds the ownership key."]] }}>
+  return <Page active="Connectors" title="Connectors" onRefresh={() => setRev(n => n + 1)} info={{ title: "Apps a method may read from", points: [["link", "Read-only access, for a limited time, that you can revoke."], ["lock", "Methods never get your token. They get only what they declared."], ["info", "Private connectors use the sealed runner. This browser holds the ownership key."]] }}>
     <AppsList connected={new Set(items.filter(c => !c.revoked && c.status !== "revoked").map(c => c.connector))} onConnect={c => { setPick(c); if (!adding) toggle(); else setTimeout(() => document.getElementById("add-form")?.scrollIntoView({ behavior: "smooth" }), 50); }}/>
-    <Main title="Your connections">
+    <Main title="Your connectors">
       {err && <ErrorPanel message={err} onRetry={() => { setErr(""); setRev(n => n + 1); }} title="That change did not go through"/>}
-      <TileGrid label="Your connections">
-        <AddTile title={adding ? "Close the form" : "Add a connection"} desc="Lets a labelled mock app share read-only data with a method, for a limited time." onClick={toggle}/>
+      <TileGrid label="Your connectors">
+        <AddTile title={adding ? "Close the form" : "Add a connector"} desc="Lets a labelled mock app share read-only data with a method, for a limited time." onClick={toggle}/>
         <PrivateWait r={r} count={3}/>
-        {r.error && <ErrorPanel message={r.error} onRetry={() => setRev(n => n + 1)} title="We could not load your connections"/>}
+        {r.error && <ErrorPanel message={r.error} onRetry={() => setRev(n => n + 1)} title="We could not load your connectors"/>}
         {items.map(c => { const state = c.effective_state || (c.revoked || c.status === "revoked" ? "revoked" : c.expires_at && Date.parse(c.expires_at) <= Date.now() ? "expired" : "active"); const off = state !== "active"; const [name, ic] = CONNECTOR[c.connector] || [c.connector, "link"];
           return <Tile key={c.id} iconNode={appForConnector(c.connector)?.brand ? <BrandLogo brand={appForConnector(c.connector)!.brand}/> : <TileIcon name={ic} color={off ? "#5c5c5c" : "#0038FF"}/>} chip={<Chip tone={off ? "grey" : "pink"}>{off ? statusLabel(state) : "Mock app"}</Chip>} title={name}
             desc={`Can ${c.scopes.map(x => x.replace(/_/g, " ")).join(" and ")} your data. It cannot change anything.`}
             meta={[c.expires_at ? `${off ? "Ended" : "Until"} ${when(c.expires_at)}` : "No end date", c.last_used_at ? `Last used ${when(c.last_used_at)}` : "Never used"]}
             foot={off ? <span className="foot-left">No method can read from it now</span> : <><span className="foot-left">{c.created_at ? `Connected ${when(c.created_at)}` : "Active"}</span>{(!c.allowed_actions || c.allowed_actions.includes("revoke")) && <button className="view" onClick={() => post(`protections/credentials/${c.id}/revoke`, {}, () => setRev(n => n + 1), setErr)}>Revoke</button>}</>}/>; })}
-        <StatePanel title="Every connection here is a labelled mock service" text="No real Google account, broker or wallet is connected. A method asks for a connection when it needs one."/>
+        <StatePanel title="Every connector here is a labelled mock service" text="No real Google account, broker or wallet is connected. A method asks for a connector when it needs one."/>
       </TileGrid>
     </Main>
     {adding && <div id="add-form"><Capability id="five_protections"><ConnectionCreate key={pick || "none"} initial={pick} onChanged={() => setRev(n => n + 1)} /></Capability></div>}

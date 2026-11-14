@@ -128,7 +128,7 @@ export function Marketplace({ parts }: { parts: string[] }) {
             />
             <h3>What the method may access</h3>
             <p>Buyers see this list before they run your method. Kalis refuses anything outside it.</p>
-            <Field name="connector" label="Connection" options={['None', 'Broker positions (read only)']} />
+            <Field name="connector" label="Connector" options={['None', 'Broker positions (read only)']} />
             <Field
               name="documents"
               label="Document types it reads, one per line"

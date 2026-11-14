@@ -12,7 +12,7 @@ export default async function Page({ params }: { params: Promise<{ path?: string
   const pages: Record<string, () => React.ReactElement> = {
     'runs/ongoing': () => <P.MyRunsPage section="Ongoing" />, 'runs/results': () => <P.MyRunsPage section="Results" />, 'runs': () => <P.MyRunsPage />, 'workspace': () => <P.MyRunsPage />, 'approvals': () => <P.ApprovalsPage />, 'activity': () => <P.ActivityPage />,
     'account': () => <P.AccountPage />, 'balance': () => <P.AccountPage />, 'community/proposals': () => <P.CommunityPage section="Proposals" />, 'community/issues': () => <P.ImprovementsPage section="Issues" />, 'community': () => <P.CommunityPage />, 'community/bounties': () => <P.ImprovementsPage />,
-    'connections': () => <P.ConnectionsPage />, 'workspace/files': () => <P.DocumentsPage />, 'workspace/memory': () => <P.NotesPage />,
+    'connectors': () => <P.ConnectionsPage />, 'connections': () => <P.ConnectionsPage />, 'workspace/files': () => <P.DocumentsPage />, 'workspace/memory': () => <P.NotesPage />,
   };
   if (pages[key]) return pages[key]();
   if (path?.length === 2 && path[0] === 'runs') return <RunPage runId={path[1] === 'new' ? undefined : decodeURIComponent(path[1])} />;

@@ -4,7 +4,7 @@
 
 ## Kesimpulan
 
-Tidak ada bukti bahwa OutLayer secara umum tidak mampu menjalankan layanan privasi yang dibutuhkan. Dokumentasi resmi menjelaskan HTTP WASI P2, encrypted storage dan encryption keys. Dukungan fitur pada deployment testnet Kalis belum dibuktikan lewat probe baru, dan tidak boleh dianggap sudah teruji hanya dari dokumentasi.
+Tidak ada bukti bahwa OutLayer secara umum tidak mampu menjalankan layanan privasi yang dibutuhkan. Dokumentasi resmi menjelaskan HTTP WASI P2, encrypted storage dan encryption keys. (Pembaruan 15 November 2026: storage probe `scientivan.testnet/storage-probe` lulus, commit d518199, lihat rancangan bagian 73.) Dukungan fitur pada deployment testnet Kalis belum dibuktikan lewat probe baru, dan tidak boleh dianggap sudah teruji hanya dari dokumentasi.
 
 Backend tidak dipilih karena ada bukti TEE mustahil. Dokumen justru menunjukkan implementasi bertahap dengan pengecualian yang dinyatakan. Bagian 52 mempertahankan browser agent di backend. Bagian 65.1 secara eksplisit menyepakati dokumen publik diproses backend tanpa penyimpanan teks, dengan pembacaan dokumen privat dalam TEE sebagai pekerjaan berikutnya. Bagian 65.3 mengizinkan konektor mock dan menyatakan impor Office di perangkat lebih privat daripada konektor. Jangan menyebut semua penggunaan backend otomatis melanggar keputusan tersebut.
 

@@ -15,7 +15,7 @@ const navigation: Record<string, NavParent[]> = {
   Consumer: [
     { label: "Marketplace", icon: "store", items: [{ label: "Methods", href: "/marketplace", active: "Marketplace" }] },
     { label: "Jobs", icon: "play", items: [{ label: "Ongoing", href: "/runs/ongoing", active: "Ongoing" }, { label: "Results", href: "/runs/results", active: "Results" }] },
-    { label: "Data", icon: "link", items: [{ label: "Connections", href: "/connections", active: "Connections" }, { label: "Documents", href: "/workspace/files", active: "Documents" }, { label: "Notes", href: "/workspace/memory", active: "Notes" }] }, ...shared,
+    { label: "Data", icon: "link", items: [{ label: "Connectors", href: "/connectors", active: "Connectors" }, { label: "Documents", href: "/workspace/files", active: "Documents" }, { label: "Notes", href: "/workspace/memory", active: "Notes" }] }, ...shared,
   ],
   Author: [
     { label: "Methods", icon: "tag", items: [{ label: "Create", href: "/marketplace/publish", active: "Drafts" }, { label: "Published", href: "/marketplace/mine", active: "Published" }] }, ...shared,

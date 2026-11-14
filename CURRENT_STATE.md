@@ -34,7 +34,7 @@ Bukti tersimpan di audit/2026-11-14-doc-sync/. Snapshot berisi data publik dan t
 
 | Area | Implementasi aktual | Batas bukti |
 |---|---|---|
-| Consumer | Marketplace → Methods, Jobs → Ongoing dan Results, Data → Connections, Documents dan Notes | Role hanya mengatur navigasi, bukan memberi izin |
+| Consumer | Marketplace → Methods, Jobs → Ongoing dan Results, Data → Connectors (sebelumnya Connections), Documents dan Notes | Role hanya mengatur navigasi, bukan memberi izin |
 | Author | Methods → Create dan Published | Label Create yang teramati menggantikan sebutan Drafts dalam sebagian catatan lama. Persetujuan perubahan istilah tidak disimpulkan dari kode |
 | Kedua role | Community → Fund, Proposals, Bounties dan Issues, Activity → History | Account dan Sign out di menu wallet |
 | Marketplace | Pencarian/filter, detail, expert, versi, review, input/check dan biaya | Rating testnet dapat berasal dari seed. Bukan bukti pelanggan atau mutu metode |
@@ -103,7 +103,7 @@ Royalti kontributor, pemeringkatan beberapa pengklaim dan sengketa penolakan mas
 | Hash runner lama sebagai build aktif | Build aktif konfigurasi dan sembilan versi adalah 823e99… |
 | Platform tidak dapat melihat data dalam semua alur | Ditolak sebagai klaim implementasi umum. Privasi inti dibatasi dan gap private-values dicatat |
 | Royalti/kontributor atau inovasi Social Money sudah final | Tidak. Fitur baru dan policy belum disepakati |
-| Proyek sudah deployed di Vercel | Hanya rencana dan konfigurasi lokal. Deployment ditunda Dien |
+| Proyek sudah deployed di Vercel | Digantikan 15 November 2026 (rancangan bagian 73). Aplikasi aktif di app.kalis.scientivan.dev (Vercel), backend di api.kalis.scientivan.dev (VPS), landing sementara redirect 307 ke aplikasi |
 
 ## Langkah setelah sinkronisasi
 
@@ -126,7 +126,7 @@ Bukti lokal. privacy-local-test.mjs 27 cek lulus, termasuk isolasi antar-pemilik
 
 Yang belum saat itu, diperbarui oleh paragraf runner privat aktif di bawah. PRIVATE_RUNNER_HASH masih not-built, jadi belum ada build TEE yang di-attest dan dikunci. Dukungan storage/HTTP pada worker OutLayer testnet belum diprobe. Deploy runner privat, penguncian secret dan versi market memerlukan persetujuan Dien. Tanpa itu, halaman proteksi di deployment biasa menolak dengan private_runner_unavailable. Data lama di backend tidak dimigrasi atau dihapus. Kepemilikan data terikat ke satu browser, belum ada pemulihan atau multi-perangkat. Konektor di runner tetap mock berlabel. Dokumen publik tetap boleh diekstrak backend setelah opt-in eksplisit sesuai 65.1.
 
-Setelah migrasi ini, langkah berikutnya adalah build dan probe runner privat di OutLayer testnet dengan persetujuan Dien, lalu deployment yang ditunda. Eksplorasi Social Money menyusul.
+Setelah migrasi ini, langkah berikutnya adalah build dan probe runner privat di OutLayer testnet dengan persetujuan Dien, lalu deployment yang ditunda. Eksplorasi Social Money menyusul. (Digantikan oleh rancangan bagian 73. Runner privat dan deployment sudah dilakukan 15 November 2026.)
 
 **Runner privat aktif di OutLayer testnet (15 November 2026, Claude).** Project `scientivan.testnet/kalis-private`, build `457e260ccbb47381049266363c0f9c2fab5161f5c80fc439479dfe95e95d547e` (kalis-runner/0.6). `PROTECTED_SEAL_KEY` dibuat di dalam TEE dengan `--generate` dan dikunci ke build itu (profile `private`, whitelist `scientivan.testnet`). `NEAR_AI_API_KEY` disalin ke profile yang sama tanpa dicetak. Kunci publik TEE `685012c942a97e6d16266f6aefd00371d183b5fad120b2a1cdc315c9a096e959`, kunci tanda terima `0fc41697787c6c3623482a6726eecf8b148cb9ef9ccd9e7bac477c3ab93394a7` (call `47f7fc97-88d8-4514-8970-c90f2c92670d`). `PRIVATE_RUNNER_HASH` di backend dan web dipasang ke hash build ini. Backend mengaktifkan jalur TEE lewat `KALIS_PRIVATE_ENABLED=1`, `KALIS_PRIVATE_TEE_KEY` dan `KALIS_PRIVATE_RECEIPT_KEY` di `app/backend/.env` (gitignored).
 

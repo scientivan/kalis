@@ -12,4 +12,4 @@ Periksa cakupan dan tampilan PDF setelah regenerasi. Ringkasan tidak boleh mengu
 
 ## Status ringkasan PDF
 
-Sinkronisasi 14 November 2026 memperbarui cover menjadi kondisi terkini versi 1.32 dan menambah ringkasan audit serta dasar Social Money. Halaman lama dipertahankan sebagai riwayat. Status terbaru mengikuti cover, Markdown bagian 0/70 dan ../CURRENT_STATE.md. Hasil regenerasi terbaru 15 November 2026 adalah 74 halaman tanpa overflow, dengan cover versi 1.33 dan halaman 74 tentang migrasi runner privat.
+Sinkronisasi 14 November 2026 memperbarui cover menjadi kondisi terkini versi 1.32 dan menambah ringkasan audit serta dasar Social Money. Halaman lama dipertahankan sebagai riwayat. Status terbaru mengikuti cover, Markdown bagian 0/70 dan ../CURRENT_STATE.md. Hasil regenerasi terbaru 15 November 2026 adalah 75 halaman tanpa overflow, dengan cover versi 1.34 dan halaman 75 tentang perubahan sesi 15 November (bagian 73).

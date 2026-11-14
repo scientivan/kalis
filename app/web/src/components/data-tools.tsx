@@ -64,13 +64,13 @@ export function ConnectionCreate({ onChanged, initial }: { onChanged: () => void
       setOpen(false);
       onChanged();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Connection failed.");
+      setError(e instanceof Error ? e.message : "Connector failed.");
     } finally {
       setBusy(false);
     }
   }
   return (
-    <Tool title="Add a Connection">
+    <Tool title="Add a connector">
       <div className="note-row">
         <div>
           <p>
@@ -79,7 +79,7 @@ export function ConnectionCreate({ onChanged, initial }: { onChanged: () => void
           </p>
           {!open && (
             <button className="view" onClick={() => setOpen(true)}>
-              Add connection
+              Add connector
             </button>
           )}
         </div>
@@ -121,7 +121,7 @@ export function ConnectionCreate({ onChanged, initial }: { onChanged: () => void
               value={token}
               onChange={(e) => setToken(e.target.value)}
             />
-            <span className="se-fx-h">Sealed for the private runner. Built-in mock connections only.</span>
+            <span className="se-fx-h">Sealed for the private runner. Built-in mock connectors only.</span>
           </label>
           <label className="se-fx">
             <span className="se-fx-l">Expires In</span>
@@ -132,7 +132,7 @@ export function ConnectionCreate({ onChanged, initial }: { onChanged: () => void
               value={ttl}
               onChange={(e) => setTtl(e.target.value)}
             />
-            <span className="se-fx-h">Minutes until the connection stops working.</span>
+            <span className="se-fx-h">Minutes until the connector stops working.</span>
           </label>
           <div className="se-note rp-wide">
             <span><b>Read only.</b> Trading, transfers and edits are not permitted.</span>
@@ -490,7 +490,7 @@ export function PreparationSources({
         const c = credentials.find(
           (x) => x.id === credential && x.connector === connector,
         );
-        if (!c) throw new Error("Choose an active connection for this source.");
+        if (!c) throw new Error("Choose an active connector for this source.");
         const data = await backend<unknown>(
           `protections/credentials/${encodeURIComponent(c.id)}/use`,
           {
@@ -581,10 +581,10 @@ export function PreparationSources({
         {kind.startsWith("connector:") && (
           <>
             <Dropdown
-              label="Connection"
+              label="Connector"
               value={credential}
               options={[
-                { value: "", label: "Choose a connection" },
+                { value: "", label: "Choose a connector" },
                 ...credentials
                   .filter(
                     (c) =>

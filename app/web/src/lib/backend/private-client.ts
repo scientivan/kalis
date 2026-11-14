@@ -307,7 +307,7 @@ function localAction(rows: Rows, action: string, p: Obj): any {
   switch (action) {
     case "credentials.list": return list("credentials").map(publicCredential);
     case "credentials.connect": {
-      if (!["broker_mock", "sheets_mock", "docs_mock", "wallet_mock"].includes(p.connector)) throw new Error("Only built-in mock connections are supported.");
+      if (!["broker_mock", "sheets_mock", "docs_mock", "wallet_mock"].includes(p.connector)) throw new Error("Only built-in mock connectors are supported.");
       if (p.token !== "kalis-private-demo") throw new Error("Use the private demo token. Real connector authentication is not enabled.");
       if (JSON.stringify(p.scopes) !== JSON.stringify(["read"])) throw new Error("Only read access is supported.");
       const ttl = Number(p.ttl_minutes);

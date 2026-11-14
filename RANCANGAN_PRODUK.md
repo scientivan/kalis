@@ -2,13 +2,13 @@
 
 Catatan review frontend 14 November 2026 tersedia di bagian 58. Penolakan visual pengguna berlaku pada draf aplikasi bagian 57, bukan perubahan kemampuan backend.
 
-Versi 1.32 • 14 November 2026 • Bahasa Indonesia
+Versi 1.34 • 15 November 2026 • Bahasa Indonesia
 
 Dokumen ini merupakan acuan utama agent development. Pasangannya, `RANCANGAN_PRODUK.pdf`, merangkum seluruh bidang keputusan untuk pemahaman dan audit pemilik produk. Ini konsolidasi hasil pembahasan, bukan transkrip verbatim. Riwayat alternatif tetap dicatat agar ide yang ditinggalkan tidak dibangun kembali tanpa alasan.
 
 ## 0. Status terkini (baca dulu)
 
-Sinkronisasi 14 November 2026, versi 1.32. Bagian ini serta bagian 70 menggantikan status implementasi lama. Keputusan Dien menetapkan apa yang seharusnya dilakukan produk. Kode/runtime menetapkan apa yang sekarang terjadi. Perbedaan di antaranya tetap gap, bukan keputusan produk baru. CURRENT_STATE.md merinci bukti dan DOCUMENTATION_INDEX.md mengelompokkan dokumen aktif, referensi dan sejarah.
+Sinkronisasi 15 November 2026, versi 1.34. Bagian ini serta bagian 70 dan 73 menggantikan status implementasi lama. Keputusan Dien menetapkan apa yang seharusnya dilakukan produk. Kode/runtime menetapkan apa yang sekarang terjadi. Perbedaan di antaranya tetap gap, bukan keputusan produk baru. CURRENT_STATE.md merinci bukti dan DOCUMENTATION_INDEX.md mengelompokkan dokumen aktif, referensi dan sejarah.
 
 **Produk dan track.** Kalis adalah marketplace metode privat, berupa WASM atau prompt. Target disepakati tetap Privacy & Private AI, Social Money dan Open Innovation. Produk berfokus pada cara eksekusi, proteksi serta transaksi, bukan menjamin metode lebih unggul, profitable atau berkualitas universal.
 
@@ -18,9 +18,9 @@ Sinkronisasi 14 November 2026, versi 1.32. Bagian ini serta bagian 70 menggantik
 
 **Eksekusi dan kontrak.** Metode berjalan di runner OutLayer TEE dengan sandbox wasmi dan AI privat NEAR AI Cloud. Runner aktif konfigurasi adalah 823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d. Registry dan escrow memakai market.scientivan.testnet. registry.scientivan.testnet adalah kontrak lama. Pembeli mempunyai draft/consent/quote, model narrowing, sealed input, async execute, device checks, settle/reclaim dan rating pada kode UI. Seller mempunyai editor manifest/harga/DAO, artifact sealing, validasi dan wallet publication/confirmation. UI tersedia tidak berarti semua langkah sudah diverifikasi browser.
 
-**Privasi yang diinginkan dan batas aktual.** Privasi dua pihak tetap tujuan disepakati. Per 15 November 2026 jalur plaintext checkout sudah ditutup dan lima perlindungan dipindah ke protokol tersegel dengan runner privat terpisah, backend hanya relay ciphertext. Bukti baru lokal mode native, belum TEE. Runner privat belum di-build, dikunci, atau di-deploy ke OutLayer, sehingga di deployment biasa halaman proteksi menolak tanpa fallback plaintext. Rincian di bagian 72.
+**Privasi yang diinginkan dan batas aktual.** Privasi dua pihak tetap tujuan disepakati. Jalur plaintext checkout sudah ditutup (commit d94aae6). Atas keputusan Dien 15 November 2026 (opsi vault perangkat), data milik pemilik untuk lima perlindungan disimpan terenkripsi di browser dan diproses di perangkat, backend tidak menerima isinya. Runner privat `scientivan.testnet/kalis-private` aktif di OutLayer testnet, build `cd95487f…`, hanya untuk aksi yang ditegakkan terhadap metode atau butuh rahasia tersegel. Aksi itu masih menunggu antrean testnet sekitar 5 menit dan belum diuji ulang end-to-end di build ini. Rincian di bagian 72 dan 73.
 
-**Lima perlindungan.** Kredensial, outbound approval, memori, dokumen dan HTTP browser agent memakai operasi tersegel yang ditandatangani kunci perangkat. Office import membaca file di perangkat. PDF privat ditolak di jalur privat, dokumen publik tetap boleh diekstrak backend setelah opt-in sesuai 65.1. Sertifikat Intel/NVIDIA belum diverifikasi mandiri. Prompt leak check tidak menahan semua parafrase dan verdict prompt maksimal attention.
+**Lima perlindungan.** Kredensial (di UI disebut Connectors sejak 15 November 2026, sebelumnya Connections), outbound approval, memori, dokumen dan HTTP browser agent memakai vault perangkat dan operasi tersegel yang ditandatangani kunci perangkat. Konektor tetap mock berlabel. Google Sheets dan Google Docs dapat dihubungkan sebagai mock, aplikasi lain berstatus Coming soon. Office import membaca file di perangkat. PDF privat ditolak di jalur privat, dokumen publik tetap boleh diekstrak backend setelah opt-in sesuai 65.1. Sertifikat Intel/NVIDIA belum diverifikasi mandiri. Prompt leak check tidak menahan semua parafrase dan verdict prompt maksimal attention.
 
 **Pembayaran.** Fiat top-up masih mock, tidak ada saldo kustodian atau gateway fiat nyata. Settlement memakai transaksi NEAR testnet. Platform 10 persen, DAO minimal 10 persen sesuai versi, penjual sisanya. Sembilan versi teramati memakai 80/10/10. Stage failure refund dan timeout reclaim sudah mempunyai mekanisme, berbeda dari sengketa kualitas yang masih terbuka. Tidak ada izin transaksi atau real trading baru.
 
@@ -28,7 +28,7 @@ Sinkronisasi 14 November 2026, versi 1.32. Bagian ini serta bagian 70 menggantik
 
 **Bukti audit terbaru.** Sembilan endpoint GET lokal serta proxy health berhasil. Chrome tanpa login membuka 14 halaman. Build dan 31 tes frontend sesi yang sama lulus sebelum perubahan dokumen. Pemeriksaan backend lokal tanpa URL menghasilkan 47 cek manifest dan 8 cek Office lulus. Modul browser crypto/checks/file-import identik dengan backend. Audit tidak login, memanggil AI berbayar, membuat record atau menandatangani transaksi. Mobile, aksesibilitas penuh dan wallet E2E tidak dibuktikan ulang.
 
-**Domain dan prioritas.** Landing di calis.scientivan.dev dan aplikasi di app.calis.scientivan.dev tetap rencana. Konfigurasi lokal tersedia, publikasi dan DNS belum diaktifkan. Dien menunda deployment. Prioritas terbaru adalah menelusuri penghalang privasi pada bagian 71 sebelum melanjutkan Social Money. Belum ada fitur tambahan atau policy baru yang disepakati.
+**Domain dan prioritas.** Ejaan domain kini kalis (bukan calis). Aplikasi aktif di https://app.kalis.scientivan.dev (Vercel), backend di https://api.kalis.scientivan.dev (VPS), landing https://kalis.scientivan.dev sementara redirect 307 ke aplikasi karena landing belum dirancang (commit e07d4ef). Katalog juga menampilkan enam metode Upcoming yang hanya ada di frontend, tidak terdaftar on-chain dan tidak bisa dibeli. Logo Meeting K dipakai (commit 98c05c9). Eksplorasi Social Money tetap ditunda. Rincian di bagian 73.
 
 **Fase dan batas klaim.** Development MVP sejak 13 November 2026, deadline 14 November 2026 23:59 UTC. Kesediaan membayar, manfaat metode dunia nyata dan keunggulan atas AI biasa belum terbukti. Rating testnet/seed dan verdict safe bukan bukti pelanggan, mutu atau keamanan menyeluruh. Compliance gate NEAR diperiksa, tidak ada konflik pada audit dokumentasi dan klaim harus mengikuti Q-017.
 
@@ -1649,12 +1649,14 @@ Implementasi persiapan memakai proyek Vercel terpisah untuk aplikasi Next.js di 
 
 Pemeriksaan read-only menemukan akun Vercel tersedia, domain scientivan.dev tercatat di Vercel, dan nameserver aktif dikelola Cloudflare. URL HTTPS publik backend belum diberikan. Default backend loopback hanya berlaku lokal. Deploy aplikasi harus mengisi KALIS_BACKEND_URL pada server Vercel. Jangan mengklaim aplikasi hosted terhubung sebelum API health dan alur terkait diverifikasi.
 
+> Digantikan oleh bagian 73. Ejaan domain menjadi kalis dan deployment sudah dilakukan 15 November 2026.
+
 Status masih persiapan lokal. Belum deploy publik, membuat proyek Vercel, memasang domain atau mengubah DNS. Aktivasi publik mengikuti konfirmasi pada bagian 52. Compliance gate NEAR diperiksa dan tidak ada konflik. Tidak ada push, signing atau spending.
 
 
 ## 70. Sinkronisasi rancangan, website dan seluruh dokumen aktif
 
-Permintaan Dien, 14 November 2026. Audit dokumen harus dua arah. Implementasi tidak otomatis lebih benar daripada keputusan tertulis, dan dokumen lama tidak otomatis menggambarkan kemampuan sekarang. Setelah sinkronisasi selesai, pembahasan dilanjutkan ke inovasi Social Money. Deployment ditunda. Tidak ada fitur Social Money baru yang dipilih dalam tugas ini.
+Permintaan Dien, 14 November 2026. Audit dokumen harus dua arah. Implementasi tidak otomatis lebih benar daripada keputusan tertulis, dan dokumen lama tidak otomatis menggambarkan kemampuan sekarang. Setelah sinkronisasi selesai, pembahasan dilanjutkan ke inovasi Social Money. Deployment ditunda (digantikan oleh bagian 73, deployment dilakukan 15 November 2026). Tidak ada fitur Social Money baru yang dipilih dalam tugas ini.
 
 CURRENT_STATE.md memetakan sumber keputusan, source, runtime, bukti historis dan gap. DOCUMENTATION_INDEX.md menginventaris dokumen aktif, prototipe, handoff dan riset/benchmark historis. README, PRODUCT, DESIGN, BUILD_STATUS, coverage/integration/gap/navigation frontend, API privacy notes, memori dan PDF diselaraskan. Handoff/review lama ditandai historis tanpa menghapus bukti atau mengubah usulan lama menjadi persetujuan.
 
@@ -1708,3 +1710,34 @@ Uji end-to-end `app/backend/scripts/privacy-remote-test.mjs` lewat relay backend
 Ukuran waktu. Membaca daftar catatan lewat TEE di production butuh 295,5 detik. Lewat vault perangkat, simpan catatan 45 ms dan tampil setelah reload 165 ms (uji Chrome lokal), dan di production catatan tersimpan dan tampil kurang dari 1 detik tanpa request ke /api/privacy/execute. Uji native `privacy-vault-test.mjs` lulus 10 cek, termasuk token dan isi catatan tidak keluar dari kotak tersegel, aksi pemilik ditolak di runner, request antre 10 menit diterima, lebih dari 15 menit ditolak, dan runner tidak menyimpan apa pun. `privacy-local-test.mjs` 27 cek dan `privacy-http-test.mjs` 13 cek tetap lulus.
 
 Batas. Aksi yang butuh TEE tetap menunggu antrean OutLayer testnet (sekitar 5 menit) dan belum diuji end-to-end di TEE pada build baru. Kepemilikan data tetap terikat satu browser. Pencegahan rollback sekarang dicek di perangkat, bukan di runner. Operator masih dapat melihat metadata seperti waktu dan ukuran request TEE.
+
+
+## 73. Perubahan sesi 15 November 2026: domain, deployment, vault perangkat, konektor dan logo
+
+Bagian ini mencatat perubahan sesi 15 November 2026. Fakta ditandai dengan buktinya. Keputusan Dien ditulis sebagai keputusan. Hal yang belum diverifikasi ditulis terpisah di akhir.
+
+**Domain dan deployment (fakta, commit e07d4ef).** Ejaan domain berubah dari calis menjadi kalis. Landing https://kalis.scientivan.dev saat ini redirect 307 sementara ke aplikasi karena landing belum dirancang (app/web/src/proxy.ts). Aplikasi berjalan di https://app.kalis.scientivan.dev pada proyek Vercel kalis. Backend API berjalan di https://api.kalis.scientivan.dev pada VPS tinjau-vps (systemd kalis-backend, port 8790, TLS oleh Caddy). Ini menggantikan status deployment ditunda pada bagian 0, 69 dan 70.
+
+**Runner privat di OutLayer testnet (fakta).** Project `scientivan.testnet/kalis-private`. Build pertama `457e260c…` (commit a3973e9), build sekarang `cd95487f39bda73e054a569ac806c93cad11883d6a4e8651860e6fa7c9c39c19` (commit 2bef8fc). Kunci segel dibuat di dalam TEE dan dipindah ke build baru dengan `secrets access --build`. Kunci publik tidak berubah (TEE `685012c9…`, tanda terima `0fc41697…`, call verifikasi `4bacc9bb-e539-442f-9ff5-930852308bc7`). Storage probe `scientivan.testnet/storage-probe` lulus (call `6fb25965` dan `475453f1`, commit d518199).
+
+**Vault perangkat (keputusan Dien, opsi 1).** Data pemilik untuk lima perlindungan (catatan/memori, konektor/kredensial, dokumen, persetujuan outbound, audit) disimpan terenkripsi di browser (IndexedDB, kunci AES-GCM non-extractable) dan diproses di perangkat. Backend tidak menerima isinya. TEE hanya dipakai untuk credentials.use, memory.recall, outbound.propose, outbound.execute, documents.ingest dan browser.act. Browser mengirim record pemilik tersegel bersama request, runner menerapkan aturan di memori, mengembalikan record baru tersegel, dan tidak menyimpan apa pun. Batas kedaluwarsa request menjadi 900 detik (sebelumnya 180/300). Implementasi di commit 2bef8fc.
+
+**Alasan keputusan (fakta pengukuran).** Antrean OutLayer testnet sekitar 5 menit. memory.list lewat TEE di production butuh 295,5 detik, sedangkan lewat vault simpan 45 ms dan tampil setelah reload 165 ms (bagian 72).
+
+**Konsekuensi yang diterima (fakta desain).** Perlindungan rollback kini dicek di perangkat, bukan di runner. Kepemilikan data tetap terikat satu browser. Aksi khusus TEE tetap menunggu sekitar 5 menit. Jalur plaintext checkout sudah ditutup sebelumnya (commit d94aae6).
+
+**Dua bug diperbaiki (fakta).** Web hanya mem-pin kunci TEE lewat env NEXT_PUBLIC yang tidak terisi, kini kunci dipin di bundle (commit 31f8090). Kedaluwarsa request terlalu pendek untuk antrean, kini 900 detik (commit 2bef8fc).
+
+**Hasil uji TEE sebelum vault (fakta, hasil agent).** 6 dari 15 cek perlindungan lulus (credentials connect/list/use broker mock, place_order ditolak, browser open mock terdeklarasi, sentinel tidak muncul). Sisanya gagal karena kedaluwarsa atau timeout, bukan logika. Uji memory end-to-end di build pertama lulus 6 cek (`privacy-remote-test.mjs`).
+
+**UI konektor dan katalog (fakta, commit 2bef8fc).** Halaman konektor menampilkan aplikasi sebagai grid kartu dengan logo dari Simple Icons (app/web/src/lib/connector-apps.ts). Google Sheets dan Google Docs dapat dihubungkan sebagai mock berlabel (sheets_mock, docs_mock). Gmail, Google Drive, Google Calendar, Google Meet, Notion, Slack, Zoom dan Telegram berstatus Coming soon. Outlook tidak ditampilkan karena tidak ada ikon. Demo broker dan Demo lending wallet tetap ada. Setiap kartu metode marketplace menampilkan ikon konektor di bawah nama expert, dan semua kartu memakai ilustrasi use case (app/web/src/components/use-case-art.tsx). Enam metode Upcoming hanya di frontend (app/web/src/lib/upcoming-methods.ts) mengikuti bagian 32 dan 45, tidak terdaftar on-chain dan tidak bisa dibeli, tetapi tampil di situs yang sudah di-deploy.
+
+**Istilah Connectors (keputusan Dien).** Label UI Connections diganti Connectors, termasuk item navigasi, judul halaman, tombol "Add a connector" dan teks status. Route kanonik baru /connectors, /connections tetap berfungsi. Identifier kode dan path API (protections/credentials) tidak berubah. Kutipan historis di bagian lama tidak diubah.
+
+**Logo (keputusan Dien, commit 98c05c9).** Konsep 1 Meeting K (design/brand/logo/concept-1) dipakai sebagai favicon dan tanda sidebar. Masalah diketahui, tanda centang tidak terlihat di bawah sekitar 32 px.
+
+**Status halaman privat (fakta, commit 31f8090).** Halaman privat menampilkan teks status eksplisit, bukan skeleton kosong. Dengan vault, sebagian besar kini tampil instan.
+
+**Social Money.** Eksplorasi tetap ditunda. Tidak ada fitur baru dipilih.
+
+**Belum diverifikasi.** Aksi khusus TEE belum diuji ulang end-to-end di build `cd95487f…`. Uji browser terhadap production untuk aksi TEE belum dilakukan. Logo di ukuran kecil belum diperbaiki. Landing belum dirancang. Metode Upcoming tampil publik tanpa bukti permintaan. Compliance gate NEAR tidak menemukan konflik pada pencatatan ini. Tidak ada push, deploy, signing atau spending dalam pencatatan dokumen ini.

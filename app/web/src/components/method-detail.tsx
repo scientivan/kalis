@@ -88,7 +88,7 @@ export function MethodDetail({ id, tab }: { id: string; tab?: string }) {
               <ol className="steps">{(m.steps || []).map((s, i) => <li key={s.id} style={{ "--i": i } as React.CSSProperties}><span className="sn">{i + 1}</span><span>{s.what}</span></li>)}</ol></div>
             <div className="dblock"><h2 className="h3">What it may use</h2><div className="uses">
               {(m.ai?.allowed || []).map(a => <span className="use" key={a} title={m.ai?.proprietary ? "Proprietary model" : "Private model with attestation"}>{icon("chip")}Private AI {a.split("/").pop()}</span>)}
-              {(m.connectors || []).map(c => <span className="use" key={c.id} title={c.what}>{icon("link")}{connectorName(c.id)} connection{/mock/i.test(c.id + c.what) ? " (mock)" : ""}</span>)}
+              {(m.connectors || []).map(c => <span className="use" key={c.id} title={c.what}>{icon("link")}{connectorName(c.id)} connector{/mock/i.test(c.id + c.what) ? " (mock)" : ""}</span>)}
               {(m.outbound || []).map(o => <span className="use" key={o.host + o.what} title={o.what}>{icon("pulse")}Sends after your approval</span>)}
               {m.browser?.enabled && <span className="use" title={(m.browser.domains || []).join(", ")}>{icon("store")}Opens web pages</span>}
               {m.memory?.read && <span className="use" title={`Writes ${m.memory.write || "nothing"}`}>{icon("note")}Reads your saved notes</span>}

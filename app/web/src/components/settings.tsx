@@ -43,11 +43,11 @@ export function Settings({ page }: { page: string }) {
         </Panel>
       </>
     );
-  if (page === 'connections')
+  if (page === 'connections' || page === 'connectors')
     return (
       <>
         <Heading
-          title="Connections"
+          title="Connectors"
           description="Mock read-only service access. No credentials are collected."
         />
         <Panel title="Connected services">

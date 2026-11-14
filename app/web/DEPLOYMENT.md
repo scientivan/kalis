@@ -68,6 +68,6 @@ Saat `PRIVATE_RUNNER_HASH` di `app/backend/src/private-release.js` atau `app/web
 
 ## Verifikasi
 
-Sudah: `curl localhost:8790/api/health` di VPS sehat, `/api/privacy/config` memberi `mode: tee`, `enabled: true`, runner hash `457e260c…`. Build Vercel produksi Ready, halaman `/` memberi 200 lewat `vercel curl`. Redirect host landing diuji lokal dengan `next start`.
+Sudah: `curl localhost:8790/api/health` di VPS sehat, `/api/privacy/config` memberi `mode: tee`, `enabled: true`, runner hash `457e260c…` (saat itu, kini build `cd95487f…`, commit 2bef8fc). Build Vercel produksi Ready, halaman `/` memberi 200 lewat `vercel curl`. Redirect host landing diuji lokal dengan `next start`.
 
 Setelah DNS aktif: buka https://api.kalis.scientivan.dev/api/health, https://app.kalis.scientivan.dev/api/backend/api/health, https://app.kalis.scientivan.dev/marketplace, dan pastikan https://kalis.scientivan.dev mengalihkan ke aplikasi. Jangan menjalankan smoke berbayar tanpa otorisasi.

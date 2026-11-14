@@ -150,7 +150,7 @@ export function BackendPages({ path }: { path: string }) {
   const parts = path.split("/").filter(Boolean);
   const base = parts[0] || "workspace",
     section = parts[1];
-  if (base === "connections") return <BackendConnections />;
+  if (base === "connections" || base === "connectors") return <BackendConnections />;
   if (base === "marketplace")
     return <BackendMarketplace parts={parts.slice(1)} />;
   if (base === "workspace" && section === "memory") return <BackendMemory />;
@@ -184,8 +184,8 @@ export function BackendPages({ path }: { path: string }) {
             This browser tab keeps one backend workspace identity across
             requests. It does not grant chain or DAO authority.
           </p>
-          <Go to="/connections" secondary>
-            Manage backend connections
+          <Go to="/connectors" secondary>
+            Manage backend connectors
           </Go>{" "}
           <Go to="/workspace/memory" secondary>
             Review backend memory
@@ -221,7 +221,7 @@ export function BackendConnections() {
   return (
     <>
       <Heading
-        title="Connections"
+        title="Connectors"
         description="Scope, expiry, revocation and broker use are handled by the backend."
       />
       <Notice />
@@ -249,7 +249,7 @@ export function BackendConnections() {
               });
             } catch (e) {
               setConnectError(
-                e instanceof Error ? e.message : "Connection failed",
+                e instanceof Error ? e.message : "Connector failed",
               );
             } finally {
               setConnecting(false);

@@ -14,7 +14,7 @@ The intended value is a trade that can happen because neither party needs to rev
 
 ## Current implementation
 
-The app has Marketplace and method detail, expert profiles, Jobs, Connections, Documents, Notes, author Create/Published, Community Fund/Proposals/Bounties/Issues, Account and Activity. Role selection organises navigation only. Seller editing, wallet requests, async execution, reclaim, private test grants and community writes are implemented, with transaction and browser verification limits in CURRENT_STATE.md.
+The app has Marketplace and method detail, expert profiles, Jobs, Connectors (renamed from Connections on 15 November 2026), Documents, Notes, author Create/Published, Community Fund/Proposals/Bounties/Issues, Account and Activity. Role selection organises navigation only. Seller editing, wallet requests, async execution, reclaim, private test grants and community writes are implemented, with transaction and browser verification limits in CURRENT_STATE.md.
 
 The runtime catalog observed on 14 November contains nine registered methods. Eight are the original demo set and one is scientivanmsk-freelance-rate. Catalog presence is not proof that every current version has completed a paid browser run.
 
@@ -22,7 +22,7 @@ Platform share is 10 percent. The method version sets a DAO share of at least 10
 
 ## Privacy and product limits
 
-The core runner takes sealed method/data and returns a sealed answer. However, current checkout also sends private-marked input values to the ordinary backend for outbound detection and stores them there. Connections, notes, outbound content, document uploads and the HTTP browser agent run on the backend, outside a TEE. The operator can read these paths. Local Office parsing does not eliminate the checkout disclosure.
+The core runner takes sealed method/data and returns a sealed answer. Since 15 November 2026 the checkout plaintext path is closed. Owner data for connectors, notes, documents, outbound approvals and audit is kept encrypted in the browser, and enforced actions run in the private TEE runner `scientivan.testnet/kalis-private`. Limits are in RANCANGAN_PRODUK.md section 73.
 
 Intel/NVIDIA certificate-chain verification is incomplete. Prompt leak checks do not prevent all paraphrase leaks. A prompt verdict is at best attention. Buyer checks prove only declared computable conditions, not expert quality, investment returns or business success.
 
@@ -40,7 +40,7 @@ Agreed tracks are Privacy & Private AI, Social Money and Open Innovation. Social
 
 ## Brand and communication
 
-Name Kalis. Domain spelling calis is approved for calis.scientivan.dev and app.calis.scientivan.dev. The approved hero hook remains “Where expertise is traded, run privately, and improved together.”
+Name Kalis. Domain spelling is kalis (changed from calis on 15 November 2026): landing kalis.scientivan.dev (temporary redirect), app app.kalis.scientivan.dev, API api.kalis.scientivan.dev. The approved hero hook remains “Where expertise is traded, run privately, and improved together.”
 
 Follow FRONTEND_GUIDE.md for Inter typography, light theme, capsule role navigation and current page patterns. Historical Corbel, HelloNear and batik drafts are not current app specifications. No invented customers, testimonials, partnerships, method-quality benchmarks or real revenue.
 
