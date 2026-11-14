@@ -7,6 +7,9 @@
 //   the server never adds the buyer's input or the answer to a review.
 // User reviews are kept apart from method evidence (benchmarks), which lives elsewhere.
 import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import { METHODS_DIR } from "./config.js";
 import * as db from "./db.js";
 import { principal } from "./principal.js";
 import { ApiError, chainRun, readExecution, getMethod } from "./market.js";
@@ -36,13 +39,29 @@ async function eligibility(p, runId) {
   return { ...base, method_id: row.method_id, version: row.version, run_status: onChain?.status || null, eligible: true, reason: "executed_run", message: "You ran this method, so you can rate it once." };
 }
 
+// Runs paid and released on chain but recorded by other backend instances (local test servers).
+// Listed in methods/onchain-runs.json and trusted only after get_run on the market contract says Released.
+const chainReleased = [];
+(async () => {
+  try {
+    const file = path.join(METHODS_DIR, "onchain-runs.json");
+    const { run_ids = [] } = JSON.parse(fs.readFileSync(file, "utf8"));
+    for (const id of run_ids) {
+      const run = await chainRun(id).catch(() => null);
+      if (run?.status === "Released") chainReleased.push({ run_id: id, method_id: run.method_id, version: run.version });
+    }
+  } catch { /* no file, nothing to add */ }
+})();
+
 function summary(methodId, version) {
   const rows = Object.values(db.all("reviews")).filter((r) => r.method_id === methodId && (version == null || r.version === Number(version)));
   const dist = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
   for (const r of rows) dist[r.rating]++;
   const count = rows.length;
   // Successful runs of this method (payment released to the seller), shown as "uses" on the Marketplace.
-  const runs = Object.values(db.all("runs")).filter((r) => r.method_id === methodId && r.phase === "released" && (version == null || r.version === Number(version))).length;
+  const ids = new Set(Object.values(db.all("runs")).filter((r) => r.method_id === methodId && r.phase === "released" && (version == null || r.version === Number(version))).map((r) => r.id));
+  for (const r of chainReleased) if (r.method_id === methodId && (version == null || r.version === Number(version))) ids.add(r.run_id);
+  const runs = ids.size;
   return {
     runs,
     method_id: methodId, scope: version == null ? "all_versions" : `version_${Number(version)}`,

@@ -64,7 +64,7 @@ export const setupCommands = (p: AllowancePolicy) => {
 // The owner's wallet signs one transaction that creates the sandbox, funds it with the cap and adds a
 // key generated on this device. The owner's main key never leaves the wallet; the sandbox key never
 // leaves this browser. Balances are read live from NEAR testnet RPC.
-export const RPC = "https://rpc.testnet.near.org";
+export const RPC = "https://rpc.testnet.fastnear.com";
 const yocto = (near: number) => (BigInt(Math.round(near * 1e6)) * 10n ** 18n).toString();
 export async function createSandboxCall(p: AllowancePolicy) {
   const { KeyPair } = await import("@near-js/crypto");
