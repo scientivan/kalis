@@ -308,7 +308,8 @@ svg.i { width: 20px; height: 20px; flex: none }
   & .rail-navigation { min-height:0; overflow-y:auto; overflow-x:hidden; scrollbar-width:thin; flex:1; }
   & .rail-logo { display:flex; align-items:center; gap:12px; min-height:40px; color:var(--blue); font-weight:800; }
   & .rail-logo>span { display:grid; place-items:center; width:44px; flex:none; font-size:24px; }
-  & .rail-logo b { display:none; font-size:20px; }
+  & .rail-logo b { display:none; font-size:20px; color:var(--ink, #101010); }
+  & .rail-logo>span svg { width:30px; height:30px; display:block; }
   & .rail-search { display:flex; align-items:center; width:44px; height:38px; border:1px solid transparent; border-radius:12px; position:relative; cursor:text; }
   & .rail-search>svg { width:22px; height:22px; margin:0 11px; flex:none; color:var(--blue); }
   & .rail-search input { width:0; min-width:0; opacity:0; border:0; padding:0; background:transparent; font:500 13px var(--font-inter),sans-serif; color:var(--ink); }

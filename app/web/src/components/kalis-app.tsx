@@ -58,7 +58,7 @@ export function KalisApp() {
       </a>
       <header className="app-header">
         <Link className="brand" href="/workspace">
-          <span className="brand-mark">K</span>Kalis
+          <span className="kalis-logo-mark"><svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true" focusable="false"><rect x="10" y="8" width="11" height="48" rx="3" fill="#101010"/><path d="M24 32 L44 9 L56 9 L36 32 Z" fill="#0038FF"/><path d="M24 32 L36 32 L56 55 L44 55 Z" fill="#0038FF"/><path d="M27 32.5 l3.2 3.4 l6.2-7.2" fill="none" stroke="#FFFFFF" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"/></svg></span>Kalis
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
           {["Workspace", "Marketplace", "Community", "Activity", "Balance"].map(

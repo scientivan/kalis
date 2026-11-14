@@ -3312,3 +3312,6 @@ html body #near-wallet-selector-modal, html body #near-wallet-selector-modal .nw
   --option-single-wallet-bg-color: #FFFFFF; --deprecated-icon-bg-color: #F4F4F4; --deprecated-icon-bg-color-selected: #0038FF;
   font-family: var(--font-inter), sans-serif; color-scheme: light;
 }
+
+.kalis-logo-mark { display:grid; place-items:center; width:42px; height:42px; }
+.kalis-logo-mark svg { width:34px; height:34px; display:block; }
