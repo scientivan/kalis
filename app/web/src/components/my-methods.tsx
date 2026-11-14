@@ -36,7 +36,7 @@ function MyMethodsContent({ covers, onChanged, section }: MyMethodsProps) {
   const [reload, setReload] = useState(0);
   const [form, setForm] = useState({ method_id: "", title: "", kind: "Program", category: "", description: "" });
   const [creating, setCreating] = useState(false);
-  const [editing, setEditing] = useState<string | null>(null);
+  const [editing, setEditing] = useState<string | null>(null); useEffect(() => { if (editing) window.scrollTo({ top: 0 }); }, [editing]);
   const [formMsg, setFormMsg] = useState(""); const [saving, setSaving] = useState(false);
   async function createDraft(e: React.FormEvent) {
     e.preventDefault(); setSaving(true); setFormMsg("");
@@ -57,6 +57,9 @@ function MyMethodsContent({ covers, onChanged, section }: MyMethodsProps) {
   }, [session, reload]);
 
   async function newVersion(methodId: string) {
+    // Reopen an unpublished draft of this method instead of starting a duplicate.
+    const open = mine?.drafts.find(d => d.method_id === methodId && d.state === "draft");
+    if (open) { setEditing(open.id); return; }
     setSaving(true); setLoadError("");
     try {
       const detailResponse = await fetch(`/api/backend/api/methods/${encodeURIComponent(methodId)}`, { cache: "no-store", headers: sessionHeader() });
@@ -95,6 +98,8 @@ function MyMethodsContent({ covers, onChanged, section }: MyMethodsProps) {
     ? mine.listed.map(m => ({ method_id: m.method_id, title: m.title, note: `${m.version_count} ${m.version_count === 1 ? "version" : "versions"}` }))
     : mine.drafts.filter(d => d.state !== "published").map(d => ({ method_id: d.method_id, draft_id: d.id, title: d.title, note: statusLabel(d.state) }));
   const openCreate = () => { setCreating(c => !c); setTimeout(() => document.getElementById("new")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); };
+  // While a draft is open the editor takes the whole page, so the seller never scrolls past the grid to reach it.
+  if (editing) return <SellerEditor key={editing} id={editing} onClose={() => { setEditing(null); window.scrollTo({ top: 0 }); }} onChanged={() => { setReload(n => n + 1); onChanged(); }} />;
   return <>
     <section className="card ph"><div className="ph-title"><h1>{heading}</h1></div><div className="page-purpose">{icon(section === "Drafts" ? "plus" : "tag")}<p>{section === "Drafts" ? "Start a method and prepare it before publishing. Drafts are not available to buyers." : "Methods you published on NEAR, with their Marketplace pictures."}</p></div></section>
     <section className="card list-card"><div className="toolbar"><h2 className="list-title">{section === "Drafts" ? "Your drafts" : "Published methods"}</h2></div>
@@ -114,7 +119,6 @@ function MyMethodsContent({ covers, onChanged, section }: MyMethodsProps) {
             {r.draft_id ? <button className="view" onClick={() => setEditing(r.draft_id!)}>Edit</button> : <button className="view" disabled={saving} onClick={() => void newVersion(r.method_id)}>New version</button>}</>} />; })}
       </TileGrid>
     </section>
-    {editing && <SellerEditor key={editing} id={editing} onClose={() => setEditing(null)} onChanged={() => { setReload(n => n + 1); onChanged(); }} />}
     {section === "Drafts" && creating && <section className="card list-card" id="new"><div className="toolbar"><h2 className="list-title">Create method</h2></div>
       <form className="nform" onSubmit={createDraft}>
         <label className="fx"><span className="fx-label">Method ID</span><input required pattern="[A-Za-z0-9_-]{3,48}" title="3 to 48 letters, digits, - or _" value={form.method_id} onChange={e => setForm({ ...form, method_id: e.target.value })} placeholder="cash-forecast" /></label>
