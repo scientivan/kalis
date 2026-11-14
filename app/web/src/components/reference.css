@@ -821,3 +821,16 @@ svg.i { width: 20px; height: 20px; flex: none }
 .reference .tile.is-full { grid-column: 1 / -1 }
 .reference .tile.is-full .day-lines { grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); column-gap: 28px }
 .reference .tile.is-full .day-lines li:nth-child(-n+3) { border-top: 0 }
+
+/* Marketplace search, between the kind filter and the goal/sort selects (moved out of the sidebar). */
+.mk-search { display:flex; align-items:center; gap:10px; flex:1 1 260px; max-width:420px; min-width:200px; height:42px; margin:0 auto; padding:0 14px; border:1px solid var(--line2, #d9dce3); border-radius:12px; background:#fff; color:var(--ink, #111); }
+.mk-search>svg { width:20px; height:20px; flex:none; color:var(--blue, #1239e6); }
+.mk-search input { flex:1; min-width:0; border:0; outline:0; background:transparent; font:inherit; font-size:15px; font-weight:500; color:inherit; }
+.mk-search:focus-within { outline:3px solid var(--blue, #1239e6); outline-offset:2px; }
+@media (max-width:900px) { .mk-search { order:3; flex-basis:100%; max-width:none; margin:0; } }
+
+/* Expanded rail: one icon column (centre 32px from the rail edge) and one label column (53px) for logo, nav and bottom controls. */
+.reference .rail-logo { gap:2px; }
+.reference .rail-logo>span { width:38px; }
+.reference .side:hover .rail-control, .reference .side:focus-within .rail-control, .reference .side.mobile-open .rail-control { padding:0 8px; gap:10px; }
+.reference .rail-bottom a.rail-control, .reference .rail-bottom a.rail-control span { font:600 13px var(--font-inter),sans-serif; color:var(--ink); }
