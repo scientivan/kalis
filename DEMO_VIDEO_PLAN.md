@@ -217,26 +217,31 @@ Link transaksi memakai testnet.nearblocks.io/txns/hash.
 
 ## Tracking produksi video
 
-Dibangun dengan Remotion di folder `video/` (React, 1920x1080, 30 fps). Gaya mengikuti `../Pitch Video.mp4` (latar terang, kartu putih, teks hitam tebal, subtitle kotak hitam di kiri bawah) dengan dua perbedaan atas arahan Dien: tidak ada frame orang sama sekali, dan voiceover memakai suara AI.
+Dibangun dengan Remotion di folder `video/` (React, 1920x1080, 30 fps). Gaya mengikuti `../Pitch Video.mp4` (latar terang dengan grid halus, kartu putih, teks hitam tebal, subtitle kotak hitam) dengan arahan Dien: tanpa frame orang, voiceover AI, subtitle di tengah bawah.
 
-**Suara.** Microsoft Edge neural TTS lewat `edge-tts`, suara perempuan `en-US-AvaMultilingualNeural`, kecepatan 1,5x (`--rate=+50%`), dipilih Dien setelah review adegan 1. File per adegan di `video/public/vo/sceneN.mp3`, dengan timing kalimat di `sceneN.vtt` yang dipakai untuk subtitle. Yang dikirim ke layanan TTS hanya teks narasi.
+**Suara.** Microsoft Edge neural TTS lewat `edge-tts`, suara perempuan `en-US-AvaMultilingualNeural`, kecepatan 1,25x (`--rate=+25%`). File per adegan `video/public/vo/sceneN.mp3` dan timing kalimat `sceneN.vtt`. `node scripts-vo.mjs` mengubah semua VTT menjadi `src/vo-data.ts`, sehingga setiap animasi menempel ke awal kalimat. Mengganti suara cukup membuat ulang mp3/vtt lalu menjalankan script itu. Yang dikirim ke layanan TTS hanya teks narasi.
 
-**Cara membuat ulang.**
+**Rekaman tampilan app.** Sekilas saja, sesuai arahan Dien: Marketplace (adegan 2), Jobs Ongoing dan Connectors (adegan 3), Community Fund (adegan 5). Diambil dari situs live `app.kalis.scientivan.dev` sebagai tangkapan halaman penuh di `video/public/screens/`, lalu digulir pelan di dalam bingkai browser seperti rekaman layar. Sisanya ilustrasi.
+
+**Membuat ulang.**
 
 ```bash
 cd video && npm install
-npx remotion studio                 # pratinjau
-npx remotion render Scene1 out/scene1.mp4 --codec h264 --crf 18
+node scripts-vo.mjs                       # setelah voiceover diganti
+npx remotion studio                       # pratinjau
+npx remotion render Full out/kalis-demo.mp4 --codec h264 --crf 20
 ```
 
-| Adegan | Komposisi | Status | Durasi | Catatan |
+| Adegan | Komposisi | Status | Durasi | Isi visual |
 |---|---|---|---|---|
-| 1. Masalah dua sisi | `Scene1` | ✅ Revisi 2 (Ava 1,5x, subtitle di tengah) | 14,0 detik | Kartu Arif, salinan aturan beterbangan, kartu Sari dengan data diburamkan, orang asing ditolak, garis putus-putus tertutup logo Meeting K saat "Until now" |
-| 2. Kalis mempertemukan keduanya | `Scene2` | ⏳ Belum | target 12 detik | Mulai dari logo di tengah, lanjut ke marketplace |
-| 3. Hari Sari | `Scene3` | ⏳ Belum | target 70 detik | Butuh rekaman app: run portofolio, Connectors, Notes, Wallet allowance, explorer |
-| 4. Hari Arif | `Scene4` | ⏳ Belum | target 15 detik | Butuh rekaman editor metode |
-| 5. Memperbaiki bersama | `Scene5` | ⏳ Belum | target 35 detik | Butuh rekaman Community dan explorer pool |
-| 6. Impact dan sustainability | `Scene6` | ⏳ Belum | target 22 detik | Kartu data bersumber, diagram aliran uang |
-| 7. Penutup | `Scene7` | ⏳ Belum | target 6 detik | Logo dan URL |
+| 1. Masalah dua sisi | `Scene1` | ✅ | 16,6 detik | Kartu Arif, salinan aturan, kartu Sari dengan data diburamkan, orang asing ditolak, garis tertutup logo |
+| 2. Kalis | `Scene2` | ✅ | 12,0 detik | Logo membuka ke rekaman Marketplace, tiga janji di samping |
+| 3. Hari Sari | `Scene3` | ✅ | 63,9 detik | Run portofolio di enclave, rekaman Jobs, rekaman Connectors, catatan di vault perangkat, wallet allowance, guard di TEE, serangan BLOCK, pembayaran dan penolakan jaringan |
+| 4. Hari Arif | `Scene4` | ✅ | 16,0 detik | Editor metode, kode disegel, publish di NEAR dengan 80/10/10, uses bertambah, issue dari Sari |
+| 5. Memperbaiki bersama | `Scene5` | ✅ | 23,1 detik | Rekaman Fund, pledge, escrow 1 NEAR, vote DAO, versi baru dengan royalti kontributor |
+| 6. Impact dan sustainability | `Scene6` | ✅ | 28,9 detik | Tiga kartu data bersumber, aliran uang per pemakaian |
+| 7. Penutup | `Scene7` | ✅ | 6,4 detik | Logo, janji, URL |
 
-**Keputusan dari review adegan 1:** suara Ava, kecepatan 1,5x, subtitle di tengah bawah. Target durasi adegan lain ikut menyusut sekitar sepertiga karena narasi 1,5x.
+Total sekitar 2 menit 47 detik. Hasil render `video/out/kalis-demo.mp4` (tidak di-commit).
+
+**Belum dan catatan.** Belum ada musik latar dan efek suara. Akun di ilustrasi seperti `allowance.sari.testnet` adalah nama tokoh fiktif, bukti transaksi nyatanya tercatat di tabel bukti di atas. Rekaman app berupa tangkapan halaman yang digulir, bukan rekaman interaksi klik.

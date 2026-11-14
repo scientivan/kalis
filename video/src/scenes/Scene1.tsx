@@ -1,25 +1,21 @@
 import { AbsoluteFill, Audio, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Copy, Lock, User, Users, X } from "lucide-react";
 import { C, fontFamily, shadow } from "../lib/style";
-import { Caption, type Cue } from "../lib/Caption";
+import { Caption } from "../lib/Caption";
+import { VO } from "../vo-data";
 import { KMark } from "../lib/KMark";
 
 // Scene 1. Two sides of the problem. Arif (author) cannot sell his strategy without it being copied,
 // Sari (consumer) cannot use expertise without exposing her portfolio. The dashed line between them
 // closes into the Kalis mark at "Until now", which is the bridge into scene 2.
-const CUES: Cue[] = [
-  { from: 0.05, to: 2.67, text: "Arif spent years building a portfolio rebalancing strategy." },
-  { from: 2.67, to: 5.58, text: "He wants to sell it, but the moment he shares the rules, anyone can copy them." },
-  { from: 5.58, to: 9.92, text: "Sari wants the best plan for her portfolio, but she won't hand her balances and positions to a stranger." },
-  { from: 9.92, to: 11.96, text: "So the expertise never meets the data." },
-  { from: 11.96, to: 14, text: "Until now." },
-];
-// Animation beats were authored against the first voiceover (19.7 s). The 1.5x Ava voiceover is
-// 12.8 s, so each beat is mapped piecewise onto the new sentence boundaries.
-const OLD = [0, 4.72, 9.29, 15.85, 18.59, 19.68];
-const NEW = [0, 2.67, 5.58, 9.92, 11.96, 12.79];
-const s = (t: number) => Math.round(interpolate(t, OLD, NEW, { extrapolateRight: "extend" }) * 30);
-
+const CUES = VO.scene1.cues;
+// Beats follow the voiceover sentences (cue starts), so retiming the voice retimes the scene.
+const s = (t: number) => {
+  const c = CUES.map(x => x.from);
+  const old = [0, 4.72, 9.29, 15.85, 18.59];
+  let i = old.length - 1; while (i > 0 && t < old[i]) i--;
+  return Math.round((c[i] + (t - old[i]) * 0.8) * 30);
+};
 const useEnter = (at: number, dy = 24) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -128,7 +124,7 @@ export const Scene1 = () => {
         <KMark size={110} />
       </div>
 
-      <Caption cues={CUES} />
+      <Caption cues={CUES as any} />
     </AbsoluteFill>
   );
 };

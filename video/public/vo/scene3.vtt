@@ -1,0 +1,68 @@
+1
+00:00:00,050 --> 00:00:02,750
+Sari runs Arif's method on her own portfolio.
+
+2
+00:00:02,750 --> 00:00:07,390
+Her positions are sealed on her device and only opened inside a secure enclave.
+
+3
+00:00:07,390 --> 00:00:09,770
+The answer comes back sealed to her alone.
+
+4
+00:00:09,770 --> 00:00:13,140
+Arif never sees her numbers, and she never sees his rules.
+
+5
+00:00:13,140 --> 00:00:16,120
+Next time, she doesn't want to type her positions by hand.
+
+6
+00:00:16,120 --> 00:00:23,300
+So she connects the apps her methods need, from exchanges and wallets to Google Sheets and Docs, with read-only access she can revoke anytime.
+
+7
+00:00:23,300 --> 00:00:25,560
+Her methods also need to remember her rules.
+
+8
+00:00:25,560 --> 00:00:27,530
+She saves her risk limit as a note.
+
+9
+00:00:27,530 --> 00:00:32,450
+Notes and documents are encrypted on her own device, so our server only ever holds ciphertext.
+
+10
+00:00:32,450 --> 00:00:38,070
+Now Sari wants her AI agent to act on the plan and pay for things, without giving it the keys to everything.
+
+11
+00:00:38,070 --> 00:00:41,800
+She gives the agent a sandbox wallet holding only the limit she chose.
+
+12
+00:00:41,800 --> 00:00:47,520
+Every payment it proposes goes to a guard method running inside a NEAR OutLayer enclave on Intel TDX hardware.
+
+13
+00:00:47,520 --> 00:00:53,030
+A private model on NEAR AI Cloud checks the request, and an attestation proves exactly which code ran.
+
+14
+00:00:53,030 --> 00:00:55,370
+A hidden instruction tries to drain the wallet.
+
+15
+00:00:55,370 --> 00:00:56,090
+Blocked.
+
+16
+00:00:56,090 --> 00:00:58,400
+The safe payment goes through after she approves it.
+
+17
+00:00:58,400 --> 00:01:03,220
+And if everything else failed, the network itself refuses to spend more than the sandbox holds.
+
