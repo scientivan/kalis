@@ -214,3 +214,29 @@ Link transaksi memakai testnet.nearblocks.io/txns/hash.
 ## Teks cadangan untuk postingan X
 
 "Experts want to sell their strategy without giving it away. Users want the best result without exposing their data. Kalis is the private expertise marketplace where both happen, AI agents spend only inside your limits, and every use funds the next better version. Built on NEAR: OutLayer TEE, NEAR AI Cloud, Sputnik DAO. Live on testnet. @NEARProtocol #NEARHackathon"
+
+## Tracking produksi video
+
+Dibangun dengan Remotion di folder `video/` (React, 1920x1080, 30 fps). Gaya mengikuti `../Pitch Video.mp4` (latar terang, kartu putih, teks hitam tebal, subtitle kotak hitam di kiri bawah) dengan dua perbedaan atas arahan Dien: tidak ada frame orang sama sekali, dan voiceover memakai suara AI.
+
+**Suara.** Microsoft Edge neural TTS lewat `edge-tts`, suara `en-US-AndrewMultilingualNeural` (hangat dan yakin), kecepatan normal. File per adegan di `video/public/vo/sceneN.mp3`, dengan timing kalimat di `sceneN.vtt` yang dipakai untuk subtitle. Yang dikirim ke layanan TTS hanya teks narasi.
+
+**Cara membuat ulang.**
+
+```bash
+cd video && npm install
+npx remotion studio                 # pratinjau
+npx remotion render Scene1 out/scene1.mp4 --codec h264 --crf 18
+```
+
+| Adegan | Komposisi | Status | Durasi | Catatan |
+|---|---|---|---|---|
+| 1. Masalah dua sisi | `Scene1` | ✅ Draf siap dicek | 21,0 detik | Kartu Arif, salinan aturan beterbangan, kartu Sari dengan data diburamkan, orang asing ditolak, garis putus-putus tertutup logo Meeting K saat "Until now" |
+| 2. Kalis mempertemukan keduanya | `Scene2` | ⏳ Belum | target 12 detik | Mulai dari logo di tengah, lanjut ke marketplace |
+| 3. Hari Sari | `Scene3` | ⏳ Belum | target 70 detik | Butuh rekaman app: run portofolio, Connectors, Notes, Wallet allowance, explorer |
+| 4. Hari Arif | `Scene4` | ⏳ Belum | target 15 detik | Butuh rekaman editor metode |
+| 5. Memperbaiki bersama | `Scene5` | ⏳ Belum | target 35 detik | Butuh rekaman Community dan explorer pool |
+| 6. Impact dan sustainability | `Scene6` | ⏳ Belum | target 22 detik | Kartu data bersumber, diagram aliran uang |
+| 7. Penutup | `Scene7` | ⏳ Belum | target 6 detik | Logo dan URL |
+
+**Keputusan yang menunggu review Dien setelah adegan 1:** suara (Andrew atau suara lain), kecepatan bicara, ukuran subtitle, dan apakah aturan strategi Arif boleh terbaca jelas atau ikut diburamkan.
