@@ -402,5 +402,9 @@
   [
     "101 / Footer dan deskripsi Kalis",
     "95 FOOTER KALIS\n\nDien meminta penjelasan lebih lengkap di bawah logo. Footer kini berisi logo, tagline dan deskripsi marketplace keahlian privat, kontrol data pembeli serta dana perbaikan. Dua kelompok tautan Use Kalis/Build together melengkapi navigasi.\n\nLabel NEAR testnet prototype dihapus hanya dari footer. Status jaringan tidak berubah, tetap dijelaskan pada FAQ. Responsive desktop/mobile, tanpa perubahan fitur atau deployment. Compliance gate tidak menemukan konflik."
+  ],
+  [
+    "96. Perbaikan domain publik landing",
+    "Dien melaporkan kalis.scientivan.dev masih mengarah ke app.kalis.scientivan.dev. Penyebabnya aturan proxy sementara dari sebelum landing tersedia, terkonfirmasi respons produksi HTTP 307. Root host publik kini di-rewrite internal ke /landing, mempertahankan URL dan query pengunjung. Aset landing/Next dilayani di host yang sama, sementara path aplikasi tetap menuju subdomain app. Build dan 40 tes lulus. Deployment frontend memakai proyek Vercel existing, tanpa perubahan DNS, backend, wallet atau transaksi. Compliance gate tidak menemukan konflik, push sebelumnya diotorisasi Dien."
   ]
 ]

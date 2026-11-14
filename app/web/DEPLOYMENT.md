@@ -4,15 +4,15 @@ Status 15 November 2026. Backend dan frontend sudah di-deploy. DNS di Cloudflare
 
 | Host | Tujuan | Sumber |
 |---|---|---|
-| https://kalis.scientivan.dev | Landing (sementara redirect ke aplikasi) | Proyek Vercel `kalis`, `app/web` |
+| https://kalis.scientivan.dev | Landing di root domain | Proyek Vercel `kalis`, `app/web` |
 | https://app.kalis.scientivan.dev | Aplikasi | Proyek Vercel `kalis`, `app/web` |
 | https://api.kalis.scientivan.dev | Backend API | VPS `tinjau-vps` (15.235.146.33) |
 
 Domain apex `scientivan.dev` tidak dipasang ke proyek ini karena dipakai website utama Dien.
 
-## Redirect landing sementara
+## Routing landing dan aplikasi
 
-Landing page belum dirancang. `app/web/src/proxy.ts` (proxy Next.js 16, dulu bernama middleware) mengalihkan semua permintaan dengan host `kalis.scientivan.dev` ke path yang sama di `https://app.kalis.scientivan.dev` dengan status 307. Status 307 dipilih supaya browser tidak menyimpan redirect secara permanen. Hapus atau ganti blok ini saat landing yang disetujui Dien dibangun.
+Host kalis.scientivan.dev dan www.kalis.scientivan.dev me-rewrite path / secara internal ke /landing, sehingga URL pengunjung tetap root domain. Aset landing dan Next.js dilayani pada host yang sama. Path aplikasi seperti /marketplace tetap diarahkan ke app.kalis.scientivan.dev. Host aplikasi tidak diubah. Tes host-routing mencakup root, query string, aset dan pemisahan host.
 
 ## Frontend (Vercel)
 

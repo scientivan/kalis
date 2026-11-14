@@ -2036,3 +2036,8 @@ Blok NEAR testnet demonstration dan tautan Set up a wallet allowance di footer a
 ## 95. Revisi footer dan deskripsi Kalis
 
 Dien meminta deskripsi Private methods / Shared progress berada di bawah logo Kalis dan menjelaskan produk lebih lengkap. Footer kini mempunyai kolom brand dengan logo, tagline dan dua kalimat yang menjelaskan marketplace expert/pembeli, kendali data dan pendanaan perbaikan bersama. Dua kelompok tautan Use Kalis serta Build together ditempatkan di samping pada desktop dan di bawah pada mobile. Label NEAR testnet prototype dihapus dari footer saja. Status jaringan dan batas testnet tetap sesuai kenyataan serta tersedia pada FAQ. Tidak ada perubahan produk atau deployment. Compliance gate tidak menemukan konflik.
+
+
+## 96. Perbaikan domain publik landing
+
+Dien melaporkan kalis.scientivan.dev masih mengarah ke app.kalis.scientivan.dev. Penyebabnya aturan proxy sementara dari sebelum landing tersedia, terkonfirmasi respons produksi HTTP 307. Root host publik kini di-rewrite internal ke /landing, mempertahankan URL dan query pengunjung. Aset landing/Next dilayani di host yang sama, sementara path aplikasi tetap menuju subdomain app. Build dan 40 tes lulus. Deployment frontend memakai proyek Vercel existing, tanpa perubahan DNS, backend, wallet atau transaksi. Compliance gate tidak menemukan konflik, push sebelumnya diotorisasi Dien.

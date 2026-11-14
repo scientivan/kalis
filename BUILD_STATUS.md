@@ -1089,3 +1089,9 @@ Metode WASM yang memanggil AI privat (`kalis.ai_chat`, DeepSeek V4.1 Flash) di r
 
 ### Authorized landing remote push
 Dien explicitly authorized pushing the landing work. Scope includes /landing source, assets, design references and synchronized product documents. Unrelated backend/audit files and the pre-existing BUILD_STATUS history deletion are left unstaged. Latest footer build/TypeScript and desktop/mobile inspection passed, PDF101 pages verified without overflow. Compliance gate checked, push is explicitly authorized.
+
+
+### Public landing host routing
+Replaced obsolete public-root app redirect with an internal /landing rewrite. Static assets stay on public host, app paths preserve app redirect. Build and40 tests pass. Production frontend deployment requested for existing Vercel project. No DNS/backend or wallet changes. Compliance gate no conflict.
+
+Production verification. Vercel deployment dpl_HPViUAzxjW6WedPvaXaZ6vzdSt5P is Ready. Public root returns200 with One marketplace and no redirect, app root returns200 with application content. PDF102 pages verified without overflow.
