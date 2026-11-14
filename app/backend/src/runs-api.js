@@ -11,6 +11,7 @@ import { callRunner, checkAttestation } from "./outlayer.js";
 import { sha256Hex, fromB64, verifyCompletion } from "./kalis-crypto.js";
 import * as db from "./db.js";
 import { principal } from "./principal.js";
+import { payRoyalty } from "./social-api.js";
 import {
   ApiError, HASH, toNear, money, STORAGE_DEPOSIT_YOCTO, PLATFORM_SHARE_PCT,
   getMethod, getVersion, manifestByHash, sealedMethodByHash, chainRun, readExecution, writeExecution,
@@ -274,7 +275,8 @@ async function settle(runId, body) {
   const payouts = after.status === "Released"
     ? { seller: { account: method.owner, near: toNear(toSeller), amount: money(toSeller) }, dao: { account: dao, near: toNear(toDao), amount: money(toDao) }, platform: { near: toNear(total - toSeller - toDao), amount: money(total - toSeller - toDao) } }
     : { buyer_refund: { account: onChain.buyer, near: toNear(total), amount: money(total) } };
-  return { settle_tx: r.txHash, settle_tx_url: `${config.explorer}/transactions/${r.txHash}`, status: after.status, reason: after.reason, payouts, run: await runView(runId) };
+  const royalty = after.status === "Released" ? await payRoyalty(runId).catch((e) => ({ error: e.message })) : null; // social-api.js: contributor royalty
+  return { settle_tx: r.txHash, settle_tx_url: `${config.explorer}/transactions/${r.txHash}`, status: after.status, reason: after.reason, payouts, royalty, run: await runView(runId) };
 }
 
 // ---------- routes ----------

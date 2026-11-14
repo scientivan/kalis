@@ -10,7 +10,7 @@ import { actionCreators } from "@near-js/transactions";
 
 export const SESSION_KEY = "kalis-session";
 type Session = { token: string; account_id: string; expires_at: string };
-export type ContractCall = { receiver_id: string; method_name: string; args: Record<string, unknown>; deposit_yocto: string; gas_tgas: number | string; signer_must_be?: string };
+export type ContractCall = { receiver_id: string; method_name: string; args: Record<string, unknown>; deposit_yocto: string; gas_tgas: number | string; signer_must_be?: string; kind?: "transfer" };
 type Auth = { session: Session | null; busy: boolean; error: string; signIn: () => Promise<void>; signOut: () => Promise<void>; clearError: () => void; signCalls: (calls: ContractCall[]) => Promise<unknown> };
 const Ctx = createContext<Auth | null>(null);
 
@@ -96,7 +96,7 @@ export function NearAuthProvider({ children }: { children: ReactNode }) {
     const wallet = await (await getSelector()).wallet();
     const walletAccount = (await wallet.getAccounts())[0]?.accountId;
     if (walletAccount !== account) throw new Error("The wallet account changed. Sign in again before continuing.");
-    return wallet.signAndSendTransactions({ transactions: calls.map(call => ({ signerId: account, receiverId: call.receiver_id, actions: [actionCreators.functionCall(call.method_name,call.args,BigInt(Math.round(Number(call.gas_tgas)*1e6))*1000000n,BigInt(call.deposit_yocto))] })) });
+    return wallet.signAndSendTransactions({ transactions: calls.map(call => ({ signerId: account, receiverId: call.receiver_id, actions: [call.kind === "transfer" ? actionCreators.transfer(BigInt(call.deposit_yocto)) : actionCreators.functionCall(call.method_name,call.args,BigInt(Math.round(Number(call.gas_tgas)*1e6))*1000000n,BigInt(call.deposit_yocto))] })) });
   }, [getSelector]);
 
   return <Ctx.Provider value={{ session, busy, error, signIn, signOut, signCalls, clearError: () => setError("") }}>{children}</Ctx.Provider>;

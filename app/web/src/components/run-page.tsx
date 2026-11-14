@@ -19,6 +19,7 @@ import { Fx, StepRail, Msg } from "./form-kit";
 import { ManifestInput, type ManifestField } from "./manifest-fields";
 import { statusLabel } from "../lib/labels";
 import { Sheet, SheetRow } from "./data-sheet";
+import { RunSocialMoney } from "./social-money";
 
 type Field = { id: string; label: string; type?: string; unit?: string; required?: boolean; private?: boolean; help?: string; enum?: string[]; items?: { type?: string }; display?: string; source?: string; min?: number; max?: number };
 type Manifest = { inputs?: { fields?: Field[]; sample?: Record<string, unknown> }; outputs?: { fields?: Field[]; status_field?: string }; steps?: { id: string; what: string }[]; buyer_checks?: unknown[]; ai?: { allowed?: string[] }; listing?: { outcome?: string } };
@@ -259,6 +260,7 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
     {chain?.reclaim_after_ns && chain.status === "Paid" && <span className="se-foot-note">You can take the payment back after {new Date(Number(BigInt(chain.reclaim_after_ns)/1000000n)).toLocaleString()} if the run does not finish.</span>}
     {operation && <button className="view" disabled={!!busy} onClick={()=>act("Checking progress",async()=>{const op=await backend<{status:string;kind:string;error?:{message:string}}>(`operations/${operation}`);if(op.status === "succeeded"&&op.kind === "execution"){const s=secrets.get(runId);if(s){displayExecution(s,await backend<Execution>(`runs/${encodeURIComponent(runId)}/execution`));setView("Result");}}else if(op.status !== "succeeded")throw new Error(op.error?.message||`The job is ${statusLabel(op.status).toLowerCase()}.`);})}>Check progress again</button>}
     <span className="se-foot-note">Your data and answer never leave this browser unsealed.</span>
+    {runId && status === "Released" && <RunSocialMoney runId={runId} />}
   </section>;
 
   return <Capability id="run_drafts_quotes"><AppShell active={status === "Released" || status === "Refunded" ? "Results" : "Ongoing"}>

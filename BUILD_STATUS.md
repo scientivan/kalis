@@ -703,3 +703,381 @@ Verifikasi investigasi privasi. PDF 73 halaman lolos generator tanpa overflow, h
 ## Deployment publik (15 November 2026)
 
 Backend berjalan di VPS tinjau-vps sebagai service kalis-backend (port 8790 di belakang Caddy) untuk https://api.kalis.scientivan.dev, health dan /api/privacy/config (mode tee, enabled) lulus di localhost VPS. Frontend di proyek Vercel kalis dengan domain kalis.scientivan.dev dan app.kalis.scientivan.dev, build produksi Ready. kalis.scientivan.dev sementara redirect 307 ke aplikasi lewat app/web/src/proxy.ts. Ejaan domain diganti dari calis ke kalis. Uji lewat host publik belum terverifikasi karena menunggu DNS Cloudflare. Rincian ada di app/web/DEPLOYMENT.md. npm test 32 lulus dan npm run build berhasil.
+
+### 6.21 Social Money pools: bounty patungan dan beli run bersama (🟡 testnet, satu langkah menunggu vote council)
+
+Backend `app/backend/src/pool-api.js` (didaftarkan di `server.js`), UI `app/web/src/components/pool-money.tsx` (panel di detail Bounty dan di tahap Pay halaman run), uji `app/backend/scripts/pool-test.mjs [base] bounty|refund|group|pay <pool>`. Kalis tidak memegang NEAR di kedua alur.
+
+**Bounty patungan (pledge-then-pay, non-custodial).** Pledge tidak memindahkan NEAR. Pool selesai hanya jika proposal BountyDone untuk bounty itu, yang diajukan setelah pool dibuat, berstatus Approved di DAO (dibaca dari chain). Lalu tiap pledger menandatangani transfer langsung ke kontributor, dan backend memverifikasi tx di chain (signer, receiver, jumlah, tidak dipakai dua kali). Jika ditolak, dibatalkan pembuat, atau lewat deadline, pool `released` dan tidak ada yang perlu di-refund karena tidak ada dana yang berpindah. Batas jujur: pledge adalah janji, bukan kunci dana; pledger bisa ingkar, UI menunjukkan siapa yang sudah bayar.
+- Pool `pool-mwgxeq2c-4f263623` di bounty 1, pledge 0.01 dari `auth-test.scientivan.testnet` dan 0.01 dari `platform.scientivan.testnet`.
+- `bounty_claim` oleh `kalis-buyer.testnet` (bond 1 NEAR): `9zdyA7c1XAn2p9zB3zwDWgDiTTdP4j9HGBSpS9Kq879r`.
+- `add_proposal` BountyDone (proposal 4, bond 1 NEAR): `YRjRPdBBPLMHS6GdAN3SjJRuPXCnjdtdJbdmFrqziuF`.
+- Belum: vote council `scientivan.testnet` untuk proposal 4 (kunci council tidak tersedia untuk agent). Setelah Dien approve, jalankan `node scripts/pool-test.mjs <base> pay pool-mwgxeq2c-4f263623` untuk dua transfer pembayaran pledge.
+- Jalur refund: pool deadline 15 detik di bounty 2 berubah `released`, saldo pledger tidak berubah; pool batal oleh pembuat; pledge ke pool tertutup ditolak (6/6 PASS).
+
+**Beli run bersama.** Organizer menyebut anggota; harga versi dari chain dibagi rata. Anggota mentransfer share ke akun organizer (custody: organizer, bukan Kalis), backend memverifikasi tx. Organizer membayar satu run lewat escrow `pay_for_run`, run dieksekusi sekali di TEE, lalu run ditautkan ke grup (hanya organizer, hanya run miliknya, metode sama, dibayar setelah grup dibuat). Jawaban tersegel ke kunci data organizer; anggota mendapatkannya dari organizer. Re-seal per anggota belum dibangun.
+- Grup portfolio-rebalance 0.1 NEAR, share 0.033333.
+- Share `auth-test` ke organizer: `6uutdJQRRNTFXQSKzUjNdeBn1jLcUfk4d6TJF6SCQsrY`; share `platform`: `7k831QvbUeX5f9hfB65Knkkwf3q3FCwgJKvH8aXprZN8`.
+- `pay_for_run` run `run-mwgxf6xi-a2771d5e`: `FndALEh7WXPU2psgmoBcrmDUmSZE1yjLQ1et2ENzvguk`; settle: `D6FRMG5m7ybgVxKiZcj7nfED7Xf6G2WAJn5v5vexZksD`. 11/11 PASS.
+- Catatan: uji dijalankan pada server terisolasi (`KALIS_DATA_DIR` salinan, port 8823) agar tidak menimpa data server agent lain; `bounty_pools.json` dan `group_runs.json` disalin ke `app/backend/data/db/`, tetapi baris run itu hanya ada di data salinan. Server port 8787 belum di-restart sehingga belum memuat route pool.
+
+Kepatuhan: tidak ada imbal hasil, bagi hasil, atau token; pledge dan share adalah pembayaran untuk pekerjaan atau run, bukan investasi. Testnet saja.
+
+### 6.5 Kontrak registry (✅)
+
+Kontrak `registry.scientivan.testnet`. Fungsi: `register_method`, `publish_version`, `get_method`, `list_methods`, `get_version`, `list_versions`. Setiap versi menyimpan `code_hash` (WASM penjual), `manifest_hash`, `runner_hash`, `parent`, `contributors`, `note`. Biaya storage dibayar pemanggil lewat deposit, sisanya dikembalikan. Event NEP-297 `method_registered` dan `version_published`.
+
+- Daftar metode `portfolio-rebalance`, tx `45WWbRAnmc8qZFuyNxUSzJaHNouXX9nRJdfS4NrApx5x`.
+- Publikasi versi 1, tx `JBqdPToBMRfVHMNDxpUvNJ2VmZFC3K1VTqugqW4D3rMp`. `code_hash d369c2697cc02393aaf25f7df2d6068e40ac4f6f93254f2dd932c73f6b40bc96` (guest solver), `manifest_hash 8124a6f8ba0e75842cbbacfb3fd31aa8015a35e910d743a44d2e035b0b1d01e9`, `runner_hash cbf2dc31...` (runner-spike).
+- Ditolak sesuai harapan: publikasi oleh bukan pemilik (tx `9cQ2h5QPmDRHeYwrawT7HZmJ8wUqT2qN8Qn1n94t7Tbz`), hash tidak valid (`5DwQg9rz5sMjTc9DMcGXFed8PEvRZ2sQf3rsEYM13gfi`), `method_id` ganda (`8jsBLSavsKGQVBds5evQqaksVB2UFh1ttc9SDPX4B7fM`).
+- `get_version` dan `list_methods` mengembalikan data versi 1 dengan benar.
+
+**Pesan error diperbaiki (13 Nov 15:15 UTC, Claude).** Penyebabnya build dengan rustc 1.89, sedangkan `cargo-near` 0.20.3 hanya menerima rustc paling baru 1.86 untuk near-sdk ini. Kontrak dibangun ulang dengan `cargo +1.86.0 near build non-reproducible-wasm` (`rust-version = "1.86"` di `Cargo.toml`) dan di-deploy ulang tanpa init, tx `5ihYesy7FofFHu295ageUF8vAmC6yFLMcarVTkeZXjDR`. State tetap utuh, `get_version` masih mengembalikan versi 1. Uji penolakan bukan pemilik sekarang menampilkan `Smart contract panicked: only the method owner can publish a version` (tx `Aq3xdrDfAqg3CF2BoDRCzU5ueSojNqFQCCZWNd7SxpjR`). Unit test 5/5 lolos dengan `cargo test` (profil debug; profil release memakai `panic = "abort"` sehingga test `should_panic` tidak bisa berjalan).
+
+## 7. Lima perlindungan (bagian 3 dan 49)
+
+Implementasi backend di `app/backend/src/protections/`, bukti di 6.14. Semua ditegakkan berdasarkan manifest metode.
+
+| Perlindungan | Status | Yang berjalan | Batas |
+|---|---|---|---|
+| Kredensial dan integrasi | ✅ | Token konektor `broker_mock` terenkripsi AES-256-GCM, scope baca saja, kedaluwarsa, bisa dicabut. Metode tanpa deklarasi konektor ditolak. `place_order` tidak pernah bisa. Token tidak pernah dikembalikan atau dicatat | Broker berjalan di backend, bukan TEE |
+| Aliran data keluar | ✅ | Setiap kirim ditahan sampai disetujui. Persetujuan terikat hash tujuan, isi, dan parameter. Isi berubah ditolak. Nilai privat yang ditandai terdeteksi walau ditulis ulang (812000000, 812 juta). Tujuan di luar manifest diblokir | Deteksi berbasis nilai yang ditandai pengguna, bukan pemahaman makna |
+| Memori persisten | ✅ | Usulan dari dokumen, web, atau metode menunggu tinjauan dan menyimpan asal. Teks mirip perintah ditandai. Metode hanya menerima catatan yang disetujui, dibungkus sebagai data. Edit, tolak, hapus | Deteksi perintah berbasis pola teks |
+| Dokumen multimodal | ✅ | Scan dibaca Qwen3-VL di TEE NEAR AI dengan attestation nonce baru dan tanda tangan jawaban terverifikasi. PDF teks dibaca `pdftotext` lokal. Data pribadi dicek `privacy-filter` teratestasi. Injeksi di dokumen ditandai | Dokumen melewati backend menuju NEAR AI. PDF scan harus diunggah sebagai gambar |
+| Browser agent | ✅ | Hanya domain dan aksi dari manifest (`open`, `download`). `submit` menjadi aksi keluar yang ditahan. `login` tidak pernah. Unduhan lewat perlindungan dokumen | Agent HTTP, bukan browser headless. Berjalan di backend, bukan TEE |
+
+## 8. Daftar mock dan data sintetis
+
+| Item | Kondisi terkini |
+|---|---|
+| Fiat top-up | Mock berlabel, akun platform membayar NEAR testnet, bukan saldo fiat |
+| Konektor broker, sheets, docs dan wallet | Implementasi mock backend tersedia, bukan integrasi layanan atau trading nyata |
+| Portal pengadaan tender | Mock HTTP tersedia, bukan browser agent headless |
+| Portofolio, tender, karier dan metode demo lain | Data/seller demo fiktif, bukan nasabah atau saran profesional |
+| Rating dan riwayat testnet | Bisa berasal dari seed/script, bukan bukti pelanggan nyata |
+| Public deployment | Aktif sejak 15 November 2026. App di app.kalis.scientivan.dev, API di api.kalis.scientivan.dev, landing redirect sementara (commit e07d4ef) |
+
+
+## 9. Buku klaim README
+
+| Klaim | Status | Bukti atau batas |
+|---|---|---|
+| Runner membuka input/metode tersegel dan mengembalikan jawaban tersegel | Ada bukti historis | 6.1, 6.8, 6.15–6.18, sesuai versi |
+| Seluruh website hanya mengirim ciphertext kepada backend | Tidak boleh diklaim | run-page.tsx pay mengirim field private plaintext, outbound.markPrivate menyimpannya |
+| Lima perlindungan tersedia | Ya pada backend biasa | 6.14, bagian 7, CURRENT_STATE.md. Bukan lima fungsi dalam TEE |
+| AI evidence dan sandbox | Ada implementasi/bukti historis | Jangan menyamakan dengan verifikasi rantai sertifikat Intel/NVIDIA penuh |
+| Registry/escrow aktif | market.scientivan.testnet | registry.scientivan.testnet historis |
+| Dana DAO dan bounty pernah dibayar | Bukti historis 6.11–6.12 | Bukan semua bounty sekarang siap diuji, bukan request call sudah dibayar |
+| Publikasi editor dan wallet UI tersedia | Source tersedia | SellerEditor dan auth.signCalls, audit sekarang tidak signing |
+| Katalog memiliki sembilan metode saat audit | GET methods berhasil | Bukan bukti run berbayar seluruh versi aktif |
+| Kontributor mendapat royalti | Belum | Royalti, pengklaim bersaing dan sengketa masih terbuka |
+| Produk privat dari operator tanpa batas | Tidak boleh diklaim | Jalur protections sudah tersegel secara lokal, tetapi runner privat belum di-deploy sebagai TEE (6.19) |
+| Keunggulan metode, profit dan adopsi teruji | Tidak boleh diklaim | Benchmark dan rating demo tidak membuktikannya |
+
+
+## 10. Belum terverifikasi
+
+Gap terkini mencakup wallet E2E penuh, mobile/aksesibilitas, privasi checkout, enforcement reviewer, policy revoke dan legacy bounty. Daftar riset lama berikut tetap konteks dan tidak berarti seluruh fitur terblokir.
+
+- Rantai sertifikat Intel dan NVIDIA pada quote OutLayer dan NEAR AI.
+- Kecepatan interpreter `wasmi` di dalam OutLayer untuk metode yang lebih berat dari C03 (C03 sekitar 5,3 detik).
+- Jalur keluaran HTTPS OutLayer melalui koordinator (inferensi, belum dicek di kode).
+- Apakah fungsi storage dan transaksi NEAR OutLayer bisa dibatasi per project.
+- Status hukum crypto sebagai alat bayar di Indonesia (bagian 50).
+
+## 11. Tugas berikutnya (urut prioritas)
+
+Status lama tentang OutLayer gagal, frontend mock-only, tender belum dibuat dan API belum terintegrasi sudah digantikan. Log lama tetap di bagian bukti/changelog.
+
+1. Sinkronisasi dokumen dua arah berdasarkan bagian 0 dan 70 rancangan serta CURRENT_STATE.md. Audit ini tidak mengubah kode produk.
+2. Bahas inovasi Social Money bersama Dien dari fund/proposal/bounty/evaluation yang sudah ada. Belum memilih fitur baru atau policy.
+3. Gap privasi checkout, reviewer enforcement, revoke policy dan bounty legacy dicatat di CURRENT_STATE.md serta app/web/FRONTEND_GAPS.md untuk keputusan/perbaikan terpisah.
+4. Verifikasi wallet E2E, mobile dan aksesibilitas hanya pada lingkup yang dibutuhkan dan dengan otorisasi transaksi yang sesuai. Jangan memakai seed atau pembacaan halaman sebagai bukti pembayaran.
+5. README dan video mengikuti bukti versi aktual serta batas privasi. Deployment dan DNS ditunda saat itu, kemudian dilakukan 15 November 2026 (rancangan bagian 73).
+
+
+### Log historis percobaan ulang OutLayer
+
+Perintah uji: `outlayer run scientivan.testnet/sealed-probe '{"cmd":"pubkey"}' --secrets-profile default --secrets-account scientivan.testnet` (dari `app/sealed-probe`), lalu `outlayer run scientivan.testnet/runner-spike '{"cmd":"ping"}'` (dari `app/runner-spike`).
+
+| Waktu (UTC) | sealed-probe | runner-spike ping | Catatan |
+|---|---|---|---|
+| 13 Nov 11:45 | ✅ (request 38119) | belum ada | Satu percobaan pertama sempat timeout, percobaan kedua berhasil |
+| 13 Nov 12:00–12:05 | ❌ (38332) | ❌ (38322) | `Execution promise failed` |
+| 13 Nov 12:12 | ❌ | ❌ | Masih gagal |
+| 13 Nov 12:42 | ❌ | belum dicoba | Masih gagal |
+| 13 Nov 15:10 | ❌ | ❌ | Masih gagal (Claude) |
+| 13 Nov 15:43 | ❌ on-chain | ✅ HTTPS (call `5c9d36a7...`) | Jalur HTTPS jalan, on-chain masih gagal |
+
+## 12. Runbook
+
+```bash
+# Build program TEE (dari folder project masing-masing)
+cargo build --release --target wasm32-wasip2
+
+# Upload ke FastFS dan deploy versi project
+outlayer upload target/wasm32-wasip2/release/<file>.wasm
+outlayer deploy <project> <FastFS URL>
+
+# Jalankan (jalur on-chain testnet)
+outlayer run scientivan.testnet/<project> '<json>'
+outlayer run scientivan.testnet/sealed-probe '{"cmd":"pubkey"}' --secrets-profile default --secrets-account scientivan.testnet
+
+# Uji enkripsi
+cd app/sealed-probe && cargo build --release && node client/local-test.mjs target/release/sealed_probe
+node client/remote-test.mjs <tee_pubkey_hex> C03 <folder sementara>
+
+# Uji NEAR AI Cloud
+node app/near-ai-probe/verify.mjs
+
+# Cek attestation OutLayer
+curl -s https://testnet-api.outlayer.ai/attestations/by-request/<request_id>
+
+# Cek worker OutLayer testnet
+curl -s https://testnet-api.outlayer.ai/public/workers
+```
+
+Catatan: CLI `outlayer run` bisa menampilkan `timeout error` walau eksekusi masih diproses. Cek hasil lewat tx di RPC atau `attestations/by-request`.
+
+## 13. Kendala lingkungan
+
+- **Disk laptop sempat penuh.** Pada 13 Nov 12:20 UTC sisa 122 MB dan build gagal `No space left on device`. Dien mengosongkan disk, sisa 13 GB pada 12:42 UTC. Pantau dengan `df -h /System/Volumes/Data` sebelum build besar.
+- `cargo-near` terbaru (0.23.0) butuh rustc 1.95. Instalasi versi 0.20.3 sempat dihentikan akibat disk penuh, lalu dilaporkan selesai pada sesi Claude 13 Nov 13:30 UTC. Kontrak testnet sebelumnya dibangun dengan `cargo build --target wasm32-unknown-unknown --release` dan `RUSTFLAGS="-C link-arg=-s"`. Sudah dibangun ulang dengan toolchain 1.86.0 dan di-deploy ulang 13 Nov 15:15 UTC (6.5). Build kontrak NEAR berikutnya wajib `cargo +1.86.0 near build non-reproducible-wasm`.
+
+## 14. Batas agent
+
+Tanpa konfirmasi eksplisit Dien dilarang: submission, posting X, membuat repo publik, push, signing di mainnet, mengeluarkan dana nyata, deploy mainnet, commit secret (`../NEAR.md` Compliance gate poin 7). Transaksi testnet dengan NEAR faucet sudah diizinkan untuk development.
+
+## 15. Changelog
+
+- 14 November 2026, Codex. Menyimpan riset delapan website pembanding dan brand system resmi n8n. Rekomendasi tetap usulan, audit visual belum dilakukan. Lihat bagian 68 rancangan dan research/website-reference-2026-11-14.md.
+
+- **13 Nov 2026 (Claude Code).** Akun `scientivan.testnet` dan OutLayer CLI. Uji enkripsi `sealed-probe` lolos lokal dan testnet. Temuan koordinator OutLayer. Klaim kredit NEAR AI dan uji attestation lolos. Keputusan opsi B. Spike runner lolos lokal, gagal di testnet dengan dugaan gangguan layanan. Dokumen ini dibuat.
+- **13 Nov 2026 12:30 UTC (Claude Code).** OutLayer dicoba ulang, masih gagal. Kontrak registry ditulis, di-deploy ke `registry.scientivan.testnet`, metode portofolio versi 1 tercatat. Draf manifest metode portofolio. Disk penuh ditemukan dan sebagian dibersihkan.
+- **13 Nov 2026 13:30 UTC (Claude Code).** Disk dikosongkan Dien (13 GB). Unit test kontrak 5/5 lolos, `cargo-near` 0.20.3 terpasang. OutLayer 12:42 masih gagal. Nama Kalis, `PRODUCT.md`, arah batik tulis, draf hero artifact v1.
+- **13 Nov 2026 (Codex, serah konteks).** Membaca seluruh pesan percakapan Claude sesi `333cb961-537f-41ee-afce-3622d35df115`, jawaban pertanyaan terstruktur dan bukti unit test yang relevan. Mencocokkan dengan dokumen produk dan preferensi desain. Memperbaiki catatan unit test dan instalasi `cargo-near` yang tertinggal dari changelog. Tidak menjalankan ulang layanan atau mengubah produk.
+- **13 Nov 2026 (Codex, revisi hero).** Pengguna menolak draf batik dan memilih arah HelloNear yang simpel, bersih dan interaktif. Draf hero diganti dengan adegan Three.js buatan sendiri, interaksi kursor, pilihan tiga tahap, kontrol jeda dan reduced motion. Bukti memakai sealed-probe historis dan data sintetis. Tidak ada API atau transaksi. Aset lokal, anchor, sintaks dan kontras diperiksa. Browser/localhost diblokir sandbox, sehingga review render belum selesai. Dokumen rancangan dan PDF diperbarui ke v1.31. OutLayer tidak dicoba ulang karena pekerjaan hanya preview desain.
+
+## 16. Titik lanjut setelah serah konteks Claude ke Codex
+
+- Permintaan Dien saat serah konteks adalah memahami pembahasan agar dapat dilanjutkan di sesi Codex. Belum ada permintaan baru untuk mengubah desain atau menjalankan build.
+- Target desain terdekat adalah review pengganti hero `design/kalis-hero.html` berdasarkan HelloNear. Artifact Claude lama merupakan draf yang ditolak dan tersimpan di `design/kalis-hero-v1.html`. Bukti yang ditampilkan tetap memakai `sealed-probe`, bukan runner opsi B.
+- Arah terbaru simpel, bersih dan interaktif seperti HelloNear, copy Inggris, SF Pro system stack dan warna solid. Batik boleh menjadi aksen halus. Rincian preferensi ada di `~/.claude/DESIGN-PREFERENCES.md`. Dien meminta impeccable dan UI UX Pro Max untuk pekerjaan desain.
+- Dua pilihan bernama A dan B berasal dari pembahasan berbeda. Opsi A pada bagian 51 memilih OutLayer sebagai tempat eksekusi. Opsi B pada bagian 52 memilih kode penjual di sandbox runner platform. Keduanya berlaku bersama.
+- Lima perlindungan adalah cakupan yang disepakati untuk dibangun, bukan lima fitur yang sudah selesai. Status implementasinya tetap mengikuti bagian 7.
+- Penyebab kegagalan OutLayer belum pasti. Percobaan terakhir yang tercatat tetap 12:42 UTC. Saat melanjutkan pekerjaan implementasi, ikuti jadwal percobaan ulang di bagian 11 dan catat bukti baru.
+- Belum ada keputusan baru tentang pilihan DAO, skema final manifest, pembagian pembayaran, refund atau sengketa. Jangan mengubah usulan lama menjadi keputusan.
+
+### Review layout section pendukung, 13 November 2026
+
+Dien meminta revisi khusus pada Private by purpose dan daftar tiga langkah. Draf kini memakai satu panel proses berurutan dan tab use case dengan panel tunggal. File tambahan `design/kalis-sections.css` dan `design/kalis-sections.js`. Sintaks dan interaksi tab diperiksa, termasuk keyboard, fokus, visibilitas panel tunggal dan orientasi mobile. Browser masih diblokir sandbox, sehingga hasil render belum diperiksa visual. Menunggu review Dien. Tidak ada transaksi, perubahan backend atau percobaan ulang OutLayer. Rancangan MD dan PDF disinkronkan pada bagian 53.1.
+
+### Review isi tab dan kontrol, 13 November 2026
+
+Dien menyukai kemasan panel proses dan tab use case, lalu meminta perapian isi tab, visual tombol How it works dan kejelasan kontrol tahap. Draf kini memakai tiga baris fakta yang sejajar per use case, tombol sekunder yang jelas dan stepper bernomor dengan tahap aktif serta status yang berubah. Sintaks, referensi elemen, kontrol tahap dan reduced motion lolos pemeriksaan lokal. Render browser belum diperiksa. Perubahan dicatat di rancangan bagian 53.2 dan PDF halaman 40. Tidak ada perubahan backend atau transaksi.
+
+### Pembacaan menyeluruh untuk pembahasan hook hero, 13 November 2026
+
+Atas permintaan Dien, Codex membaca ulang seluruh RANCANGAN_PRODUK.md dari bagian 0 sampai 53.2, termasuk riwayat benchmark, bisnis, lima perlindungan, kontribusi modular, kasus uji privat, dana bersama dan keputusan terbaru. Opsi hook sebelumnya belum dipilih. Pembahasan hook perlu mempertimbangkan workspace privat, transaksi keahlian dua pihak dan perbaikan bersama, dengan kemampuan terbangun tetap dibedakan dari rancangan. Tidak ada perubahan copy hero atau keputusan produk baru pada giliran pembacaan ini.
+
+### Hook hero dipilih, 13 November 2026
+
+Dien memilih “Where expertise is traded, run privately, and improved together.” Hook diterapkan di design/kalis-hero.html dengan pemenggalan responsif. Tidak ada perubahan kontrol, backend atau kemampuan produk. Keputusan dicatat di rancangan bagian 53.3, PDF dan PRODUCT_MEMORY.md. Render browser belum diperiksa karena batas sandbox.
+
+### Deskripsi dan background hero, 13 November 2026
+
+Atas permintaan Dien, deskripsi diselaraskan dengan perdagangan metode, privasi dua pihak dan pendanaan perbaikan. Background polos diganti lanskap orisinal melalui imagegen bawaan, disimpan di design/assets/kalis-landscape-v1.webp (1672 × 941, 76.418 byte). Prompt/provenance di file pendamping. Aset diperiksa visual, render halaman terintegrasi belum diperiksa karena sandbox. Tinggi background mengikuti ukuran hero. Rancangan bagian 53.4 dan PDF disinkronkan. Draf belum disetujui. Tidak ada transaksi atau perubahan backend.
+
+### Adegan hero modular, 13 November 2026
+
+Dien menyukai background dan meminta foreground menyatu dengan privacy, expertise dan pengembangan bersama. Atas izin percobaan, cincin diganti bidang kerja Three.js dengan input tersegel, ruang eksekusi, modul metode dan keluaran. Preview an improvement memperlihatkan kontribusi bergabung/reset. Konstruksi geometri nyata dan state diuji di Node memakai renderer pengganti, bukan render piksel. Sintaks lolos. Render browser tetap belum diperiksa. Draf lama script tersimpan di design/kalis-hero-orbit-v1.js. Rancangan bagian 53.5 dan PDF disinkronkan. Tidak ada backend kontribusi atau transaksi baru.
+
+### Ilustrasi siklus produk lengkap, 13 November 2026
+
+Dien menolak scene abstrak dan meminta alur produk lengkap. Setelah giliran terputus, pekerjaan dilanjutkan sampai CSS dan kontrol selesai. Hero aktif memakai ilustrasi UI enam tahap melalui design/kalis-story.css dan design/kalis-story.js. Tahapnya publikasi, pembelian, eksekusi privat, hasil, aliran pembayaran/dana dan perbaikan versi. Three.js tidak lagi dimuat oleh HTML aktif. File lama dipertahankan sebagai riwayat.
+
+Pemeriksaan lokal lolos untuk sintaks, enam panel, navigasi langsung dan sebelumnya/berikutnya, batas tombol, playback selesai, jeda saat halaman tersembunyi, reduced motion manual, aset dan ARIA. Detector terbatas tidak menemukan temuan regex. Render desktop/mobile belum diperiksa karena sandbox. Rancangan bagian 53.6, PDF dan memori diperbarui. Draf menunggu review. Tidak ada API, transaksi atau backend baru. OutLayer tidak dicoba ulang dalam pekerjaan desain ini.
+
+### Kelanjutan pemeriksaan kontrol cerita, 13 November 2026
+
+Playback diperbaiki agar tombol putar melanjutkan tahap yang sedang dipilih atau dijeda. CTA Explore tetap memulai dari awal dan putar setelah tahap terakhir mengulang cerita. Uji Node VM lolos untuk pemilihan tahap, pause/resume, kemajuan timer, restart CTA, replay akhir dan reduced motion. Sintaks JavaScript lolos. Tidak ada keputusan produk baru, perubahan backend atau transaksi. Render browser masih belum terverifikasi karena batas sandbox yang telah dicatat.
+
+### Pembagian kerja agent (13 Nov 2026, dari Dien)
+
+**Diperbarui 14 Nov 2026 07:00 UTC (Dien).** Frontend `app/web` (Next.js) dikerjakan Codex mulai sekarang, mengikuti `FRONTEND_GUIDE.md` (aturan desain, palet, layout, peta navigasi, mock acuan `design/app/marketplace-luno-crypto.html`), `app/backend/API.md`, dan `app/methods/MANIFEST_V5.md`. Backend tetap Claude Code. Jangan mengubah backend dari sisi frontend; minta lewat file kebutuhan seperti sebelumnya.
+
+**Diperbarui 14 Nov 2026 02:10 UTC (Dien).** Codex berhenti mengedit. Claude Code mengerjakan seluruh backend (10 pekerjaan rencana dan semua butir A–H di `app/web/BACKEND_REQUIREMENTS_FOR_CLAUDE.md`), lalu frontend `app/web`. Urutan: inti demo dulu (kelompok A, manifest v5, tender, 8 metode), lalu rating, riwayat, login NEP-413, publikasi penjual, komunitas, uji privat, H5, H7, H8. Kebijakan di RANCANGAN 65.4.
+
+*Pembagian lama (13 Nov):* Codex mengerjakan tampilan frontend (`design/`, nanti app Next.js). Claude Code mengerjakan semua selain frontend: OutLayer dan runner, kontrak NEAR, DAO dan bounty, lima perlindungan di sisi backend, metode tender, API yang dipakai frontend, README dan bukti. Jangan mengedit file milik agent lain tanpa koordinasi. Antarmuka backend untuk frontend dicatat di dokumen ini saat dibuat.
+
+### Hero animasi minimal, 13 November 2026
+
+Permintaan Dien diterapkan dalam draf 53.7. Enam adegan objek vektor menggantikan panel teks, navigasi terpisah dihapus, kontrol ringkas berada dalam hero. Auto-next 7 detik, jeda manual dan reduced motion manual. Uji Node VM lolos untuk autoplay, wrap, pause, halaman tersembunyi, reduced motion dan satu panel aktif. ID SVG/HTML dan referensi valid. PDF 45 halaman terverifikasi tanpa overflow. Render browser tetap belum diverifikasi karena pembatasan lingkungan yang tercatat. Tidak ada backend atau transaksi baru.
+
+### Revisi screenshot hero dan Three.js
+
+Konflik position absolute pada scene-caption diperbaiki dengan class terisolasi dan normal flow. Three.js lokal kini membangun enam kegiatan dengan warna lanskap, SVG fallback dipertahankan. Caption/controls berlatar solid, fokus menjeda, target kontrol utama 44px, titik tahap 28px. Sintaks kedua script lolos. Render WebGL/browser belum terverifikasi, tidak mengklaim audit WCAG penuh. Rancangan 53.8 dan PDF disinkronkan. Tidak ada transaksi, tidak ada konflik gate NEAR.
+
+### Pembaruan memori preferensi desain
+
+Preferensi Dien untuk tidak memakai karakter bullet points disimpan di PRODUCT_MEMORY.md. Tidak ada perubahan implementasi atau keputusan kemampuan produk.
+
+### Kelanjutan kontrol dan preferensi teks
+
+Pemisah karakter bullet pada preview dihapus. Konflik focusin pada tombol play/pause diperbaiki agar klik jeda pertama tidak menyalakan ulang cerita. Sintaks diperiksa. Batas verifikasi visual sebelumnya tetap berlaku. Rancangan 53.9 dan PDF diperbarui. Tidak ada konflik aturan NEAR atau transaksi baru.
+
+### Orientasi halaman aplikasi
+
+Dien mengalihkan fokus sementara dari landing page ke aplikasi dan meminta pembacaan ulang rancangan. Bagian 0–11, 21–23, 29–30, 44–52 serta keputusan 54 ditinjau untuk kebutuhan UI. Aplikasi mencakup workspace privat, penemuan/publikasi metode, izin dan hasil eksekusi, saldo/transaksi serta perbaikan dan dana bersama. Struktur beranda masih usulan, belum implementasi. Pembagian pembayaran dan Sputnik DAO mengikuti bagian 54, bukan asumsi lama. Tidak ada perubahan backend.
+
+### Pembahasan sidebar aplikasi
+
+Istilah metode marketplace dan perpindahan fokus aplikasi dicatat di rancangan bagian 55, PDF dan memori. Sidebar per peran masih usulan, belum diimplementasikan atau disetujui. Tidak ada perubahan backend atau transaksi.
+
+### Audit cakupan sidebar
+
+Pemetaan seluruh area produk ke lima parent dan alternatif enam parent dicatat sebagai usulan di rancangan 56 dan PDF. Tidak ada implementasi UI atau keputusan final. Activity diarahkan menjadi inbox, dana bersama dipisahkan dari uang pribadi, dan operasi mengikuti kewenangan. Tidak ada konflik compliance NEAR.
+- **13 Nov 2026 16:45 UTC (Claude Code).** USDC testnet di-mint dari `usdc.fakes.testnet`, payment key OutLayer dibuat. Jalur HTTPS OutLayer jalan. Uji jaringan: manifest `network: []` memblokir koneksi (6.7). `kalis-runner` opsi B dengan metode dan data tersegel lolos 12/12 lokal dan C03/C09 di testnet (6.8). Versi 2 metode portofolio tercatat di registry. Kontrak registry dibangun ulang dengan rustc 1.86 sehingga pesan error tampil.
+
+### Draf aplikasi Kalis, kelanjutan setelah usage limit
+
+Draf frontend lokal design/app/index.html selesai untuk review. Lima tujuan utama Workspace, Marketplace, Community, Activity dan Balance, ditambah dropdown nama Dien untuk Account, Connections, Permissions & preferences. Struktur mengadaptasi screenshot Corbel. Semua data contoh dan perubahan hanya selama sesi. Tidak ada integrasi backend, transaksi atau deployment.
+
+Alur yang dapat dicoba mencakup navigasi, pencarian metode/pekerjaan, filter, pembuatan draf pekerjaan, hasil C03 historis, persetujuan memori dan tindakan contoh, draf metode, top-up mock dengan gagal/coba lagi/batal, serta pengaturan akun. Community menampilkan keadaan kosong untuk data yang belum terhubung.
+
+Sembilan pemeriksaan controller di design/app/verify.cjs lolos. Sintaks script lolos. Reviewer terpisah mengonfirmasi delapan temuan kode sudah resolved. Struktur shell/aset/ARIA dan tujuh pasangan kontras diperiksa. Browser tetap terblokir MachPortRendezvous permission denied 1100, sehingga belum ada screenshot valid atau klaim WCAG/visual penuh. Detector impeccable degraded regex, CLI RYUX tidak tersedia tetapi skill dibaca dari sumber resmi. Bukti dan batas lengkap di design/app/REVIEW.md.
+
+Dokumen produk bagian 57, PDF, memori serta dokumentasi artifact disinkronkan. Skill documenter sempat terhenti karena usage limit dan dilanjutkan. Menunggu review visual Dien. Pemeriksaan compliance NEAR tidak menemukan konflik. Status backend milik Claude Code tidak diubah.
+- **13 Nov 2026 17:30 UTC (Claude Code).** Laporan eksekusi, cek ulang pembeli, dan pencocokan attestation dibangun dan lolos di testnet (6.9). Registry versi 3. Antarmuka untuk frontend dicatat.
+
+
+## 14 November 2026, audit screenshot aplikasi oleh Codex
+
+Pengguna menolak beberapa pola visual draf dan meminta riset detail metode. Analisis tercatat di design/app/CRITIQUE.md, rancangan bagian 58 dan PRODUCT_MEMORY.md. Dua assessment independen diizinkan. Belum ada perubahan frontend atau backend. Bukti render berasal dari screenshot pengguna, native browser tetap tidak terverifikasi. Cek aturan NEAR tidak menemukan konflik pada analisis dan dokumentasi lokal ini.
+
+
+## Revisi Marketplace, 14 November 2026
+
+Katalog, detail, My methods dan Create method di design/app diperbarui. Ditambah Reviews, Versions dan Contributions per metode. Rating dan jumlah ulasan terlihat dengan keadaan kosong jujur. Metadata input/hasil/akses/batas draf disimpan dan di-escape. Sebelas controller checks lolos. Sintaks dua script lolos. Belum ada audit render browser. Tidak ada perubahan backend atau transaksi. Cek aturan NEAR tidak menemukan konflik.
+- **13 Nov 2026 17:45 UTC (Claude Code).** Keputusan escrow berbasis tahap, aturan yang bisa dicek pembeli, dan tambalan instruksi dicatat (rancangan bagian 56). Runner 0.3 dengan padding rerun, registry versi 4. Selisih instruksi hanya berkurang sebagian (6.10).
+
+
+## Kajian referensi OKX Marketplace
+
+Dua halaman pilihan pengguna dibaca melalui HTML dan CSS publik. Temuan dan batas bukti disimpan di design/app/OKX_REFERENCE.md dan rancangan bagian 60. Tidak ada perubahan frontend pada sesi kajian ini. Tidak ada pengujian klik/browser atau klaim perilaku Use now. Cek aturan NEAR tidak menemukan konflik.
+
+
+## Penerapan visual referensi OKX
+
+Cover JPEG lokal ditambah ke design/app/assets. Katalog memakai kartu horizontal dengan satu tautan, identitas detail memakai cover yang sama, Reviews mendapat ringkasan skor/distribusi kosong, dan form pembuat menyimpan pilihan cover serta preview. Source app.js/app.css/data.js diperbarui. Sebelas controller checks dan sintaks lolos. Render browser belum terverifikasi. Dokumentasi produk/PDF diselaraskan. Tidak ada konflik aturan NEAR.
+
+
+## Audit cakupan frontend menyeluruh, Codex
+
+Pemetaan kebutuhan dan batas tersedia di design/app/COVERAGE.md. Ditambah flows.js dan 23 rute untuk konfigurasi, input/model/checkout, izin kasus, report, escrow dan draf alur komunitas. Catatan sesi mempunyai rujukan silang dan tautan kelanjutan. Viewer report/escrow memakai fixture berlabel. Enam belas controller checks dan sintaks lolos. Belum semua perjalanan terhubung utuh atau memakai backend. Jangan menyebut seluruh fitur selesai. Reviewer mengidentifikasi celah yang dipertahankan dalam matriks. Aturan NEAR diperiksa, tidak ada konflik, signing, spending atau deploy.
+- **13 Nov 2026 18:15 UTC (Claude Code).** Tanda selesai bertanda tangan TEE (runner 0.4). Sputnik DAO `kalis-fund` dibuat. Kontrak market (registry + escrow + pembagian) di-deploy, unit test 9/9. Alur penuh sukses dan gagal lolos di testnet (6.11).
+- **13 Nov 2026 18:50 UTC (Claude Code).** Folder build tak terpakai dibersihkan (sekitar 6 GB). Langkah 4 dan 5 selesai: bounty Sputnik DAO, perbaikan metode v2 oleh `kalis-contrib.testnet`, versi 2 di market, run berbayar dengan versi 2 (6.12).
+- **13 Nov 2026 19:20 UTC (Claude Code).** API backend `app/backend/` dengan modul kripto browser, kontrak API untuk Codex, dan smoke test sukses dan gagal lewat API (6.13).
+- **13 Nov 2026 18:40 UTC (Claude Code).** Lima perlindungan di backend dengan 33 uji lulus (6.14). Portofolio versi 3 dengan manifest konektor. Manifest draf tender. Dokumen tender fiktif dengan injeksi.
+
+
+### Codex kembali setelah handoff Claude
+
+Transkrip sesi Claude fa84e545-7c4f-4d63-a24d-f8561868c297 dibaca dan dicocokkan dengan rancangan bagian 63, app/web/COVERAGE.md serta struktur komponen saat ini. Konteks disimpan di app/web/HANDOFF_CODEX.md. Hasil 20 tes/build/Chrome adalah bukti yang dilaporkan Claude, belum dijalankan ulang oleh Codex pada pembacaan konteks ini. Tidak mengembalikan file lama atau mengubah backend. Integrasi tetap mengikuti instruksi pengguna, bukan dimulai otomatis karena backend tersedia.
+
+
+### Integrasi frontend-backend dimulai atas instruksi pengguna
+
+Kode Next proxy dan mode /connected ditambah. Portfolio browser sealing, version-pinned payment, encrypted execution, local completion verification/recheck/verdict dan settle tersedia pada kode UI. DAO read dan advanced protections API panel tersedia. Mock store tetap terpisah. Rincian batas dan cara restart ada di app/web/BACKEND_INTEGRATION.md. Typecheck/build lolos, 23 TS + 2 crypto tests lolos, backend GET health/config/methods sukses. Tidak ada testnet spending atau protection mutation. Server3311 lama belum memuat route, bind3312 EPERM, sehingga browser E2E belum terverifikasi. Integrasi seluruh halaman belum selesai.
+- **14 Nov 2026 01:17 UTC (Claude Code).** Runner 0.5: jaringan hanya ke NEAR AI, import `kalis.ai_chat` dengan attestation dan tanda tangan per panggilan, metode berbentuk prompt dengan cek kebocoran. Deploy ke OutLayer, secret dipindah. Portofolio v4 dan metode prompt `salary-counteroffer` v1 di market, smoke berbayar keduanya Released. RANCANGAN bagian 5, 51, 55 direvisi, bagian 65 baru, PDF 65 halaman (6.15).
+
+
+### Integrasi seluruh permukaan API yang tersedia ke halaman utama
+
+Backend mode kini default pada route normal. backend-pages.tsx menghubungkan registry, Connections, Memory, Files, Browser, Activity/outbound/audit dan DAO reads; connected.tsx menyediakan encrypted buyer payment/run/settle dengan version pinning dan unsigned wallet request. Mock demo terpisah eksplisit. API yang tidak ada ditandai unavailable, bukan dibuat seolah live. Helper crypto disinkronkan dengan backend termasuk AI proof/prompt verdict. 23 TS + 3 crypto tests lolos, typecheck/build diperiksa. Matriks app/web/COVERAGE.md diperbarui. Tidak melakukan pembayaran/signing/mutasi backend. Server3311 perlu restart; pengujian browser belum diklaim. Tidak ada konflik aturan NEAR.
+
+
+### Handoff kebutuhan backend untuk Claude
+
+Atas permintaan Dien, Codex menyusun app/web/BACKEND_REQUIREMENTS_FOR_CLAUDE.md berdasarkan API dan kode backend aktual. Memuat gap, usulan endpoint/DTO, izin, idempotency/recovery, transisi dan kriteria penerimaan, serta prompt handoff. Ini dokumentasi, bukan backend baru atau policy final. Tidak mengirim pesan eksternal dan tidak melakukan signing/spending. Rancangan bagian 66 dan PDF diselaraskan.
+
+
+### Audit tambahan layanan backend untuk handoff Claude
+
+Handoff app/web/BACKEND_REQUIREMENTS_FOR_CLAUDE.md diperluas dengan bagian H, delapan kelompok layanan yang ditelusuri dari rancangan termasuk 65.1 tender. Menjelaskan schema/checker, runtime tender, model selection, run-bound policy, provenance/artifact, evidence/preflight, contribution package dan effective permission/cancellation. Semua bentuk API baru tetap usulan dan dibedakan dari fungsi internal atau keputusan yang terbuka. Dokumentasi saja, tidak mengubah backend dan tidak signing/spending. Cek aturan NEAR tidak menemukan konflik.
+- **14 Nov 2026 02:35 UTC (Claude Code).** Kelompok A, manifest v5 dan cek pembeli, perbaikan teks dokumen, impor file, rating dan riwayat, artefak, `transfer_method_owner`, tiga akun penjual demo, tender v1 berbayar sukses di OutLayer (6.16).
+- **14 Nov 2026 06:00 UTC (Claude Code).** Login NEP-413, publikasi penjual, komunitas, uji privat, runner build 823e99 dengan `evaluate` dan `ai_restrict`, tiga metode diterbitkan ulang di runner baru, reclaim teruji (6.17).
+- **14 Nov 2026 06:10 UTC (Claude Code).** Delapan metode dengan delapan akun penjual demo, semua lolos run berbayar. Batas waktu OutLayer dinaikkan ke 180 detik. H3, H4, H8 selesai. Seluruh butir backend A–H terpasang (6.16–6.18). Berikutnya frontend.
+
+
+## Riset website referensi, 14 November 2026
+
+Riset publik selesai dan dicatat di research/website-reference-2026-11-14.md, dengan delapan pembanding utama, sumber resmi, matriks penerapan halaman, dokumentasi brand system n8n dan usulan wording. Rancangan bagian 68 dan PDF diselaraskan. Tidak ada perubahan kode atau status fitur. Inspeksi render dan interaksi pembanding belum dilakukan. Compliance gate tidak menemukan konflik pada riset dan dokumentasi lokal.
+- **14 Nov 2026 07:00 UTC (Claude Code).** Riset referensi desain, dua mock marketplace (Luno CRM dan Luno Crypto), palet extrafazant.nl, tema terang saja. Semua aturan desain disimpan di `FRONTEND_GUIDE.md` untuk Codex. Frontend diserahkan ke Codex.
+
+
+## Persiapan domain aplikasi, 14 November 2026
+
+Persiapan lokal untuk landing calis.scientivan.dev dan aplikasi app.calis.scientivan.dev disepakati. Bukti ada di app/web/src/app/layout.tsx, app/web/vercel.json dan app/web/DEPLOYMENT.md. Pemeriksaan read-only Vercel berhasil dan nameserver domain berada di Cloudflare. Backend publik belum diberikan. Belum membuat proyek, deploy publik, memasang domain atau mengubah DNS. Verifikasi berhasil dengan npm run build dan npm test di app/web, 31 tes lulus. PDF diregenerasi menjadi 70 halaman dan generator menyatakan no overflow, isi hostname halaman domain diperiksa. Rancangan bagian 69 dan sumber PDF diselaraskan. Compliance gate NEAR tidak menemukan konflik.
+
+
+## Sinkronisasi dokumentasi menyeluruh, 14 November 2026
+
+Atas permintaan Dien, dokumen aktif direkonsiliasi dua arah dengan source, runtime dan bukti historis. Rancangan bagian 0/70, README, PRODUCT, DESIGN, coverage/gaps/integration/navigation, API notes, panduan, memori dan indeks dokumen diperbarui. Handoff/prototipe/review lama diberi status historis. Bukti di audit/2026-11-14-doc-sync/. GET sembilan endpoint dan proxy health berhasil, 14 halaman Chrome tanpa login terbuka. Build dan 31 tes frontend sesi sama lulus sebelum perubahan dokumentasi, local manifest 47 dan Office 8 lulus. Crypto/checks/file-import browser identik backend. PDF diregenerasi menjadi 72 halaman, generator memverifikasi no overflow dan isi cover serta halaman Social Money diperiksa visual. Tautan lokal dokumen aktif dan git diff --check lulus.
+
+Tidak mengubah kode produk, login, mutasi backend, seed, signing, spending, push atau deploy. Gap private-values/reviewer/revoke/legacy bounty dipertahankan eksplisit. Deployment ditunda dan diskusi inovasi Social Money menjadi langkah berikutnya. Compliance gate NEAR tidak menemukan konflik.
+
+
+## Investigasi privasi sebelum Social Money, 14 November 2026
+
+Source runner/backend/frontend serta rancangan 52 dan 65.1–65.3 ditelusuri. Bukti dan penghalang ada di PRIVACY_TEE_INVESTIGATION.md. Tidak ditemukan bukti keterbatasan fundamental OutLayer, tetapi runner belum punya API proteksi, storage dan proof owner. Shared platform payment key, localhost connector dan pdftotext host adalah dependensi nyata untuk migrasi. Registrasi private-values bukan syarat platform. Penetapan protocol/migrasi masih usulan, worker testnet belum diprobe baru. MD/PDF diperbarui, Social Money ditunda sementara. Tidak mengubah kode, signing, spending atau deploy. Cek NEAR tidak menemukan konflik.
+
+Verifikasi investigasi privasi. PDF 73 halaman lolos generator tanpa overflow, halaman hasil investigasi diperiksa visual. Pengujian TEE baru dan migrasi fitur belum dilakukan.
+
+## Deployment publik (15 November 2026)
+
+Backend berjalan di VPS tinjau-vps sebagai service kalis-backend (port 8790 di belakang Caddy) untuk https://api.kalis.scientivan.dev, health dan /api/privacy/config (mode tee, enabled) lulus di localhost VPS. Frontend di proyek Vercel kalis dengan domain kalis.scientivan.dev dan app.kalis.scientivan.dev, build produksi Ready. kalis.scientivan.dev sementara redirect 307 ke aplikasi lewat app/web/src/proxy.ts. Ejaan domain diganti dari calis ke kalis. Uji lewat host publik belum terverifikasi karena menunggu DNS Cloudflare. Rincian ada di app/web/DEPLOYMENT.md. npm test 32 lulus dan npm run build berhasil.
+
+
+### Landing Next.js lokal, 15 November 2026
+Draf /landing dibuat langsung di app/web. Hero gambar lanskap existing dengan Three.js r160 vendored, interaksi pointer, paket bergerak, kontrol tahap dan pause. Section putih aksen biru, metode contoh, proses, community dan batas testnet. Compile dan TypeScript lulus. PDF 76 halaman diverifikasi tanpa overflow. Belum review browser visual atau deployment. Root marketplace dipertahankan. Compliance gate tidak menemukan konflik.
+
+
+### Koreksi hero landing
+Logo Meeting K existing dipasang di header/footer. Carousel langkah dan ilustrasi processor bertahap dihapus, diganti satu komposisi Three.js dua volume privat dalam ruang transparan. Pause/reduced motion dipertahankan. PDF 77 halaman tanpa overflow. Review visual pengguna masih diperlukan, belum deployment.
+
+
+### HelloNear adaptation for landing sections, 15 November 2026
+Dien rejected static lower-section layout and requested HelloNear reference analysis and adaptation, leaving hero 3D deferred. Reference HTML/CSS fetched, browser sections inspected. Analysis in design/LANDING_HELLONEAR_REVIEW.md. Implemented landing-sections.tsx/css with selectable method deck, privacy/input/output preview, interactive consent illustration, two-party diagram/inspector tabs, fund split and version preview, FAQ, final invitation/footer. White and #0038ff retained. Hero scene unchanged.
+Validation. Next production build and TypeScript passed. Browser at desktop 1440 and mobile 390 reports no document overflow, three method cards and six sections. Consent click enables preview and selects answer tab. Captures /tmp/kalis-landing-desktop.png and /tmp/kalis-landing-mobile.png. Mechanical detector reported one border-width warning, corrected to 1px. PDF regenerated with 78 pages, no overflow. No publication, wallet signature or transaction. Compliance gate no conflict. Visual result remains a draft for Dien review.
+
+
+### HelloNear correction, marquee and pinned scene
+Dien explicitly rejected the preceding adaptation as incomplete. Added technology identities/roles, moving connector strip with app catalog status, per-word heading reveal and a desktop pinned right-to-left clip reveal followed by scene pan to buyer checks. Product scenes use private sheet/document objects and Kalis permission/result UI. Hero unchanged. Mobile/paused/reduced motion uses vertical scenes. No new connector capability is claimed.
+Evidence. Production build and TypeScript pass. Chrome desktop 1440/mobile 390 no document overflow or broken images. Desktop sticky and computed wipe 0%, pan -39.97% at sampled progress verified. Mobile pin relative. Reduced-motion pin relative and marquee animation none verified. Fixed missing visual word spacing and inherited brand-icon stroke after screenshot inspection. Captures /tmp/kalis-v3-*.png. PDF 79 pages no overflow. Local draft pending Dien visual review, no deployment. Compliance gate no conflict.
+
+
+### Extrafazant landing rebuild, 15 November 2026
+Dien rejected HelloNear adaptation again and supplied extrafazant.nl. Replaced lower-section components/CSS rather than adding another theme layer. Intro uses a generated cobalt still-life in tilted collage, large Barlow Condensed/Instrument Serif titles, white/blue poster stack driven by scroll, tilted protection posters, staggered community posters, FAQ/final invitation and sharp split-arrow CTAs. Technology and connector strips retained with truthful status. Hero source unchanged. OFL fonts and licenses are local. Generated WebP and exact prompt provenance are in public/landing. Reference analysis is design/LANDING_EXTRAFAZANT_REVIEW.md.
+Evidence. Production build/TypeScript pass. Chrome 1440 desktop and 390 mobile report no document overflow or broken images, ten catalog connector identities, desktop sticky stack/mobile relative stack. Three illustration controls update their statuses without network actions. Reduced motion removes sticky stack and marquee animation. Screenshot inspection found overlap of outgoing cards with the heading, small protection heading from global selector specificity and a mobile poster word collision. Fixed these in one batch with stack-stage clipping, scoped display selector and smaller mobile art type. Mechanical design detector found no issues. PDF 80 pages, no overflow. Local draft, not visual approval or deployment. Compliance gate no conflict.
+
+
+### Senyap reference inspection
+Dien supplied https://senyap.scientivan.dev/ without further instructions. Inspected public HTML and Chrome screenshots. Observed a dark interactive hero, large light sans headings, white lower sections and interactive product demonstrations. Asked whether Senyap replaces Extrafazant or applies only to specific sections. No new visual direction inferred, no implementation changes or product decisions from the link alone. Compliance gate no conflict for read-only inspection.
+
+
+### Senyap layout and fullscreen fix
+Dien explicitly replaces Extrafazant with Senyap, layout/positioning only, Kalis palette/assets retained. The earlier landing inherited global main max-width 1680px and sidebar padding. Scoped .kl reset now gives width 100%, max-width none, margin/padding zero. Hero 100dvh, overlay fixed header changes to white over lower sections. Hero sculpture/landscape/logo reused, positioned upper-right with copy lower-left and preview lower-right. Lower sections replaced with sticky privacy list/interactive panels, participant views, buyer/author marketplace, community split, FAQ/final CTA. Existing UseCaseArt reused, Inter restored.
+Verification. Production build and TypeScript pass. Chrome at 1440x900, 2560x1440 and 390x844 measured main/hero widths equal to viewport, main padding 0px and hero heights exactly equal viewport. No document overflow or broken images, Three.js canvas present. Sealing visual toggles, author view toggles, margin example passes at 10 percent and fails at 20 percent. Reduced motion stops marquee. Screenshot inspection completed. Header fixed styling and copy contrast backing added in final correction. PDF 81 pages, no overflow. Mechanical detector no findings. No deployment or final visual approval. Compliance gate no conflict.
+
+
+### Hero typography and floating capsule revision
+Dien requested Kalis product typography, Impeccable-guided hero composition, removal of workflow preview card and wide-to-compact floating navigation. Hero preview DOM removed. Inter explicit, hero 600 and section headings 500. Hero copy/CTA grouped left, existing illustration right. Navbar one large-radius capsule, starts wide then contracts after 64px scroll and moves slightly down. Mobile menu added with expanded state and matching navigation panel. Fullscreen retained.
+Validation. Production build/TypeScript pass, mechanical detector no findings. Chrome desktop 1440x900 header 1392px wide/top16px becomes 1040px/top24px. Mobile 390x844 header 366px/top12px becomes 350px/top20px. Radius999px in both states. Hero equals viewport, no horizontal overflow, Inter weight600 verified, preview absent. Mobile menu expanded=true and visible display flex. Screenshots /tmp/kalis-hero-revision-*.png visually inspected. PDF 82 pages without overflow. Local review draft, no deployment. Compliance gate no conflict.
+
+### 6.21 Social Money: royalti kontributor, tip, rating ber-stake (🟡 testnet nyata, backend lokal, belum deploy)
+Kode: `app/backend/src/social-api.js` (baru, didaftarkan satu baris di `server.js`; satu baris hook di `settle` pada `runs-api.js`), `app/web/src/components/social-money.tsx` (+ `.module.css`), sisipan satu baris di `run-page.tsx`, `method-detail.tsx`, `community-workspace.tsx`, dan dukungan aksi `Transfer` di `lib/near/auth.tsx`. Kontrak market tidak di-redeploy. Detail: `docs-social-money.md`.
+- Royalti. Kontrak `settle` hanya membayar seller, DAO, platform (field `contributors` versi disimpan tapi tidak dibayar). Maka setelah run Released pada versi yang punya `contributors`, akun platform (`platform.scientivan.testnet`) mengirim 5% harga dari fee platform 10% miliknya ke kontributor, transfer terpisah, idempoten per run. Bagian seller (80%) dan DAO (10%) tidak berubah. Bukti: run `run-mwgxfxq1-bb507657` (portfolio-rebalance v6, settle `6PCTUj3QxEdezuQfbKaNapngPixYj4pSJTRt81LoVDZE`), royalti 0.005 NEAR ke `kalis-contrib.testnet` tx `E3kbGoTaruMnWNxF7kWGrRkxgpFLByD6HTzsSo9TTiCS`. Run sebelumnya `run-mwgxaeg9-bfec6168` tx `9byEigUThdT4nwWD6dANcMZMApDKLCYT71A8YjKYybNw`.
+- Tip. Backend mengembalikan transfer tanpa tanda tangan (`kind: "transfer"`, `signer_must_be` = pembeli on-chain); dicatat hanya setelah backend membaca tx di chain (signer, penerima seller/kontributor, 0.01 sampai 1 NEAR). Bukti: 0.02 NEAR `kalis-buyer.testnet` ke `arif-planner.scientivan.testnet` tx `AocPgXqFQi9f7esRHDuUn1EfpGGfBKgimyMuZNv3LTUa` (ditandatangani kunci demo buyer lewat skrip, bukan dompet browser).
+- Rating ber-stake. 0.01 sampai 0.1 NEAR dari pembeli run ke `kalis-fund.sputnik-v2.testnet` sebagai donasi: tidak dikembalikan, tanpa imbal hasil. Ditampilkan sebagai badge "Backed by" di ulasan. Bukti: 0.02 NEAR tx `Gjvf1Vx8eMifGTrZuQeCKPPDaqzaxZpy53SXujPic3pu`.
+Validasi: `node scripts/social-money-test.mjs <base> <run>` lulus (termasuk penolakan nominal di luar batas, penerima asing, tx tip dipakai untuk stake), keempat tx dicek ulang via RPC (`SuccessValue`). `app/web` `npm test` 3/3, `npm run build` lulus. Belum: alur dompet browser untuk tip/stake belum diuji di browser; catatan off-chain (tips, review_stakes, royalties) ada di data server lokal uji, bukan VPS; server produksi perlu deploy agar royalti otomatis berjalan di settle.

@@ -1,0 +1,29 @@
+.wrap { display: grid; gap: 0; padding: 8px 18px; margin-top: 12px }
+.row { display: flex; gap: 12px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--line) }
+.ic { width: 34px; height: 34px; border-radius: 8px; background: var(--blue); color: var(--on-accent); display: grid; place-items: center; flex: none }
+.ic svg { width: 18px; height: 18px }
+.body { display: grid; gap: 4px; flex: 1; min-width: 0; font-size: 14px; font-weight: 500; color: var(--ink2) }
+.body > b { font-size: 15px; font-weight: 700; color: var(--ink) }
+.body a { color: var(--blue); font-weight: 600 }
+.form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px }
+.pick { display: flex; gap: 6px; flex-wrap: wrap }
+.pick button { height: 38px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--line2); background: var(--card); font: 600 13px inherit; color: var(--ink); cursor: pointer }
+.pick button small { font-weight: 500; color: var(--muted); margin-left: 4px }
+.pick button.on { border-color: var(--blue); outline: 2px solid var(--blue); outline-offset: -2px }
+.amt { display: flex; align-items: center; height: 38px; border: 1px solid var(--line2); border-radius: 6px; padding: 0 10px; gap: 6px; background: var(--card) }
+.amt input { width: 64px; border: 0; font: 600 14px inherit; background: transparent; color: var(--ink) }
+.amt:focus-within { outline: 2px solid var(--blue) }
+.amt span { font-weight: 600; font-size: 13px }
+.list { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 4px }
+.list li { display: flex; gap: 8px; flex-wrap: wrap; font-size: 13px }
+.foot { display: grid; gap: 6px; padding: 12px 0 6px; font-size: 13px; font-weight: 500; color: var(--ink2) }
+.manual { display: grid; gap: 4px }
+.manual input { height: 38px; border: 1px solid var(--line2); border-radius: 6px; padding: 0 10px; font: 500 13px inherit }
+.msg { font-weight: 600; color: var(--ink) }
+.badge { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--blue); color: var(--blue); font-size: 12px; font-weight: 700; text-decoration: none; width: fit-content }
+.badge svg { width: 13px; height: 13px }
+.fund { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; padding: 12px 0 0 }
+.cell { display: grid; gap: 4px; align-content: start; border: 1px solid var(--line); border-radius: 12px; padding: 14px; font-size: 13px; font-weight: 500; color: var(--ink2); background: var(--card) }
+.cell b { font-size: 14px; font-weight: 700; color: var(--ink) }
+.cell .num { font-size: 24px; font-weight: 800 }
+@media (prefers-reduced-motion: no-preference) { .badge { transition: background .15s } .badge:hover { background: var(--line) } }

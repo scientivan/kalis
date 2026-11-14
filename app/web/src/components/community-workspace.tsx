@@ -12,6 +12,7 @@ import { sealData, sealMethod, sha256Hex } from "../lib/backend/crypto";
 import { AppShell, icon } from "./shell";
 import { Dropdown, NearTech, PageInfo } from "./controls";
 import { NEAR_TECH } from "../lib/near-tech";
+import { FundSocialMoney } from "./social-money";
 
 type Obj = Record<string, any>;
 type Section = "Fund" | "Proposals" | "Bounties" | "Issues";
@@ -102,6 +103,7 @@ export function CommunityWorkspace({ section }: { section: Section }) {
         <Tile iconNode={<TileIcon name="spark" color="#FF5F04"/>} chip={<Chip tone="orange">For bounties</Chip>} title="Available for improvements" desc="What is left after bounties already promised to contributors." foot={<span className="mcard-price">{data?.available_near ? `${data.available_near} NEAR` : "Unavailable"}</span>}/>
         {(config?.council || []).map((a: string) => <Tile key={a} iconNode={<span className="avatar" aria-hidden="true">{a.slice(0, 1).toUpperCase()}</span>} chip={<Chip tone={auth.session?.account_id === a ? "pink" : "grey"}>{auth.session?.account_id === a ? "You" : "Council"}</Chip>} title={a} desc="Votes on funding proposals and reviews contributed fixes." />)}
       </TileGrid>
+      <div className="dpane"><FundSocialMoney /></div>
       <div className="dpane"><Proof label="Council voting policy and bonds" value={config}/>{config?.rules?.map((r: Obj) => <Note key={r.id}>{r.reason}</Note>)}</div></section> : <>
       <section className="card list-card"><div className="toolbar"><h2 className="list-title">{section}</h2>{section === "Issues" && <button className="primary-btn" disabled={!canWrite} onClick={() => { setCreating(!creating); setSelected(null); }}>Report a problem</button>}{section === "Proposals" && <button className="primary-btn" disabled={!canWrite || !auth.session} onClick={() => { setCreating(!creating); setSelected(null); }}>Create proposal</button>}</div>
         <TileGrid label={section}>

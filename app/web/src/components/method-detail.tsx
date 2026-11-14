@@ -2,6 +2,7 @@
 // Method detail at /marketplace/<id>[/<tab>]. Built from the approved Marketplace template
 // (FRONTEND_GUIDE.md section 9): head card, one main card with a segmented switch, one side card.
 import Link from "next/link";
+import { StakeBadge } from "./social-money";
 import { VersionEvidence } from "./version-evidence";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -121,7 +122,7 @@ export function MethodDetail({ id, tab }: { id: string; tab?: string }) {
               {summary && summary.count > 0 && <div className="dist">{[5, 4, 3, 2, 1].map(n => { const c = summary.distribution[String(n)] || 0; return <div className="drow" key={n}><span>{n}</span><span className="dbar"><i style={{ width: summary.count ? `${(c / summary.count) * 100}%` : "0%" }} /></span><span>{c}</span></div>; })}</div>}</div>
             {reviews && !reviews.length && <div className="note-row">{icon("info")}<span>Only buyers who ran this method can rate it. Ratings are separate from the seller’s own tests.</span></div>}
             <ul className="cl-reviews">{(reviews || []).map(r => <li key={r.id}><div className="cl-rh"><Stars n={r.rating} /><span>{new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}{r.version ? `, version ${r.version}` : ""}</span></div>
-              <p className={r.comment ? "" : "muted"}>{r.comment || "Rated without a comment."}</p></li>)}</ul>
+              <p className={r.comment ? "" : "muted"}>{r.comment || "Rated without a comment."}</p><StakeBadge methodId={id} reviewId={r.id} /></li>)}</ul>
           </section>}
         </div>
       </section>
