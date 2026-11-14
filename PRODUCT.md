@@ -36,7 +36,7 @@ The latest audit inspected 14 unauthenticated browser pages, nine GET endpoints 
 
 ## Tracks and next discussion
 
-Agreed tracks are Privacy & Private AI, Social Money and Open Innovation. Social Money already includes a funded Sputnik DAO bounty cycle and private candidate evaluation. Dien requested further Social Money innovation discussion after documentation reconciliation. No additional feature or governance policy has been approved by this audit.
+Agreed tracks are Privacy & Private AI, AI Security & Defense, Social Money and Open Innovation. Dien added AI Security & Defense on 15 November 2026 and reports Claude is implementing an AI method that can act through a user-connected wallet. Recorded guard/sandbox testnet demonstrations are now documented in BUILD_STATUS.md 6.21. They used a local backend and do not prove every production wallet flow. RANCANGAN_PRODUK.md section 82, Penjelasan utama produk, is the canonical product explanation and track/criteria mapping. Social Money already includes a funded Sputnik DAO bounty cycle and private candidate evaluation. Dien requested further Social Money innovation discussion after documentation reconciliation. No additional feature or governance policy has been approved by this audit.
 
 ## Brand and communication
 

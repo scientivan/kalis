@@ -1987,3 +1987,52 @@ Dicatat atas permintaan Dien sebagai pelengkap bagian 72, 73 dan 82. Bagian ini 
 ### Track
 - Dien memutuskan mengikuti empat track: Privacy & Private AI (utama), Social Money, AI Security & Defense, dan Open Innovation. Strategi dan analisis risiko ada di `TRACK_STRATEGY_2026-11-14.md`.
 
+
+
+## 89. Koreksi urutan marketplace, privasi dan contoh guard
+
+Dien mengoreksi susunan bagian 88. Section One marketplace / Expertise on both sides menggantikan Expert knowledge / Your private context langsung setelah hero. Diagram expert brings / Kalis / buyer brings dipertahankan dan ditambah ilustrasi metode dan data. Daftar metode diawali Wallet Allowance Guard, diikuti tender dan negosiasi gaji sebagai contoh lainnya, tanpa selector/input.
+
+Urutan berikutnya adalah Privacy has boundaries / Make them visible, lalu alur read-only Wallet Allowance Guard berdasarkan design/CODEX_PROMPT_WALLET_ALLOWANCE_LANDING.md. Strip teknologi/konektor dipindah setelah alur guard agar tidak menyela tiga section tersebut. Ini menggantikan urutan di bagian 88, bukan penggantian janji produk utama. Guard tetap satu contoh dari marketplace keahlian privat. Tidak ada transaksi atau deployment. Compliance gate tidak menemukan konflik.
+
+
+## 90. Teknologi di atas marketplace dan perjalanan pengguna lengkap
+
+Dien memindahkan Built with serta ikon konektor ke atas One marketplace dan menghapus seluruh section Privacy has boundaries / Make them visible. Sesudah marketplace, contoh guard harus menjelaskan perjalanan pengguna dari langkah awal sampai akhir, bukan hanya mekanisme internal guard.
+
+Alur read-only kini sembilan tahap, menemukan metode, sign-in dengan wallet dan membuka konektor, menetapkan batas, mendanai sandbox, menyiapkan tujuan/input serta meninjau izin/biaya dan membayar run, proposal AI, pemeriksaan guard/hasil, persetujuan tindakan serta pembayaran manual, kemudian hasil/receipt/history. Biaya run dipisahkan dari dana belanja agent. Guard tetap salah satu metode. Desktop memakai alur tiga kolom tersambung, mobile urutan vertikal, tanpa field/selector/simulasi input.
+
+Progres otomatis dimulai ketika intro terlihat, bukan menunggu proporsi seluruh alur panjang terlihat. Reduced motion langsung menampilkan akhir. Tidak ada transaksi/signing atau perubahan aplikasi/metode. Label testnet, synthetic proposals dan manual signature dipertahankan. Build lulus. Belum deployment atau persetujuan visual final. Compliance gate tidak menemukan konflik.
+
+
+## 91. Pilihan penjelasan guard atau portofolio
+
+Dien meminta section One method in action menyediakan pilihan penjelasan Wallet Allowance Guard atau Portfolio Rebalancing, masing-masing dari awal sampai akhir. Ini menggantikan pembatasan satu metode di section contoh sebelumnya. Pilihan hanya mengganti alur baca-saja, bukan field untuk memasukkan data privat atau menjalankan metode.
+
+Alur portofolio mencakup temukan metode, sign-in, masukan holdings/cash sintetis, batas alokasi/cash/sektor dan trade whole-unit, review versi/izin/biaya, seal/payment, pencarian plan feasible biaya transaksi minimum, buka jawaban/checks perangkat dan simpan history/settlement. Contoh output mengikuti manifest-v5 historis, sell3A/buy2C, cost0.18/cash8.82 berlabel sintetis. Tidak mengeksekusi trade atau menjanjikan return. Mode guard mempertahankan sembilan tahap yang sudah ada.
+
+Explore methods kini berurutan Wallet Allowance Guard, Portfolio Rebalancing dan Tender Bid Pricing. Salary negotiation diganti pada daftar ini saja, bukan dihapus dari produk/metode. Build/TypeScript lulus, browser desktop/mobile memverifikasi kedua mode, sembilan tahap, CTA sesuai metode dan tanpa data-entry field/overflow. Tidak ada transaksi atau deployment. Compliance gate tidak menemukan konflik.
+
+
+## 92. Penggabungan versi, dana, pengujian dan ekonomi
+
+Dien meminta section Know the version sampai A reason to publish disatukan dan diringkas. Empat section versi/terms, dana community, private-case testing serta ekonomi kini menjadi satu section A clear run / A better next version dengan deskripsi tiga kalimat. Diagram interaktif Review/Run/Improve/Version merangkum alurnya. Ringkasan pembagian fee contoh tetap terlihat, rincian refund/reclaim, consent dan batas bukti di disclosure. Anchor community #together dipertahankan. Tidak mengubah kebijakan produk, transaksi atau kemampuan backend. Revisi lokal, belum deployment atau persetujuan visual final. Compliance gate tidak menemukan konflik.
+
+
+## 93. FAQ berdasarkan pembahasan produk
+
+Dien meminta Before you try it memuat pertanyaan tambahan tentang perlindungan keamanan, perbedaan metode expert dan AI biasa, serta pertanyaan yang telah dibahas di rancangan. Arahan sebelumnya sejak pembahasan masalah portfolio/consumer/author hingga impact dibatalkan Dien dan tidak diterapkan.
+
+FAQ ditambah pertanyaan tentang tanggung jawab kualitas author/platform, akses penjual ke input, akses pembeli ke source, penyimpanan notes/documents di vault browser, batas wallet, refund/reclaim dan consent pengujian privat. Jawaban ringkas merujuk bagian 0/44/45/65/73/82 dan bukti guard. Kalis menjelaskan proteksi eksekusi/izin/privasi, bukan menjamin outcome atau keamanan mutlak. Batas sertifikat hardware, prompt output, browser-bound vault dan perbedaan refund teknis dengan mutu tetap jelas. Tidak menjanjikan setiap metode mengalahkan AI biasa. Tidak ada perubahan layout, fitur, transaksi atau deployment. Compliance gate tidak menemukan konflik.
+
+
+## 94. FAQ ringkas berkategori dan penghapusan footer demo
+
+Dien meminta daftar FAQ kanan dikemas lebih baik dan tidak memanjang ke bawah. Dua belas jawaban dipertahankan, dikelompokkan dalam Getting started, Methods, Privacy serta Wallet & consent. Pengunjung melihat dua sampai empat pertanyaan sesuai kategori dan hanya satu jawaban terbuka pada satu waktu. Kontrol memakai aria-pressed/expanded/controls dan region berlabel.
+
+Blok NEAR testnet demonstration dan tautan Set up a wallet allowance di footer alur metode dihapus. CTA utama menuju metode tetap tersedia. Ini penghapusan elemen presentasi, bukan perubahan status testnet atau langkah setup yang dibutuhkan produk. Label testnet dan batas lainnya tetap ada di FAQ serta fragmen alur. Build/TypeScript lulus. Tidak ada transaksi atau deployment. Compliance gate tidak menemukan konflik.
+
+
+## 95. Revisi footer dan deskripsi Kalis
+
+Dien meminta deskripsi Private methods / Shared progress berada di bawah logo Kalis dan menjelaskan produk lebih lengkap. Footer kini mempunyai kolom brand dengan logo, tagline dan dua kalimat yang menjelaskan marketplace expert/pembeli, kendali data dan pendanaan perbaikan bersama. Dua kelompok tautan Use Kalis serta Build together ditempatkan di samping pada desktop dan di bawah pada mobile. Label NEAR testnet prototype dihapus dari footer saja. Status jaringan dan batas testnet tetap sesuai kenyataan serta tersedia pada FAQ. Tidak ada perubahan produk atau deployment. Compliance gate tidak menemukan konflik.

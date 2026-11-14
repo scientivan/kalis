@@ -1,3 +1,4 @@
+import { LandingPage } from '../../components/landing-page';
 import { KalisApp } from '../../components/kalis-app';
 import { MarketplaceNext } from '../../components/marketplace-next';
 import { MethodDetail } from '../../components/method-detail';
@@ -6,6 +7,7 @@ import * as P from '../../components/app-pages';
 export const dynamic = 'force-dynamic';
 export default async function Page({ params }: { params: Promise<{ path?: string[] }> }) {
   const { path } = await params;
+  if (path?.length === 1 && path[0] === "landing") return <LandingPage />;
   if (path?.length === 2 && path[0] === 'marketplace' && (path[1] === 'mine' || path[1] === 'publish')) return <MarketplaceNext mine authorSection={path[1] === 'publish' ? "Drafts" : "Published"} />;
   if (path && path[0] === 'marketplace' && path[1] && path[1] !== 'mine' && path[1] !== 'publish' && path.length <= 3) return <MethodDetail id={decodeURIComponent(path[1])} tab={path[2]} />;
   const key = (path || []).join('/');

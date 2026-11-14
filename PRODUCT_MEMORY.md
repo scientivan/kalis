@@ -194,3 +194,60 @@ Utamakan keselarasan seluruh dokumen aktif dengan keputusan, implementasi, runti
 ## Prioritas privasi dan batas yang sudah disepakati
 
 14 November 2026. Dien menegaskan batas privasi sudah ada dalam rancangan dan meminta alasan/hambatan sebelum development. Jangan meminta pengguna menetapkan ulang batas tersebut. Bedakan pengecualian publik yang disepakati dari gap implementasi. Telusuri kemampuan platform dan kode, jangan mengasumsikan deadline/biaya sebagai alasan historis. Social Money ditunda sampai investigasi/perbaikan privasi dibahas. Lihat PRIVACY_TEE_INVESTIGATION.md.
+
+
+## Landing 15 November 2026
+Dien memilih implementasi langsung Next.js. Hero gambar lanskap dengan aset Three.js interaktif dan banyak animasi. Section lain putih, aksen biru aplikasi. Palet kuning NEAR dibatalkan. Tidak memakai canvas desain.
+
+Landing correction 15 November. Gunakan logo Meeting K existing. Jangan ilustrasikan langkah utama produk sebagai urutan atau carousel hero. Satu komposisi Three.js yang mewakili ide produk.
+
+
+Landing 15 November. Dien menilai section bawah hero mati dan layout buruk. Jadikan HelloNear referensi art direction menyeluruh untuk section tersebut, terapkan palet dan konteks Kalis. Tunda revisi aset hero 3D. Pertahankan section putih dengan biru aplikasi.
+
+Dien menolak adaptasi HelloNear yang hanya mengubah kartu dan heading. Wajib pelajari mekanisme spesifik, termasuk scene kanan-ke-kiri saat scroll, placement copy/ilustrasi, word reveal, strip konektor bergerak dan Built with teknologi NEAR. Adaptasi sebelumnya belum disetujui.
+
+
+Dien menolak kembali hasil adaptasi HelloNear dan mengganti referensi section landing ke https://www.extrafazant.nl/. Ikuti komposisi dan perilaku referensi baru secara nyata. Belum ada persetujuan visual final. Hero 3D tetap ditunda, putih-biru dan logo Kalis dipertahankan.
+
+
+Dien memilih Senyap sebagai pengganti Extrafazant untuk layout dan positioning Kalis. Warna dan aset tetap Kalis. Wajib fullscreen, jangan mewarisi max-width dan padding sidebar aplikasi. Tambahkan animasi/interaksi sesuai produk. Hero 3D existing cukup diposisikan ulang.
+
+
+Revisi hero. Font wajib mengikuti Kalis. Hapus kartu What a private run brings together. Navbar satu kapsul floating beradius besar, awal lebar kemudian mengecil dan sedikit turun saat scroll. Ikuti Impeccable untuk komposisi hero, pertahankan fullscreen.
+
+
+Dien menghentikan fokus UI/UX landing dan beralih membahas pesan yang perlu ditonjolkan. Evaluasi setiap usulan terhadap technical implementation, design, impact, originality, sustainability dan arah ketiga track yang dipilih. Jangan mengubah UI sebelum pembahasan konten menghasilkan arahan.
+
+
+## Penjelasan utama dan empat track
+Dien menambahkan AI Security & Defense sehingga target kini empat track bersama Privacy & Private AI, Social Money dan Open Innovation. Claude sedang mengerjakan metode yang memperbolehkan AI memakai wallet konektor pengguna untuk bertindak. Status laporan pengguna, belum audit fitur selesai. Untuk menjelaskan produk, rujuk RANCANGAN_PRODUK.md bagian 82 berjudul Penjelasan utama produk. Tekankan manfaat, privasi dua pihak, tindakan berizin, transaksi/versioning dan perbaikan bersama. Dokumentasi ini bukan izin signing/spending.
+
+
+Dien meminta penerapan penjelasan utama bagian 82 pada isi landing. Pertahankan layout/palet/font/navbar terbaru. Jelaskan manfaat, mekanisme dan bukti tanpa menjadikan kriteria penilaian sebagai jargon pengunjung. Bukti wallet Claude kini parsial testnet/backend lokal, jangan tetap menyebut sepenuhnya belum ada bukti atau mengklaim production lengkap.
+
+
+Deskripsi utama per section landing maksimal tiga kalimat, satu paragraf ringkas. Detail lain harus menjadi ilustrasi, kontrol, indikator atau penjelasan yang bisa dibuka. Dien meminta elemen hidup melalui animasi/interaksi. Status mock/testnet dan batas penting jangan disembunyikan.
+
+
+Dien meminta intro Expertise needs context beserta deskripsi centered, menghapus pointer hint/pause hero serta footer synthetic-data/pause strip konektor. Pertahankan label per konektor. Wallet section perlu entrance saat scroll, Privacy has boundaries memakai latar berbeda dari putih.
+
+
+Transisi Let AI help act harus scroll-linked, bukan keyframes berdurasi. Mulai sepenuhnya di luar kanan viewport, masuk ke kiri sesuai scroll, selesai ketika top section mencapai top viewport, dan dapat berbalik saat scroll naik.
+
+
+Landing harus menjelaskan marketplace keahlian privat langsung setelah hero, sebelum contoh wallet. Wallet Allowance Guard satu contoh metode saja. Alur demonstrasi hanya guard, read-only dan progres otomatis tersambung, tanpa selector/input simulasi. Metode lain tetap diperlihatkan sebagai ringkasan baca-saja di marketplace. Jangan memposisikan Kalis sebagai produk wallet saja.
+
+
+Koreksi urutan landing. Setelah hero langsung One marketplace / Expertise on both sides dengan diagram expert–Kalis–buyer. Daftar metode dimulai Wallet Allowance Guard. Sesudahnya Privacy has boundaries, lalu alur guard read-only lima tahap. Jangan tambahkan section Expert knowledge terpisah atau menyela urutan itu dengan strip teknologi.
+
+
+Urutan terbaru landing. Built with dan ikon konektor sebelum One marketplace. Hapus seluruh section Privacy has boundaries. Demo guard harus menjelaskan perjalanan pengguna sejak menemukan metode dan sign-in, setup, paid run, hasil/verdict, approval/payment hingga receipt/history, bukan hanya internal guard. Tetap read-only dan guard sebagai satu contoh marketplace.
+
+
+Landing One method in action kini boleh memilih penjelasan guard atau portofolio, keduanya journey penuh baca-saja tanpa memasukkan data. Explore methods diurutkan guard, portfolio, tender. Salary tidak ditampilkan pada daftar tersebut.
+
+
+Dien meminta section Know the version sampai A reason to publish digabung menjadi satu section ringkas, mencakup terms, community funding, consent private tests dan siklus versi.
+
+
+Dien meminta FAQ berkategori agar ringkas, bukan daftar panjang 12 pertanyaan. Hapus blok footer NEAR testnet demonstration dan link Set up a wallet allowance, tanpa mengubah status produk/testnet.
