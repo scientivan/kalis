@@ -298,7 +298,7 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
                     {!termsOk && <ul className="rp-todo">{!input.ok && <li>{input.message}</li>}{v?.method_kind?.kind === "prompt" && !promptConsent && <li>Accept the AI prompt notice.</li>}{!consent && <li>Tick that you checked your data and agree to pay {price} into escrow.</li>}</ul>}
                     <div className="se-actions">{!termsOk && <button className="view" onClick={() => { setDataPage(0); setView("Your data"); }}>Go to Your Data</button>}<button className="primary-btn" disabled={!!busy || !termsOk} onClick={prepareQuote}>{busy || "See the Cost"}</button></div></section>}
                 {payment === "wallet" && <div className="se-note">{icon("info")}<span>{auth.session ? `Your wallet ${auth.session.account_id} signs the payment after you review it. A submitted payment is never retried automatically.` : "Sign in with your NEAR testnet account to pay from your wallet."}</span></div>}
-                {d && <GroupRun methodId={d.method_id} />}
+                {d && <GroupRun methodId={d.method_id} runId={runId} answer={answer} />}
               </>}
               {current === "Run" && <section className="se-box"><header><b>{icon("play")}{busy ? "Running in the Locked Chip" : "Steps That Will Run"}</b><span>{busy ? "This can take up to four minutes. Keep this tab open." : "Keep this tab open. The key that opens your answer lives only here."}</span></header>
                 <ol className={`steps ${busy ? "live" : ""}`}>{(m.steps || []).map((s, i) => <li key={s.id} style={{ "--i": i } as React.CSSProperties}><span className="sn">{i + 1}</span><span>{s.what}</span></li>)}</ol></section>}

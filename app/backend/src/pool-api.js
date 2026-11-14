@@ -1,18 +1,18 @@
-// Social Money pools (BUILD_STATUS 6.x "Pools"). Two features, both NON-CUSTODIAL: Kalis never holds anyone's NEAR.
+// Social Money pools (docs-social-money.md "Pools").
 //
-// 1. Crowdfunded bounty (pledge-then-pay). People pledge an amount toward a method improvement. A pledge moves
-//    no money. When the DAO approves a BountyDone proposal for the linked bounty (read from the Sputnik DAO on
-//    chain), every pledger gets an unsigned transfer to the contributor the DAO paid, signs it in their own
-//    wallet, and the backend checks the transaction on chain. If the deadline passes first, or the pool is
-//    cancelled, the pledges are released. Nothing was moved, so nothing has to be refunded.
-//    Honest limit: a pledge is a promise, not a lock. A pledger can still decline to pay after completion;
-//    the pool shows who paid and who did not.
-// 2. Group purchase of a run. An organizer names the members and the price. Each member sends their share to
-//    the organizer as a plain NEAR transfer (checked on chain). The organizer then pays the run through the
-//    normal escrow (pay_for_run) and links the run here. The run executes once in the TEE. Its answer is sealed
-//    to the organizer's data key, so members do not get it automatically; the organizer shares it.
+// 1. Crowdfunded bounty, ESCROWED (v2). Pledges are NEAR locked in the pool contract (app/pool-contract,
+//    POOL_CONTRACT, default kalis-pools-1114.testnet). The chain is the only record: this API reads pools from
+//    the contract and returns UNSIGNED calls (create_pool, pledge, release, refund, mark_rejected) that the
+//    user's own wallet signs. The contract pays the whole pool to the receiver of a BountyDone proposal for the
+//    pool's bounty only after reading it as Approved from the DAO; after the deadline each pledger refunds
+//    their own pledge. Kalis holds no key that can move pool funds.
+// 2. Group purchase of a run. Members send their share to the organizer (checked on chain), the organizer pays
+//    one run through the market escrow. The answer is sealed to the organizer's tab. The organizer's device then
+//    re-seals it to each member's device key (X25519, app/web/src/lib/backend/group-seal.js) and uploads only
+//    ciphertext here; each member opens it on their own device. Re-sealing happens on the organizer's device,
+//    not in the TEE.
 import { config } from "./config.js";
-import { view, rpc } from "./near.js";
+import { view, rpc, clearReadCache } from "./near.js";
 import * as db from "./db.js";
 import { principal } from "./principal.js";
 import { ApiError } from "./market.js";
@@ -55,16 +55,18 @@ export async function verifyTransfer(txHash, signer, receiver) {
   return sum;
 }
 function usedTx(txHash) {
-  const all = [...Object.values(db.all("bounty_pools")).flatMap((p) => p.pledges.map((x) => x.paid_tx)), ...Object.values(db.all("group_runs")).flatMap((g) => g.members.map((m) => m.share_tx))];
+  const all = Object.values(db.all("group_runs")).flatMap((g) => g.members.map((m) => m.share_tx));
   if (all.includes(txHash)) throw new ApiError(409, "tx_already_used", "This transaction is already counted in a pool");
 }
 
-// ---------- crowdfunded bounty ----------
-async function daoId() { return (await view(config.market, "get_config")).dao; }
+// ---------- crowdfunded bounty (escrow contract) ----------
+const POOLS = process.env.POOL_CONTRACT || "kalis-pools-1114.testnet";
+const call = (receiver_id, method_name, args, deposit_yocto, gas_tgas, signer) => ({ receiver_id, method_name, args, deposit_yocto: String(deposit_yocto), gas_tgas, ...(signer ? { signer_must_be: signer } : {}) });
+const nsToIso = (ns) => new Date(Number(BigInt(ns) / 1_000_000n)).toISOString();
 
-/** BountyDone proposals for a DAO bounty submitted after `sinceIso`, read from chain. */
-async function doneProposals(dao, bountyId, sinceIso) {
-  const since = BigInt(Date.parse(sinceIso)) * 1_000_000n;
+/** BountyDone proposals for a DAO bounty submitted at or after `sinceNs`, read from chain. */
+async function doneProposals(dao, bountyId, sinceNs) {
+  const since = BigInt(sinceNs);
   const last = await view(dao, "get_last_proposal_id");
   const out = [];
   for (let i = 0; i < last; i += 50) {
@@ -74,40 +76,37 @@ async function doneProposals(dao, bountyId, sinceIso) {
   return out.map((p) => ({ proposal_id: p.id, receiver_id: p.kind.BountyDone.receiver_id, status: p.status }));
 }
 
-async function refreshPool(p) {
-  if (p.state !== "open") return p;
-  const dones = await doneProposals(p.dao, p.dao_bounty_id, p.created_at).catch(() => null);
-  const done = dones?.find((d) => d.status === "Approved");
-  if (done) return db.update("bounty_pools", p.id, (x) => ({ ...x, state: "completed", recipient: done.receiver_id, done_proposal_id: done.proposal_id, completed_at: db.nowIso() }));
-  const rejected = dones?.find((d) => ["Rejected", "Removed", "Expired"].includes(d.status));
-  if (rejected) return db.update("bounty_pools", p.id, (x) => ({ ...x, state: "released", released_reason: "work_rejected", done_proposal_id: rejected.proposal_id, released_at: db.nowIso() }));
-  if (Date.parse(p.deadline) < Date.now()) return db.update("bounty_pools", p.id, (x) => ({ ...x, state: "released", released_reason: "deadline_passed", released_at: db.nowIso() }));
-  const pending = dones?.find((d) => d.status === "InProgress");
-  return pending ? { ...p, pending_done: pending } : p;
-}
-
-function poolView(p, me) {
-  const live = p.pledges.filter((x) => !x.withdrawn);
-  const pledged = live.reduce((s, x) => s + BigInt(x.amount_yocto), 0n);
-  const paid = live.filter((x) => x.paid_tx).reduce((s, x) => s + BigInt(x.paid_yocto), 0n);
-  const mine = live.find((x) => x.account_id === me) || null;
-  const allowed = [];
-  if (p.state === "open" && me) allowed.push(mine ? "withdraw_pledge" : "pledge");
-  if (p.state === "open" && me === p.creator) allowed.push("cancel");
-  if (p.state === "completed" && mine && !mine.paid_tx) allowed.push("pay_pledge");
+async function poolView(p, dao, who) {
+  const dones = await doneProposals(dao, p.bounty_id, p.created_ns).catch(() => []);
+  const approved = dones.find((d) => d.status === "Approved");
+  const rejected = dones.find((d) => ["Rejected", "Removed", "Expired"].includes(d.status));
+  const pending = dones.find((d) => d.status === "InProgress");
+  const pastDeadline = Date.now() * 1e6 >= Number(p.deadline_ns);
+  const mine = who ? BigInt(await view(POOLS, "get_pledge", { pool_id: p.id, account_id: who })) : 0n;
+  const state = p.state === "Open" && pastDeadline ? "refunding" : p.state.toLowerCase();
+  const calls = {};
+  if (who && p.state === "Open" && !pastDeadline) calls.pledge = { method: "pledge", note: "attach the amount you lock" };
+  if (who && p.state === "Open" && approved && BigInt(p.total) > 0n) calls.release = call(POOLS, "release", { pool_id: p.id, proposal_id: approved.proposal_id }, 0, 100);
+  if (who && p.state === "Open" && !approved && rejected) calls.mark_rejected = call(POOLS, "mark_rejected", { pool_id: p.id, proposal_id: rejected.proposal_id }, 0, 100);
+  if (who && mine > 0n && (p.state === "Refunding" || (p.state === "Open" && pastDeadline))) calls.refund = call(POOLS, "refund", { pool_id: p.id }, 0, 30, who);
   return {
-    id: p.id, title: p.title, issue_id: p.issue_id, dao: p.dao, dao_bounty_id: p.dao_bounty_id, creator: p.creator, created_at: p.created_at,
-    deadline: p.deadline, state: p.state, recipient: p.recipient || null, done_proposal_id: p.done_proposal_id ?? null, pending_done: p.pending_done || null, released_reason: p.released_reason || null,
-    custody: "none: pledges move no NEAR until the DAO approves the work, then each pledger pays the contributor directly",
-    target_near: fmt(p.target_yocto), pledged_near: fmt(pledged), paid_near: fmt(paid),
-    pledges: live.map((x) => ({ account_id: x.account_id, amount_near: fmt(x.amount_yocto), created_at: x.created_at, paid_tx: x.paid_tx || null, paid_near: x.paid_yocto ? fmt(x.paid_yocto) : null, explorer: x.paid_tx ? explorer(x.paid_tx) : null })),
-    my_pledge: mine ? { amount_near: fmt(mine.amount_yocto), paid_tx: mine.paid_tx || null } : null,
-    pay_call: p.state === "completed" && mine && !mine.paid_tx ? { kind: "transfer", receiver_id: p.recipient, deposit_yocto: mine.amount_yocto, signer_must_be: me } : null,
-    allowed_actions: allowed,
+    id: p.id, title: p.title, dao, dao_bounty_id: p.bounty_id, creator: p.creator, contract: POOLS,
+    created_at: nsToIso(p.created_ns), deadline: nsToIso(p.deadline_ns), state, refund_reason: p.refund_reason || (state === "refunding" && p.state === "Open" ? "deadline_passed" : null),
+    released_to: p.released_to || null, release_proposal_id: p.proposal_id ?? null,
+    custody: `escrow: pledged NEAR is locked in ${POOLS}. It goes to the contributor only after the DAO approves their BountyDone; after the deadline each pledger takes their own pledge back.`,
+    locked_near: fmt(p.total), pledgers: p.pledgers, my_pledge_near: mine > 0n ? fmt(mine) : null,
+    proposals: dones, approved_proposal: approved || null, pending_proposal: pending || null,
+    contract_calls: calls, allowed_actions: Object.keys(calls),
   };
 }
 const me = (req) => { const p = principal(req); return p.kind === "near_account" ? p.account_id : null; };
-function getPool(id) { const p = db.get("bounty_pools", id); if (!p) throw new ApiError(404, "unknown_pool", "No such bounty pool"); return p; }
+async function chainPool(id) {
+  clearReadCache(); // pool state changes with every signed pledge or refund; read it fresh
+  const p = Number.isInteger(Number(id)) ? await view(POOLS, "get_pool", { pool_id: Number(id) }) : null;
+  if (!p) throw new ApiError(404, "unknown_pool", "No such bounty pool on the pool contract");
+  return p;
+}
+const poolDao = async () => view(POOLS, "get_dao");
 
 // ---------- group run ----------
 function groupView(g, who) {
@@ -118,13 +117,16 @@ function groupView(g, who) {
   const allowed = [];
   if (mine && !mine.share_tx && g.state === "collecting") allowed.push("pay_share");
   if (who === g.organizer && allPaid && !g.run_id) allowed.push("link_run");
+  if (mine) allowed.push("set_device_key");
+  if (who === g.organizer && g.run_id && g.members.some((m) => m.device_key && !g.sealed_results?.[m.account_id])) allowed.push("seal_results");
   return {
     id: g.id, title: g.title, method_id: g.method_id, organizer: g.organizer, created_at: g.created_at, state: g.state,
     custody: "the organizer: members send their share to the organizer's own account, the organizer pays the run through the market escrow",
     price_near: fmt(g.price_yocto), share_near: fmt(share), collected_near: fmt(collected), organizer_share_near: fmt(BigInt(g.price_yocto) - share * BigInt(g.members.length)),
-    members: g.members.map((m) => ({ account_id: m.account_id, share_tx: m.share_tx || null, explorer: m.share_tx ? explorer(m.share_tx) : null })),
+    members: g.members.map((m) => ({ account_id: m.account_id, share_tx: m.share_tx || null, explorer: m.share_tx ? explorer(m.share_tx) : null, device_key: m.device_key || null, result_sealed: !!g.sealed_results?.[m.account_id] })),
     run: g.run_id ? { run_id: g.run_id, pay_tx: g.run_pay_tx, explorer: explorer(g.run_pay_tx), phase: g.run_phase } : null,
-    result_sharing: "The run's answer is sealed to the organizer's data key. Members get it when the organizer shares it; Kalis does not re-seal it per member yet.",
+    result_sharing: "The run's answer is sealed to the organizer's tab. The organizer's device re-seals it to each member's device key and uploads only ciphertext; each member opens it on their own device. The re-sealing happens on the organizer's device, not inside the TEE.",
+    my_sealed_result: mine && g.sealed_results?.[mine.account_id] ? g.sealed_results[mine.account_id] : null,
     share_call: mine && !mine.share_tx ? { kind: "transfer", receiver_id: g.organizer, deposit_yocto: g.share_yocto, signer_must_be: who } : null,
     allowed_actions: allowed,
   };
@@ -133,65 +135,47 @@ function getGroup(id) { const g = db.get("group_runs", id); if (!g) throw new Ap
 
 export function registerPoolRoutes(route) {
   route("GET", /^\/api\/pools\/bounties$/, async (q, _m, _b, req) => {
-    const rows = await Promise.all(Object.values(db.all("bounty_pools")).map(refreshPool));
-    const issue = q.get("issue_id");
-    return { items: rows.filter((p) => !issue || p.issue_id === issue).sort((a, b) => b.created_at.localeCompare(a.created_at)).map((p) => poolView(p, me(req))) };
+    clearReadCache();
+    const dao = await poolDao();
+    const rows = await view(POOLS, "get_pools", { from_index: 0, limit: 100 });
+    const bid = q.get("dao_bounty_id");
+    const items = await Promise.all(rows.filter((p) => bid == null || String(p.bounty_id) === bid).map((p) => poolView(p, dao, me(req))));
+    return { contract: POOLS, dao, items: items.sort((a, b) => b.id - a.id) };
   });
-  route("GET", /^\/api\/pools\/bounties\/([^/]+)$/, async (_q, [id], _b, req) => poolView(await refreshPool(getPool(id)), me(req)));
+  route("GET", /^\/api\/pools\/bounties\/([^/]+)$/, async (_q, [id], _b, req) => poolView(await chainPool(id), await poolDao(), me(req)));
 
+  // Unsigned create_pool. The pool exists once the creator's wallet signs it.
   route("POST", /^\/api\/pools\/bounties$/, async (_q, _m, b, req) => {
     const creator = needAccount(req, "start a bounty pool");
-    const dao = await daoId();
+    const dao = await poolDao();
     const bid = Number(b?.dao_bounty_id);
     const bounty = Number.isInteger(bid) ? (await view(dao, "get_bounties", { from_index: 0, limit: 200 })).find((x) => x.id === bid) : null;
     if (!bounty) throw new ApiError(400, "unknown_bounty", `dao_bounty_id must be a bounty that exists in ${dao}`);
     const days = Number(b?.deadline_days ?? 7);
-    const deadline = b?.deadline ? new Date(b.deadline) : new Date(Date.now() + days * 86400000);
-    if (!(deadline.getTime() > Date.now()) || deadline.getTime() > Date.now() + 90 * 86400000) throw new ApiError(400, "bad_deadline", "The deadline must be in the next 90 days");
-    const id = db.newId("pool");
-    return poolView(db.put("bounty_pools", id, {
-      id, title: String(b?.title || bounty.description).slice(0, 200), issue_id: b?.issue_id || null, dao, dao_bounty_id: bid, creator,
-      target_yocto: String(toYocto(b?.target_near ?? "0.1")), deadline: deadline.toISOString(), state: "open", pledges: [], created_at: db.nowIso(),
-    }), creator);
+    if (!(days > 0 && days <= 90)) throw new ApiError(400, "bad_deadline", "The deadline must be in the next 90 days");
+    const deadline_ns = String(BigInt(Date.now() + Math.round(days * 86400000)) * 1_000_000n);
+    return { contract_call: call(POOLS, "create_pool", { bounty_id: bid, title: String(b?.title || bounty.description).slice(0, 200), deadline_ns }, 0, 30, creator) };
   });
 
+  // Unsigned pledge: the deposit is locked in the contract.
   route("POST", /^\/api\/pools\/bounties\/([^/]+)\/pledges$/, async (_q, [id], b, req) => {
     const acct = needAccount(req, "pledge to a bounty");
-    const p = await refreshPool(getPool(id));
-    if (p.state !== "open") throw new ApiError(409, "pool_closed", `This pool is ${p.state}; it takes no new pledges`);
+    const p = await chainPool(id);
+    if (p.state !== "Open" || Date.now() * 1e6 >= Number(p.deadline_ns)) throw new ApiError(409, "pool_closed", "This pool takes no new pledges");
     const amount = toYocto(b?.amount_near);
-    return poolView(db.update("bounty_pools", id, (x) => ({
-      ...x, pledges: [...x.pledges.filter((y) => y.account_id !== acct || y.paid_tx), { account_id: acct, amount_yocto: String(amount), created_at: db.nowIso() }],
-    })), acct);
+    if (amount < 10n ** 22n) throw new ApiError(400, "bad_amount", "A pledge is at least 0.01 NEAR");
+    return { contract_call: call(POOLS, "pledge", { pool_id: p.id }, amount, 30, acct) };
   });
 
-  route("DELETE", /^\/api\/pools\/bounties\/([^/]+)\/pledges\/me$/, async (_q, [id], _b, req) => {
-    const acct = needAccount(req, "withdraw a pledge");
-    const p = await refreshPool(getPool(id));
-    if (p.state !== "open") throw new ApiError(409, "pool_closed", "A pledge can be withdrawn only while the pool is open");
-    return poolView(db.update("bounty_pools", id, (x) => ({ ...x, pledges: x.pledges.map((y) => y.account_id === acct ? { ...y, withdrawn: true } : y) })), acct);
-  });
-
-  route("POST", /^\/api\/pools\/bounties\/([^/]+)\/cancel$/, async (_q, [id], _b, req) => {
-    const acct = needAccount(req, "cancel a pool");
-    const p = await refreshPool(getPool(id));
-    if (p.creator !== acct) throw new ApiError(403, "not_creator", "Only the account that started the pool can cancel it");
-    if (p.state !== "open") throw new ApiError(409, "pool_closed", `This pool is already ${p.state}`);
-    return poolView(db.update("bounty_pools", id, (x) => ({ ...x, state: "released", released_reason: "cancelled", released_at: db.nowIso() })), acct);
-  });
-
-  route("POST", /^\/api\/pools\/bounties\/([^/]+)\/pledges\/me\/paid$/, async (_q, [id], b, req) => {
-    const acct = needAccount(req, "record a pledge payment");
-    const p = await refreshPool(getPool(id));
-    if (p.state !== "completed") throw new ApiError(409, "not_completed", "The DAO has not approved the work yet, so pledges are not due");
-    const pledge = p.pledges.find((x) => x.account_id === acct && !x.withdrawn);
-    if (!pledge) throw new ApiError(404, "no_pledge", "You have no pledge in this pool");
-    if (pledge.paid_tx) throw new ApiError(409, "already_paid", "This pledge is already paid");
-    usedTx(b?.tx_hash);
-    const moved = await verifyTransfer(b?.tx_hash, acct, p.recipient);
-    if (moved < BigInt(pledge.amount_yocto)) throw new ApiError(400, "tx_too_small", `The transfer moved ${fmt(moved)} NEAR, the pledge is ${fmt(pledge.amount_yocto)} NEAR`);
-    return poolView(db.update("bounty_pools", id, (x) => ({ ...x, pledges: x.pledges.map((y) => y.account_id === acct && !y.withdrawn ? { ...y, paid_tx: b.tx_hash, paid_yocto: String(moved), paid_at: db.nowIso() } : y) })), acct);
-  });
+  for (const action of ["release", "refund", "mark_rejected"]) {
+    route("POST", new RegExp(`^/api/pools/bounties/([^/]+)/${action.replace("_", "-")}$`), async (_q, [id], _b, req) => {
+      const acct = needAccount(req, action.replace("_", " "));
+      const v = await poolView(await chainPool(id), await poolDao(), acct);
+      const c = v.contract_calls[action];
+      if (!c) throw new ApiError(409, `cannot_${action}`, action === "release" ? "The DAO has not approved a BountyDone for this bounty since the pool started" : action === "refund" ? "Refunds open after the deadline or a rejected BountyDone, and only for your own pledge" : "No rejected BountyDone for this bounty");
+      return { contract_call: c, pool: v };
+    });
+  }
 
   // ---------- group run ----------
   route("GET", /^\/api\/pools\/group-runs$/, async (q, _m, _b, req) => {
@@ -246,5 +230,36 @@ export function registerPoolRoutes(route) {
     if (!run.pay_tx) throw new ApiError(409, "run_not_paid", "The run has no escrow payment yet");
     if (Date.parse(run.created_at) < Date.parse(g.created_at)) throw new ApiError(400, "run_too_old", "The run was paid before this group purchase started");
     return groupView(db.update("group_runs", id, (x) => ({ ...x, run_id: run.id, run_pay_tx: run.pay_tx, run_phase: run.phase, state: "run_linked", linked_at: db.nowIso() })), acct);
+  });
+
+  // A member registers the X25519 public key of their device. Only the public key reaches Kalis.
+  route("POST", /^\/api\/pools\/group-runs\/([^/]+)\/device-key$/, async (_q, [id], b, req) => {
+    const acct = needAccount(req, "register your device key");
+    const g = getGroup(id);
+    if (!g.members.some((m) => m.account_id === acct)) throw new ApiError(403, "not_member", "You are not a member of this group purchase");
+    const key = String(b?.x25519_pub || "");
+    if (!/^[0-9a-f]{64}$/.test(key)) throw new ApiError(400, "bad_key", "x25519_pub must be 32 bytes in hex");
+    return groupView(db.update("group_runs", id, (x) => ({ ...x, members: x.members.map((m) => m.account_id === acct ? { ...m, device_key: key, device_key_at: db.nowIso() } : m), sealed_results: Object.fromEntries(Object.entries(x.sealed_results || {}).filter(([a]) => a !== acct)) })), acct);
+  });
+
+  // The organizer uploads the answer re-sealed to each member's device key. Ciphertext only; Kalis cannot open it.
+  route("POST", /^\/api\/pools\/group-runs\/([^/]+)\/sealed-results$/, async (_q, [id], b, req) => {
+    const acct = needAccount(req, "share the sealed answer");
+    const g = getGroup(id);
+    if (acct !== g.organizer) throw new ApiError(403, "not_organizer", "Only the organizer shares the answer");
+    if (!g.run_id) throw new ApiError(409, "no_run", "Link the paid run first");
+    const b64 = (v, max) => typeof v === "string" && v.length <= max && /^[A-Za-z0-9+/]+=*$/.test(v);
+    const items = Array.isArray(b?.items) ? b.items : [];
+    if (!items.length) throw new ApiError(400, "bad_items", "items must list { account_id, sealed }");
+    const add = {};
+    for (const it of items) {
+      const m = g.members.find((x) => x.account_id === it?.account_id);
+      if (!m) throw new ApiError(400, "not_member", `${it?.account_id} is not a member`);
+      if (!m.device_key) throw new ApiError(409, "no_device_key", `${m.account_id} has not registered a device key`);
+      const sd = it.sealed || {};
+      if (sd.to !== m.device_key || !b64(sd.epk, 64) || !b64(sd.nonce, 32) || !b64(sd.ct, 400000) || sd.v !== "kalis/v1/group-answer") throw new ApiError(400, "bad_sealed", `The sealed answer for ${m.account_id} is malformed or not sealed to their current device key`);
+      add[m.account_id] = { v: sd.v, to: sd.to, epk: sd.epk, nonce: sd.nonce, ct: sd.ct, run_id: g.run_id, sealed_by: acct, sealed_at: db.nowIso() };
+    }
+    return groupView(db.update("group_runs", id, (x) => ({ ...x, sealed_results: { ...(x.sealed_results || {}), ...add } })), acct);
   });
 }

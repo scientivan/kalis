@@ -1,0 +1,47 @@
+.wrap { display: grid; gap: 12px; padding: 16px 18px; margin-top: 12px }
+.head { display: flex; gap: 12px; align-items: flex-start }
+.ic { width: 34px; height: 34px; border-radius: 8px; background: var(--blue); color: var(--on-accent); display: grid; place-items: center; flex: none }
+.ic svg { width: 18px; height: 18px }
+.body { display: grid; gap: 4px; flex: 1; min-width: 0; font-size: 14px; font-weight: 500; color: var(--ink2) }
+.body > b { font-size: 16px; font-weight: 700; color: var(--ink) }
+.body a { color: var(--blue); font-weight: 600 }
+.pool { border: 1px solid var(--line); border-radius: 18px; padding: 8px; background: var(--card); display: grid; gap: 10px }
+.panel { border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 12px; background: var(--bg, #f7f8fa) }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
+.stat { display: grid; gap: 2px; font-size: 13px; font-weight: 600; color: var(--ink2) }
+.stat b { font-size: 22px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; list-style: none; margin: 0; padding: 0 }
+.steps li { display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line2); background: var(--card); font-size: 13px; font-weight: 600; color: var(--ink2); min-width: 0 }
+.steps li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.steps li svg { width: 14px; height: 14px; flex: none }
+.steps li.done { border-color: var(--blue); color: var(--blue) }
+.steps li.now { border-color: var(--blue); background: var(--blue); color: var(--on-accent) }
+.rows { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line) }
+.rows li { display: flex; justify-content: space-between; gap: 8px; padding: 8px 2px; border-bottom: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--ink2); min-width: 0 }
+.rows li > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.rows li b { color: var(--ink) }
+.say { padding: 4px 8px 6px; display: grid; gap: 4px; font-size: 14px; font-weight: 500; color: var(--ink2) }
+.say b { font-size: 16px; font-weight: 700; color: var(--ink) }
+.form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 0 8px 8px }
+.amt { display: flex; align-items: center; height: 38px; border: 1px solid var(--line2); border-radius: 8px; padding: 0 10px; gap: 6px; background: var(--card) }
+.amt input { width: 64px; border: 0; font: 600 14px inherit; background: transparent; color: var(--ink) }
+.amt:focus-within { outline: 2px solid var(--blue) }
+.amt span { font-weight: 600; font-size: 13px }
+.field { display: grid; gap: 4px; flex: 1; min-width: 200px; font-size: 13px; font-weight: 600; color: var(--ink2) }
+.field input { height: 38px; border: 1px solid var(--line2); border-radius: 8px; padding: 0 10px; font: 500 13px inherit }
+.note { display: flex; gap: 10px; align-items: flex-start; border: 1px dashed var(--line2); border-radius: 12px; padding: 12px; font-size: 13px; font-weight: 500; color: var(--ink2); background: var(--card) }
+.note svg { width: 16px; height: 16px; flex: none; color: var(--blue); margin-top: 1px }
+.note b { color: var(--ink) }
+.answer { margin: 0; padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); font: 500 12px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink); max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word }
+.msg { font-size: 13px; font-weight: 600; color: var(--ink); padding: 0 8px 4px }
+@media (max-width: 560px) {
+  .stats { gap: 6px }
+  .stat { font-size: 12px }
+  .stat b { font-size: 17px }
+  .steps { grid-template-columns: 1fr }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .steps li { transition: background .2s, border-color .2s, color .2s }
+  .steps li.now svg { animation: tick .9s ease-out 1 }
+  @keyframes tick { from { transform: scale(.6); opacity: 0 } to { transform: none; opacity: 1 } }
+}

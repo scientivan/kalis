@@ -29,6 +29,27 @@ Why the stake is a donation. It is the simplest honest mechanism with existing p
 
 Test: `node app/backend/scripts/social-money-test.mjs <base url> <released run id>`.
 
+## Pools v2: escrowed bounty pool and group answers for every member (agent C2, 14 Nov 22:00 to 23:30 UTC)
+
+Code: `app/pool-contract` (Rust, near-sdk 5.27, README there), `app/backend/src/pool-api.js`, `app/web/src/components/pool-money.tsx` (+ `pool-money.module.css`), `app/web/src/lib/backend/group-seal.js`, test `app/backend/scripts/pool-test.mjs` (parts `escrow`, `group`). v1 pledge-then-pay endpoints are replaced.
+
+**Crowdfunded bounty, escrowed.** Who holds funds: the pool contract `kalis-pools-1114.testnet` (DAO fixed at init: `kalis-fund.sputnik-v2.testnet`). No owner key can move them. Payout: anyone calls `release`; the contract reads the proposal from the DAO and pays the whole pool to the `BountyDone` receiver only if it is Approved, for the pool's bounty, and submitted after the pool. Refund: each pledger calls `refund` after the deadline, or after `mark_rejected` proves a rejected BountyDone. The API returns unsigned calls signed in the user's wallet.
+
+Endpoints: `GET /api/pools/bounties[?dao_bounty_id]`, `GET /:id`, `POST /api/pools/bounties` (unsigned create_pool), `POST /:id/pledges {amount_near}`, `POST /:id/release`, `POST /:id/refund`, `POST /:id/mark-rejected`.
+
+Testnet evidence (kalis-backer-1114 and kalis-dev-1114 are faucet test accounts):
+
+- Deploy + init: `C24smEmdHuHmErZhgmyKRn82hvGhYQA4ckE3QRbHDZgj`.
+- Pool 0 (refund path): create `BumV4wF2f1jFgHM3V7E5X9Uku6yfZ8idS6YzR6am4B5z`, pledges `DbBdVdxbwjnW4zVPgvPP6nArTh7AaZ4CKLxhkK6feXoA`, `HTERs7XCnzPyHMUEe8Frg3MDx1BRi5c4i3Sbyx8sYCQZ`, refund before deadline rejected `B6paneeG1QNbAHcMA16dZqtyiryxPZChTwUVb5FtXjvU`, refund after deadline `GPXueumr8j2VdMNedpfswirSj225aMcYxQ87siuo6GfZ`.
+- Pool 1 (release path): create `B5oDarX4bjCcYHZGo7RYQJ3TZJbBNqSC2652sTuFD58z`, pledges `EFSP2jnrfQLDRbeJoTnQcsE8dtMLacbkSTgTWY9UyLFz`, `8qRZfZBf76dF4cyFpj6sQpQtzSUfk3Roxm8AAKqpiCzy` (1 NEAR locked). Bounty 2 claim `C9eMek14ym64Wnq2zRTesv1PcGQQzdU3xZZvyBVm1U1e`, BountyDone proposal 5 `7E9fe6dQCMhZDW6pWBkkEijxC3qV1bgGoKJyUK5LvapN`, release before approval refused on chain (`release refused: proposal status is InProgress`) `96cKTSKyrHHf6TwDyZVAEFZv7AJS6m4tgLkzKRheTfjS`. **Not finished:** the council vote. The only council member is `scientivan.testnet`, whose key is not on this machine.
+- Pool 2 (through the API, `pool-test.mjs escrow`, 12/12 pass): create `96VgZUUqo2tWA8oyMvnKZi68xa2BgiDgioVRmo1YU8JB`, pledges `FVnCK1CDDzMAVMYmgwDYGhN9n7SpaibGtA16zvkfktn5`, `nJ4bASu1JGfr74ZXL4w2xrUCYaLDuMPdC84ecvRSTSz`, refused release `GDnBrpeb4jox7Bs2gKcNvWSW7atdHidukfMt5mnnE3G5`, refund `CY9noo6G5huJFQE3w8CtxH7Yr1pmZGse3bcpKRAaEySn`.
+
+To finish the release (Dien): vote on DAO proposal 5 as `scientivan.testnet` (Approve), then anyone calls `release {"pool_id":1,"proposal_id":5}` on `kalis-pools-1114.testnet` (the Bounties page shows the button once approved).
+
+**Group run, answer for every member.** Members register an X25519 device public key (`POST /api/pools/group-runs/:id/device-key`); the secret stays in that browser's localStorage. The organizer's tab, which opened the answer, seals it to each member key (`group-seal.js`: X25519 + HKDF-SHA256 + ChaCha20-Poly1305, AAD binds group, run and member) and uploads ciphertext only (`POST /:id/sealed-results`). Each member gets `my_sealed_result` from `GET /:id` and opens it on their device. Honest label: the re-sealing happens on the organizer's device, not in the TEE, so members trust the organizer to seal the true answer. The ideal (TEE seals to every member key) needs a kalis-runner change, not done here.
+
+Test (`pool-test.mjs group`, 19/19 pass, real TEE run): shares `6f6HSNzebiUyxt92y7xWENX1KCnX9f5HJijynziKGNxJ`, `HNQqJXNGEh1B53ERVZEhrEJGHmsRd91CfBmSa6BQ3YYu`, pay_for_run `2J37m277uzEWsanVwks8aQBPEuVZ5aqenpfWDaqFRA4y`, settle `3MSM9uDfqJuhEFcgoZv3sKHbHFgvrUF98XrB2bHwdP51`. Two members opened the same answer with their own keys; a member key cannot open another member's copy; the backend file holds no plaintext.
+
 ## Contract-paid royalty, refundable stake (agent E2, 14 Nov 2026 22:00 to 22:15 UTC)
 
 **Contributor royalty is now paid by the market contract.** `publish_version` takes an optional `contributor_bps` (one entry per contributor, basis points of the seller share, total at most 5000). `settle` pays each contributor from the seller share, in the same transaction, and adds `contributors` and `to_contributors` to the `run_released` event. A contributor equal to the method owner is skipped. The rates live under their own storage prefix (`cbps`), so the `Market` and `Version` layouts did not change and no migration was needed. New view `get_contributor_bps(method_id, number)`.
