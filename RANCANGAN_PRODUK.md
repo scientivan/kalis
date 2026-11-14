@@ -8,9 +8,11 @@ Dokumen ini merupakan acuan utama agent development. Pasangannya, `RANCANGAN_PRO
 
 ## 0. Status terkini (baca dulu)
 
+**Acuan penjelasan utama.** Untuk menjelaskan produk, manfaat, pesan landing, lima kriteria kerja dan empat track terkini, baca [bagian 82 — Penjelasan utama produk](#82-penjelasan-utama-produk). Bagian itu menggantikan daftar tiga track pada pembahasan lama.
+
 Sinkronisasi 15 November 2026, versi 1.34. Bagian ini serta bagian 70 dan 73 menggantikan status implementasi lama. Keputusan Dien menetapkan apa yang seharusnya dilakukan produk. Kode/runtime menetapkan apa yang sekarang terjadi. Perbedaan di antaranya tetap gap, bukan keputusan produk baru. CURRENT_STATE.md merinci bukti dan DOCUMENTATION_INDEX.md mengelompokkan dokumen aktif, referensi dan sejarah.
 
-**Produk dan track.** Kalis adalah marketplace metode privat, berupa WASM atau prompt. Target disepakati tetap Privacy & Private AI, Social Money dan Open Innovation. Produk berfokus pada cara eksekusi, proteksi serta transaksi, bukan menjamin metode lebih unggul, profitable atau berkualitas universal.
+**Produk dan track.** Kalis adalah marketplace metode privat, berupa WASM atau prompt. Target terbaru yang ditetapkan Dien adalah Privacy & Private AI, AI Security & Defense, Social Money dan Open Innovation (bagian 82). Produk berfokus pada cara eksekusi, proteksi serta transaksi, bukan menjamin metode lebih unggul, profitable atau berkualitas universal.
 
 **Aplikasi aktif.** Next.js di app/web dan backend Node di app/backend sudah terintegrasi. design/app adalah prototipe/referensi historis. Marketplace memakai template yang disetujui dan FRONTEND_GUIDE.md terbaru, bukan lagi shell Corbel lima menu. Consumer memakai Marketplace, Jobs, Data, Community dan Activity. Author memakai Methods, Community dan Activity. Account ada di wallet menu. Label author Create teramati di kode, sementara panduan sebelumnya memakai Drafts. Ini dicatat sebagai perbedaan istilah tanpa menyimpulkan persetujuan baru.
 
@@ -1076,6 +1078,8 @@ Pemilihan jaminan yang menjadi janji utama di frontend masih terbuka.
 
 ## 47. Keputusan track dan satu alur demo lintas track
 
+> Pembaruan 15 November 2026. Daftar tiga track serta pengecualian AI Security di bawah adalah riwayat. Dien menambahkan AI Security & Defense sebagai track keempat. Acuan terkini ada di bagian 82.
+
 **Disepakati.** Pengguna memutuskan mengikuti minimal tiga track, yaitu Privacy & Private AI, Social Money dan Open Innovation. Satu proyek boleh masuk beberapa track dalam satu submission (`NEAR.md`). Pilihan ini menggantikan rekomendasi agent untuk hanya mengikuti Privacy.
 
 Teks resmi track yang menjadi acuan adalah sebagai berikut. Privacy meminta komputasi rahasia dan AI yang melindungi data sensitif. Contoh prompt resminya memakai NEAR AI Cloud, verifikasi attestation dengan nonce baru, tanpa retensi di server, dan dokumen contoh fiktif. Social Money meminta anggaran bersama, reward terprogram, kepemilikan kolektif dan akses berbasis reputasi di atas Sputnik DAO dan Trezu, tanpa membangun ulang multisig. Open Innovation meminta cara baru agar uang, kecerdasan dan kepemilikan bekerja bersama.
@@ -1741,3 +1745,245 @@ Bagian ini mencatat perubahan sesi 15 November 2026. Fakta ditandai dengan bukti
 **Social Money.** Eksplorasi tetap ditunda. Tidak ada fitur baru dipilih.
 
 **Belum diverifikasi.** Aksi khusus TEE belum diuji ulang end-to-end di build `cd95487f…`. Uji browser terhadap production untuk aksi TEE belum dilakukan. Logo di ukuran kecil belum diperbaiki. Landing belum dirancang. Metode Upcoming tampil publik tanpa bukti permintaan. Compliance gate NEAR tidak menemukan konflik pada pencatatan ini. Tidak ada push, deploy, signing atau spending dalam pencatatan dokumen ini.
+
+
+## 74. Landing Next.js, 15 November 2026
+
+Dien meminta implementasi langsung di Next.js, tanpa canvas desain. Hero tetap memakai gambar lanskap dengan ilustrasi Three.js yang diperbarui dan interaksi pointer, animasi aset serta kontrol pause dan reduced motion. Section lain putih dengan aksen biru aplikasi. Palet kuning NEAR dibatalkan.
+
+Draf lokal tersedia pada /landing di app/web, dengan gambar lanskap existing dan Three.js r160 vendored berlisensi MIT. Isi mencakup hook terpilih, tiga metode contoh, proses privat, dana perbaikan dan batas testnet. Belum deployment atau persetujuan visual final. Root aplikasi tetap marketplace. Compliance gate tidak menemukan konflik pada implementasi lokal.
+
+
+## 75. Koreksi ilustrasi landing, 15 November 2026
+Dien menolak ilustrasi alur langkah pada hero. Hero harus memakai satu komposisi Three.js yang mewakili ide produk, tanpa carousel langkah. Logo wajib memakai logo Kalis Meeting K yang sudah dibuat. Revisi lokal memakai dua volume berbeda di satu ruang transparan dengan orbit bersama, bukan urutan use case. Ini draf visual yang masih perlu review pengguna.
+
+
+## 76. Revisi section landing dengan referensi HelloNear
+
+Dien meminta fokus pada section selain hero yang dinilai mati dan layout buruk, mempelajari https://hellonear.xyz/ dan menerapkan art direction ke produk serta palet Kalis. Hero 3D ditunda. Analisis detail ada di design/LANDING_HELLONEAR_REVIEW.md.
+
+Implementasi lokal memakai heading lapang, deck metode interaktif, preview input/hasil, ilustrasi persetujuan, diagram privasi dua pihak dengan tab, pembagian biaya metode serta versi kontribusi, FAQ dan ajakan akhir. Latar tetap putih, aksen biru #0038ff, logo Meeting K existing. Animasi aset dapat dijeda dan menghormati reduced motion. Contoh interaktif berlabel ilustrasi tanpa transaksi. Ini draf implementasi, belum persetujuan visual final atau deployment. Compliance gate diperiksa, tidak ada konflik dan klaim dibatasi kemampuan aktual Q-017.
+
+
+## 77. Koreksi penerapan HelloNear dan motion landing
+
+Dien menilai penerapan bagian 76 belum mengikuti detail referensi. Ia meminta gerakan kanan-ke-kiri, placement, kemasan teks/ilustrasi, strip Google Sheets/Google Docs dan konektor lain, serta Built with NEAR. Bagian 76 tidak boleh dibaca sebagai persetujuan visual.
+
+Revisi lokal menambah Built with NEAR, NEAR AI, OutLayer, WebAssembly dengan peran aktual. Strip konektor memakai katalog app dan logo existing, Sheets/Docs berlabel demo, lainnya coming soon. Heading muncul per kata. Section izin pada desktop menahan viewport saat scroll, membuka adegan dari kanan ke kiri, lalu menggeser ke ilustrasi buyer checks. Mobile/reduced motion memakai urutan vertikal. Komposisi ilustrasi memakai panel Kalis, cost sheet dan dokumen, bukan karakter HelloNear. Hero 3D tetap ditunda. Animasi dapat dijeda, berhenti saat offscreen atau tab tersembunyi. Build dan TypeScript lulus. Belum persetujuan visual final atau deployment. Compliance gate tidak menemukan konflik, Q-017 tetap membatasi klaim konektor.
+
+
+## 78. Pergantian referensi landing ke Extrafazant
+
+Dien kembali menolak hasil landing dan memberikan referensi baru https://www.extrafazant.nl/. Referensi ini menggantikan HelloNear untuk section bawah hero. Implementasi sebelumnya tidak disetujui. Hero 3D tetap ditunda, warna halaman putih dan biru Kalis serta logo Meeting K dipertahankan.
+
+Analisis browser menemukan kontras display condensed tebal dan serif, kolase foto miring, bingkai tebal, stack karya yang berganti ketika scroll, kartu layanan portrait, susunan tim berselang-seling dan ajakan besar di akhir. Adaptasi Kalis memakai kolase still-life orisinal hasil imagegen, input metode pada poster stack, kartu permission/note/outbound dan poster community berselang-seling. Display memakai Barlow Condensed serta Instrument Serif berlisensi OFL khusus landing, body/app tetap Inter. Detail ada di design/LANDING_EXTRAFAZANT_REVIEW.md.
+
+Stack desktop mengikuti scroll, mobile/reduced motion vertikal. Marquee konektor dan teknologi tetap ada dengan status mock/coming soon. Interaksi hanya ilustrasi dan tidak mengirim data, menyimpan akun atau membayar. Build/TypeScript lulus. Belum review visual final atau deployment. Compliance gate tidak menemukan konflik, klaim mengikuti Q-017.
+
+
+## 79. Senyap menggantikan referensi dan landing fullscreen
+
+Dien memilih https://senyap.scientivan.dev/ sebagai pengganti Extrafazant. Arahan khusus untuk layout dan positioning, warna tetap Kalis serta aset ilustrasi tetap milik produk. Tambahkan animasi dan interaksi yang relevan. Dien menegaskan landing harus benar-benar fullscreen. Referensi sebelumnya belum disetujui.
+
+Penyebab batas halaman ditemukan pada globals.css yang memberi semua main max-width 1680px serta padding sidebar. Root landing kini mereset batas itu secara scoped. Lebar section/background memenuhi viewport, hero 100dvh dengan header overlay. Layar mobile sangat pendek memakai tinggi adaptif agar kontrol tidak terpotong. H1/CTA kiri bawah, scene existing kanan atas, preview ringkas kanan bawah. Hero 3D tidak diganti, hanya penempatan/ukurannya.
+
+Section putih mengikuti komposisi Senyap, dengan intro dua kolom, daftar privasi sticky kiri dan panel interaktif kanan, tampilan buyer/expert/platform, marketplace buyer/author, dana community, FAQ dan CTA. Semua kembali Inter, palet putih-biru serta logo Meeting K. UseCaseArt aplikasi dan gambar Kalis existing dipakai ulang. Simulasi seal diberi label bukan enkripsi. Contoh checks deterministik fiktif, tidak menjalankan metode berbayar. Rincian di design/LANDING_SENYAP_REVIEW.md. Build/TypeScript lulus. Belum review visual final atau deployment. Compliance gate tidak menemukan konflik.
+
+
+## 80. Revisi tipografi produk, hero dan navbar floating
+
+Dien menegaskan font landing harus mengikuti produk Kalis, bukan tampilan Senyap. Inter produk dipertahankan dengan headline hero 600 dan heading section 500, menggantikan bobot ringan 300 dari adaptasi sebelumnya. Layout hero dirapikan mengikuti panduan Impeccable, hook terpilih tetap sama. Kartu What a private run brings together dihapus beserta elemennya, tidak dipindah ke tempat lain. Ilustrasi hero existing tetap satu scene.
+
+Navbar menjadi satu kapsul floating beradius besar, lebar pada keadaan awal lalu mengecil dan sedikit turun ketika scroll melewati 64px. Logo, navigasi dan CTA berada dalam kapsul yang sama. Mobile menyediakan tombol buka/tutup navigasi. Reduced motion meniadakan transisi. Fullscreen root dan hero tetap dipertahankan. Revisi lokal, belum persetujuan visual final atau deployment. Compliance gate tidak menemukan konflik.
+
+
+## 81. Pembahasan prioritas pesan landing dan dukungan penilaian (usulan)
+
+Dien menghentikan fokus perubahan UI/UX untuk membahas isi landing. Poin yang ditonjolkan harus mendukung kelima kriteria kerja yang disepakati, technical implementation, design, impact, originality dan sustainability, serta arah Privacy & Private AI, Social Money dan Open Innovation. Tidak ada implementasi UI baru dalam pembahasan ini. Lima kriteria tetap asumsi kerja yang memakai panduan edisi sebelumnya, bukan rubrik resmi berbobot yang baru diumumkan. Teks track diperiksa ulang pada HACKATHON.md, 15 November 2026. Tidak ditemukan perubahan pada arah tiga track terkait.
+
+Usulan prioritas pesan, belum disetujui. Pertama, akses ke keahlian privat dengan perlindungan dua pihak, pembeli tidak perlu memberikan plaintext ke penjual dan penjual tidak membagikan source privat kepada pembeli. Kedua, manfaat konkret melalui metode portofolio, tender dan negosiasi gaji, dengan input sensitif dan hasil yang terlihat, tanpa janji profit atau keunggulan AI universal. Ketiga, kontrol pengguna atas integrasi/kredensial, outbound, memori, dokumen dan browser, didukung checks di perangkat yang bukan jaminan kualitas. Keempat, transaksi terikat versi dan biaya yang diperlihatkan, escrow/tahap/refund teknis serta reclaim, terpisah dari sengketa mutu. Kelima, pendanaan bersama menjadi perbaikan nyata melalui issue, bounty, proposal/vote, kandidat, review dan payout DAO, bukan sekadar potongan fee. Keenam, kontribusi dan pengujian kasus privat dengan consent terpisah, batas output dan atribusi versi, sebagai inti eksperimen Open Innovation, bukan klaim kebaruan global. Ketujuh, ekonomi per run, insentif penjual/kontributor dan bukti implementasi NEAR yang bisa diperiksa.
+
+Pemetaan kerja. Technical implementation dibantu bukti run/version/check/settlement/DAO yang tersedia. Design dibantu penjelasan input, izin, biaya dan hasil yang mudah dipahami. Impact dibantu masalah nyata dan konsekuensi kebocoran, tetapi WTP/adopsi belum terbukti. Originality menekankan siklus perdagangan privat dan perbaikan bersama, dengan batas benchmark dan tanpa klaim first/only. Sustainability menjelaskan aliran biaya dan insentif, bukan angka revenue atau pengguna yang dibuat-buat. Privacy menekankan komputasi dan batas akses aktual. Social Money menekankan dana, keputusan dan reward bersama. Open Innovation menekankan hubungan keahlian, uang dan versi/atribusi.
+
+Landing sebaiknya menawarkan bukti aktual, contoh hasil, detail transaksi/versi yang sudah tersedia dan tautan dokumentasi. Jangan memakai angka seed sebagai pelanggan, menampilkan demo DAO satu council sebagai desentralisasi matang, mengklaim konektor live, menganggap unsigned payout sudah dibayar atau menyebut seluruh privasi terverifikasi. Batas testnet, mock, hardware certificate chain dan prompt leak tetap jelas. Ini rekomendasi konten untuk dibahas, bukan persetujuan struktur section. Compliance gate tidak menemukan konflik pada pembahasan dan pencatatan.
+
+
+## 82. Penjelasan utama produk
+
+**Tujuan bagian ini.** Acuan yang mudah ditemukan ketika Dien meminta Claude, Codex atau agent lain menjelaskan produk Kalis. Disimpan atas permintaan Dien, 15 November 2026, berdasarkan pembahasan pesan utama produk dan tambahan track AI Security & Defense. Bagian ini menetapkan kerangka penjelasan dan prioritas narasi. Ini bukan persetujuan otomatis atas setiap kalimat copy, urutan section landing atau klaim bahwa semua kemampuan selesai. Fokus perubahan UI/UX sedang dihentikan untuk pembahasan isi.
+
+### Penjelasan ringkas yang dipakai agent
+
+**Kalis adalah marketplace keahlian privat. Pengguna dapat menjalankan metode milik expert pada data sensitifnya tanpa harus menyerahkan data itu kepada penjual, sementara expert menjual akses ke metodenya tanpa membagikan source privat. Eksekusi dan tindakan metode dibatasi oleh izin pengguna. Sebagian biaya pemakaian mendanai perbaikan bersama, sehingga kontribusi yang ditinjau dan diuji dapat berkembang menjadi versi metode berikutnya.**
+
+Dengan tambahan yang sedang dikerjakan, AI di dalam metode juga dapat memakai kemampuan wallet yang dihubungkan pengguna melalui konektor untuk menjalankan suatu tindakan. Nilai yang perlu ditonjolkan adalah **AI dapat membantu bertindak dalam kewenangan yang diberikan pengguna, bukan memperoleh kebebasan atas wallet**. Kemampuan wallet ini adalah pekerjaan Claude yang sedang berlangsung menurut laporan Dien. Nama metode, jenis tindakan, jaringan, batas izin dan bukti pengujian belum dipastikan oleh pencatatan ini. Jangan mengatakannya sudah berjalan atau aman teruji sebelum bukti tersedia.
+
+Hook yang sudah dipilih tetap “Where expertise is traded, run privately, and improved together.” Kerangka tersebut diperluas dengan penekanan tindakan AI yang terkendali, bukan diganti menjadi produk wallet atau trading semata.
+
+### Hal utama yang perlu dijelaskan dan ditonjolkan
+
+1. **Keahlian yang dapat dipakai tanpa harus dibuka.** Metode berisi pendekatan, strategi atau prosedur yang dapat dijalankan ulang. Pembeli membayar pemakaian versi metode, sedangkan expert mempertahankan source privat. Wadahnya boleh WASM atau prompt privat. Nilai keahlian berasal dari pembuat dan konteksnya, bukan klaim semua metode pasti lebih baik daripada AI biasa.
+
+2. **Privasi untuk kedua pihak.** Data sensitif pembeli tidak otomatis diberikan ke penjual, dan metode privat penjual tidak otomatis dibagikan ke pembeli. Terangkan siapa dapat melihat apa, bagaimana input dan hasil diproses, serta batas operator, perangkat dan layanan pendukung. Privasi dua pihak adalah tujuan dan mekanisme inti, bukan janji kerahasiaan mutlak atau ketahanan terhadap seluruh ekstraksi melalui output.
+
+3. **Pekerjaan nyata dengan input dan hasil yang konkret.** Gunakan metode portofolio, tender dan negosiasi gaji untuk memperlihatkan masalah, informasi yang sensitif serta hasil yang diterima. Portofolio tetap demo utama dan tender demo kedua. Contoh metode wallet dari Claude dapat ditambahkan setelah ruang lingkup dan buktinya jelas. Jangan mengklaim profit, kemenangan tender, kenaikan gaji atau manfaat bisnis yang belum diuji.
+
+4. **Pengguna tetap memegang kendali atas data dan tindakan AI.** Jelaskan lima perlindungan melalui manfaatnya, yaitu kredensial/konektor, aliran data ke luar, memori, dokumen dan browser agent. Buyer checks memeriksa kondisi yang dinyatakan di perangkat. Untuk metode yang dapat memakai wallet, jelaskan kemampuan yang diizinkan, tindakan yang diajukan, kapan diperlukan persetujuan, serta penolakan di jalur eksekusi sebelum penandatanganan untuk tindakan yang melampaui izin. Rincian kebijakan wallet masih mengikuti pekerjaan dan keputusan lanjutan, bukan diasumsikan sudah ditegakkan.
+
+5. **Transaksi jelas dan terikat versi.** Pengguna mengetahui versi, biaya, input dan akses yang disetujui sebelum menjalankan metode. Registry/escrow NEAR mendukung keterikatan versi dan pembayaran. Bedakan refund kegagalan teknis serta timeout reclaim dari sengketa mutu hasil yang belum final. Pemeriksaan lokal tidak otomatis memindahkan dana escrow. Jangan menganggap pengguna membeli jaminan keberhasilan bisnis.
+
+6. **Pemakaian membiayai perbaikan bersama.** Sebagian fee metode masuk ke dana komunitas. Bagian DAO ditetapkan per versi dengan minimal 10 persen, platform 10 persen dan penjual mendapat sisanya. Pembagian 80/10/10 adalah contoh versi teramati, bukan pembagian wajib selamanya. Tunjukkan bagaimana dana dapat menjadi issue, proposal, bounty, kontribusi, pengujian, review dan pembayaran melalui Sputnik DAO. Potongan fee saja belum menjelaskan Social Money. Permintaan payout atau unsigned call bukan bukti dana sudah dibayar.
+
+7. **Metode berkembang tanpa otomatis membuka kasus privat.** Kontributor dapat memperbaiki metode melalui akses/modul yang diizinkan. Kasus uji privat membutuhkan consent terpisah, dengan batas kandidat, tujuan, output, percobaan dan masa berlaku yang sesuai mekanisme. Kontribusi yang diterima dapat menjadi versi baru dengan hubungan versi dan atribusi. Ini pembeda siklus perbaikan bersama, bukan klaim semua kontributor memperoleh royalti atau semua bentuk kepemilikan kolektif sudah tersedia.
+
+8. **Ekonomi dan bukti implementasi yang dapat diperiksa.** Jelaskan alasan pengguna membayar akses keahlian, insentif expert menyediakan metode dan insentif kontributor memperbaikinya. Perlihatkan contoh hasil, versi, checks, bukti eksekusi dan transaksi yang memang tersedia. Jelaskan peran konkret NEAR, NEAR AI Cloud, OutLayer dan Sputnik DAO. Pendapatan, permintaan, kemauan membayar dan keunggulan dibanding alternatif belum terbukti hanya dari keberadaan prototipe.
+
+### Empat track yang diikuti
+
+Daftar terbaru ini menggantikan daftar tiga track dalam bagian 47, 81 dan catatan lama. Penambahan AI Security & Defense adalah keputusan Dien pada sesi ini.
+
+| Track | Penekanan produk | Bukti yang mendukung penjelasan |
+|---|---|---|
+| Privacy & Private AI | Keahlian privat bertemu data sensitif dalam komputasi terlindungi, dengan kontrol akses dan batas privasi yang jelas | Run tersegel, versi runner/metode, hasil dan checks, bukti privasi aktual beserta batas attestation dan operator |
+| AI Security & Defense | AI memakai kemampuan wallet sesuai kewenangan pengguna. Kredensial, izin dan jalur tindakan harus membatasi apa yang dapat dilakukannya | Setelah fitur tersedia, tunjukkan tindakan yang diizinkan dan upaya berbahaya/di luar izin yang diblokir sebelum signing. Simulasi prompt injection relevan sebagai usulan bukti, bukan tes yang sudah dilakukan |
+| Social Money | Dana bersama mengubah pendapatan pemakaian menjadi keputusan dan imbalan perbaikan metode | Pembagian fee, proposal/vote, bounty, review dan pembayaran DAO yang dapat ditelusuri. Council demo satu akun bukan tata kelola terdistribusi matang |
+| Open Innovation | Perdagangan keahlian privat, tindakan terkendali, uang bersama dan versi/atribusi membentuk satu siklus | Satu contoh lengkap dari metode dipakai hingga kontribusi yang didanai menjadi versi berikutnya. Daftar gabungan fitur saja bukan bukti originality |
+
+Teks resmi AI Security & Defense menekankan spending limits, policy engines, sandboxed wallets, reputation dan scam detection, dengan prinsip memberi AI kemampuan menggunakan uang tanpa memberi kendali atas semuanya. Memakai wallet saja belum cukup menunjukkan kecocokan track. Prinsip proteksi dan penegakannya harus terlihat. Tidak semua contoh resmi tersebut otomatis menjadi requirement atau fitur yang sudah diputuskan untuk Kalis. Sumber resmi https://nearhackathon.com/HACKATHON.md, tabel Tracks dan Q-011.
+
+### Dukungan terhadap lima kriteria kerja
+
+Kelima dimensi ini adalah acuan kerja yang disepakati Dien berdasarkan panduan edisi sebelumnya, bukan rubrik resmi baru dengan bobot terpublikasi.
+
+| Dimensi | Apa yang perlu ditunjukkan |
+|---|---|
+| Technical implementation | Integrasi dan alur nyata, versi/eksekusi privat, checks, settlement, kontrol wallet dan mekanisme DAO, dengan bukti sesuai kemampuan yang selesai |
+| Design | Pengguna memahami apa yang dibeli, data/akses yang dipakai, biaya, tindakan yang diusulkan serta hasil dan batasnya |
+| Impact | Pekerjaan yang terbantu dan konsekuensi kebocoran atau tindakan wallet yang salah. Relevansi masalah dibedakan dari adopsi dan WTP yang belum terbukti |
+| Originality | Siklus perdagangan keahlian privat, tindakan terkendali serta perbaikan bersama. Jangan memakai klaim first/only tanpa riset yang memadai |
+| Sustainability | Aliran biaya, imbalan penjual/kontributor, pendanaan perbaikan dan kemungkinan pemakaian berulang. Jangan membuat angka pelanggan atau pendapatan |
+
+### Penjabaran hubungan delapan pesan dengan lima kriteria
+
+Pemetaan ini menjelaskan alasan tiap pesan relevan untuk penilaian, bukan skor, bobot resmi atau bukti otomatis bahwa produk sudah unggul. Satu pesan dapat mendukung beberapa kriteria. Landing perlu menghubungkan klaim dengan mekanisme, contoh dan bukti yang dapat diperiksa.
+
+**Technical implementation.** Terutama poin 2, 4, 5, 6, 7 dan 8. Privasi dua pihak menjelaskan kebutuhan sealed input/metode dan runtime terlindungi. Kendali pengguna menjelaskan izin, checks dan enforcement tindakan wallet. Versi/escrow menghubungkan metode yang dipilih dengan eksekusi dan pembayaran. Dana/perbaikan/kasus privat menambah mekanisme DAO, evaluator dan versi kontribusi. Bukti yang relevan ialah run/receipt, versi/hash, transaksi testnet, checks yang pass/fail dan tindakan di luar izin yang ditolak. Banyak logo teknologi atau animasi UI bukan bukti implementasi. Metode wallet belum dihitung sebagai selesai pada pencatatan ini.
+
+**Design.** Terutama poin 3, 4 dan 5. Design didukung kejelasan pekerjaan, input sensitif, hasil, akses, biaya dan tindakan yang diminta, serta cara pengguna mempertahankan kendali. Contoh tender harus memudahkan pengguna memahami apa yang diberikan, apa yang diterima dan apa yang disetujui. Buyer checks perlu membedakan pass, fail dan tidak dapat dicek. Presentasi state pada landing membantu menunjukkan intent desain, tetapi ilustrasi interaktif bukan pengganti usability atau workflow aplikasi yang berfungsi. Penampilan menarik saja belum membuktikan design yang baik.
+
+**Impact.** Terutama poin 1, 2, 3 dan 4. Akses ke keahlian, kerahasiaan biaya/portofolio/batas negosiasi serta kendali wallet mengaitkan produk dengan pekerjaan dan konsekuensi nyata. Contoh tender memperlihatkan mengapa biaya internal perlu privat sambil mendapat bantuan pricing. Kemampuan yang berjalan dan contoh output mendukung relevansi, tetapi penghematan waktu, penurunan kerugian, keberhasilan bisnis, adopsi serta willingness to pay tetap memerlukan bukti pengguna atau pengukuran. Contoh sintetis tidak sama dengan dampak dunia nyata.
+
+**Originality.** Terutama hubungan poin 1, 2, 6 dan 7. Kandidat pembeda adalah siklus penjual menjual pemakaian keahlian privat, pembeli menjalankannya tanpa menyerahkan konteks kepada penjual, sebagian fee mendanai kontribusi, kasus privat berizin membantu evaluasi, lalu perubahan diterima menjadi versi berikutnya dengan atribusi. TEE, marketplace, DAO, wallet dan bounty secara terpisah memiliki preseden. Keberadaan semuanya dalam satu proyek belum membuktikan kebaruan. Kontrol wallet adalah penguat siklus dan Security track, bukan klaim inovasi global tersendiri. Pembandingan alternatif dan bukti siklus yang lengkap tetap diperlukan.
+
+**Sustainability.** Terutama poin 1, 5, 6, 7 dan 8. Penjual mendapat imbalan pemakaian, platform menerima bagian fee dan perbaikan dapat dibiayai dana komunitas. Metode yang dapat dipakai ulang dan diperbarui memberi alasan konseptual untuk penggunaan berulang. Versi/biaya yang jelas membantu transaksi yang dapat dipercaya. Hal yang belum dibuktikan ialah pengguna bersedia membayar, fee menutup biaya operasi/compute/review, kecukupan dana bounty, pasokan metode/kontributor dan retensi. Pembagian uang yang tersedia di kontrak adalah mekanisme, bukan bukti bisnis sudah berkelanjutan.
+
+Cakupan pesan sudah menyentuh kelima dimensi. Kekuatan buktinya tidak otomatis sama. Technical implementation memiliki artefak implementasi yang dapat ditunjukkan sesuai versi dan batas audit. Design perlu terlihat pada alur yang dapat dipahami. Impact dan sustainability masih memerlukan validasi pengguna/ekonomi, sementara originality memerlukan pembandingan dan bukti mekanisme pembeda. Tidak ada kenaikan skor atau fitur baru yang diputuskan oleh analisis ini.
+
+### Status wallet dan batas kewenangan agent
+
+**Pembaruan bukti untuk landing.** BUILD_STATUS.md 6.21 dan app/methods/wallet-allowance-guard/evidence/testnet-runs.json kini mencatat demo testnet parsial lewat backend lokal, termasuk run ALLOW/BLOCK dan transfer sandbox terbatas. Ini memperbarui laporan pekerjaan berjalan di bawah, tetapi belum membuktikan seluruh integrasi wallet production. Rincian penerapan narasi ada di bagian 83.
+
+Menurut Dien, Claude sedang menambahkan satu metode yang mengizinkan AI menggunakan wallet yang ditambahkan ke konektor pengguna untuk melakukan suatu tindakan. Pencatatan ini tidak mengaudit pekerjaan Claude, tidak menetapkan bahwa semua konektor wallet sekarang live, dan tidak mengubah mock menjadi integrasi nyata. Detail batas nominal, tujuan/kontrak, operasi, masa berlaku, kebutuhan persetujuan serta uji penolakan harus mengikuti implementasi yang telah diperiksa dan keputusan pemilik.
+
+Permintaan mendokumentasikan dan menjelaskan fitur ini bukan izin bagi agent untuk menandatangani, membelanjakan dana, melakukan transaksi mainnet atau mengubah wallet pengguna. Batas konfirmasi eksplisit pada NEAR.md tetap berlaku.
+
+### Pembaruan bukti dari pekerjaan Claude, 15 November 2026
+
+Subbagian ini menambah, bukan menggantikan, isi di atas. Rincian lengkap dan semua hash ada di bagian 89. Semuanya di NEAR testnet.
+
+**Wallet untuk AI kini punya bukti.** Metode `wallet-allowance-guard` ("Let your AI agent pay from a wallet allowance, never your main wallet") live di market. AI hanya membayar dari sub-account sandbox yang diisi persis sebesar batas, misalnya `allowance.auth-test.scientivan.testnet` berisi 0,15 NEAR. Guard di OutLayer TEE memberi ALLOW, WARN atau BLOCK per tindakan, AI privat NEAR AI Cloud hanya boleh memperketat, dan kebijakan deterministik menjadi keputusan akhir. Serangan prompt injection yang mencoba menguras saldo di-BLOCK (call `0f944760-0305-4c2f-8a31-46893a8cbf88`, settle Released). Satu pembayaran 0,02 NEAR yang di-ALLOW dan disetujui pemilik berhasil (tx `9EnSucxUDD4r2cMqaptt6i39nAu3jDMTAbva2FKMjCTg`), transfer di atas saldo ditolak jaringan (`NotEnoughBalance`), dan function-call key terbukti tidak dapat memindahkan NEAR (`RequiresFullAccess`), jadi batas belanja memakai saldo sandbox. Konektor "Wallet allowance" di halaman Connectors membuat sandbox lewat tanda tangan dompet dan membaca saldonya dari chain. Pembuatan sandbox lewat dompet browser belum diuji dengan login sungguhan.
+
+**AI Security & Defense punya empat guard tambahan.** `perp-risk-limit-fit` (order agen di dalam kebijakan belanja dan risiko), `token-scam-screen` (honeypot dengan instruksi "SYSTEM owner approved" di-BLOCK), `large-swap-split` (rencana eksekusi dalam venue dan anggaran sesi) dan `strategy-robustness-audit`. Semuanya dibeli akun lain, dijalankan di TEE, di-settle dan diberi rating. Rating diberikan skrip otomatis bila semua cek lolos, bukan penilaian manusia.
+
+**Social Money kini lima mekanisme nyata.** Royalti kontributor dibayar oleh kontrak market saat settle (upgrade `market.scientivan.testnet`, contoh run membagi 0,0064 NEAR ke kontributor). Tip pembeli ke seller atau kontributor. Rating ber-stake yang dapat direfund lewat proposal Transfer DAO setelah masa tahan, atau tetap donasi bila ditandai council. Bounty patungan dengan escrow di kontrak baru `kalis-pools-1114.testnet` yang hanya membayar setelah proposal BountyDone Approved di DAO dan merefund setelah deadline (1 NEAR dibayar setelah Dien menyetujui proposal 5, tx `DSLnvsxtwFcuJrxjK1itCp58oUVaCXaGWSErL3XoujJ2`). Beli run bersama, dengan jawaban disegel ulang ke kunci perangkat tiap anggota oleh perangkat organizer.
+
+**Pembaruan tabel track.** Bukti AI Security di tabel atas kini tersedia sebagian (lihat dua paragraf di atas). Bukti Social Money kini mencakup royalti dari kontrak, escrow pool dan refund stake, selain alur DAO yang sudah ada. Council masih satu akun.
+
+### Aturan menggunakan penjelasan ini
+
+Mulai dengan manfaat pengguna dan satu cerita yang utuh, lalu jelaskan mekanisme serta buktinya. Jangan menjadikan badge empat track sebagai pengganti bukti. Pisahkan keputusan produk, fitur yang sedang dikerjakan, ilustrasi dan hasil yang sudah diverifikasi. Tetap sebutkan batas testnet, top-up/mock connector, pemeriksaan sertifikat hardware, prompt leak dan sengketa mutu sesuai status aktual. Jangan menjanjikan keunggulan metode, keuntungan investasi, keamanan mutlak atau penilaian/jaminan menang.
+
+Compliance gate NEAR diperiksa. Tidak ada konflik pada penambahan target track dan dokumentasi ini. Kecocokan AI Security & Defense perlu ditopang enforcement dan bukti setelah pekerjaan Claude tersedia. Tidak ada perubahan UI, signing, spending, push atau submission pada pencatatan ini.
+
+
+## 83. Penerapan penjelasan utama pada landing
+
+Dien meminta landing berisi penjelasan utama bagian 82 berdasarkan pembahasan lima dimensi. Ini izin penerapan konten, bukan perubahan kebijakan wallet atau persetujuan visual final. Route lokal tetap /landing, layout fullscreen/palet/font/navbar yang disepakati dipertahankan.
+
+Narasi yang diterapkan mencakup perdagangan keahlian privat, perlindungan dua pihak dan contoh metode, kendali data/tindakan AI, versi/manifest/biaya/escrow, dana perbaikan bersama, izin terpisah untuk pengujian kasus privat, versi/atribusi kontribusi serta ekonomi penggunaan berulang. Pemetaan kriteria dan empat track menjadi dasar pemilihan isi, bukan judul promosi skor penilaian di UI.
+
+Section baru menambahkan wallet action review dengan contoh within-permission/drain attempt berlabel ilustrasi tanpa transaksi, penjelasan terms sebelum run, preview consent kasus privat dan tautan ke marketplace/proposal/bounty serta bukti testnet. Salinan artefak publik wallet ada di app/web/public/landing/evidence/wallet-allowance-guard.json. Data salinan berupa metadata testnet, hash dan public key, tidak memuat private key.
+
+Bukti baru dari Claude dibaca pada BUILD_STATUS.md 6.21 dan artefak testnet-runs.json. Metode wallet-allowance-guard memiliki run sampel ALLOW dan run serangan v2 BLOCK, serta satu transfer sandbox terotorisasi 0.02 NEAR. Sandbox signer menolak aksi di luar daftar yang dapat disetujui atau tanpa approval hash, dan pembatasan account/key juga diuji di testnet. Pencatatan ini mengandalkan artefak Claude, tidak melakukan transaksi atau verifikasi RPC baru. Backend pengujian lokal, DB production belum memuat run/review. Landing menyebut batas tersebut dan tidak mengklaim semua attack/wallet aman.
+
+Dana DAO tetap minimal 10 persen per versi, 80/10/10 contoh. Request payout bukan pembayaran selesai. WTP/retensi, keunggulan bisnis dan originality tidak dinyatakan terbukti. Simulasi check/permission bukan bukti cryptographic enforcement. Build/TypeScript lulus. UI dapat direview Dien, belum deployment. Compliance gate tidak menemukan konflik.
+
+
+## 84. Copy ringkas dan elemen landing interaktif
+
+Dien menilai deskripsi section terlalu panjang, termasuk dua paragraf. Keputusan baru membatasi deskripsi utama tiap section maksimal tiga kalimat. Penjelasan lain dikemas menjadi elemen ilustrasi, kontrol, indikator atau detail yang dapat dibuka. Tambahkan animasi dan interaksi agar elemen/section terasa hidup. Ini perubahan penyajian, bukan pengurangan janji utama bagian 82 atau perubahan kebijakan produk.
+
+Implementasi lokal merangkum setiap blok deskripsi utama menjadi satu paragraf pendek. Rincian teknis/refund/evidence limits dipindah ke disclosure. Diagram versi/terms dan siklus issue/bounty/review/version memiliki node serta tombol lanjut yang menampilkan satu penjelasan per pilihan. Slider fee ilustratif memperbarui pembagian 80/10/10. Permission map kasus privat berubah sesuai toggle consent. Metadata penting tetap terlihat sebagai label status, tanpa menyembunyikan status mock/testnet.
+
+Motion mengikuti aksi, berupa perpindahan indikator diagram, perubahan status hasil, preview sealing, angka fee dan check marks. Panel muncul saat masuk viewport, hero memiliki entrance ringan. Pause/reduced motion dan penghentian offscreen/tab tersembunyi tetap berlaku. Tidak ada transaksi, enkripsi riil atau grant riil dari ilustrasi. Build/TypeScript lulus. Belum deployment atau persetujuan visual final. Compliance gate tidak menemukan konflik.
+
+
+## 85. Alignment intro, kontrol dihapus dan background privacy
+
+Dien meminta heading Expertise needs context / Context deserves privacy beserta deskripsinya berada di tengah. Teks Move your pointer to explore the illustration dan kontrol Pause motion dihapus. Footer strip konektor berisi kalimat Sheets/Docs synthetic data serta Pause section animations juga dihapus. Status Demo connector/Coming soon pada masing-masing logo tetap ditampilkan agar kemampuan tidak disalahartikan.
+
+Section Let AI help act mendapat transisi masuk khusus saat masuk viewport, copy dari kiri dan panel dari kanan dengan reveal, mobile dari bawah. Section Privacy has boundaries memakai latar biru muda #eef1ff, berbeda dari putih. Reduced motion tetap mematikan animasi meskipun tombol pause di atas dihapus atas permintaan Dien. Layout/fullscreen/navbar dan isi utama dipertahankan. Build/TypeScript lulus. Revisi lokal, belum deployment atau persetujuan visual final. Compliance gate tidak menemukan konflik.
+
+
+## 86. Transisi wallet mengikuti posisi scroll
+
+Dien mengoreksi bagian 85. Transisi Let AI help act harus mulai sepenuhnya di luar ujung kanan viewport, masuk ke kiri seiring scroll dan selesai pada posisi asli ketika section mencapai bagian atas viewport. Ini bukan animasi waktu yang berjalan setelah trigger.
+
+Implementasi mengganti keyframes wallet dengan translasi berbasis jarak section terhadap viewport. Saat top section berada di batas bawah layar offset satu lebar viewport, saat top mencapai 0 offset menjadi 0. Berhenti scroll mempertahankan posisi, scroll balik mengembalikan proses. Berlaku desktop/mobile, isi tetap terpotong pada batas section agar tidak menghasilkan overflow horizontal. Reduced motion menampilkan posisi akhir tanpa translasi. Build/TypeScript lulus. Tidak ada perubahan isi/kebijakan produk atau deployment. Compliance gate tidak menemukan konflik.
+
+
+## 87. Penghapusan empat caption dan intro marketplace center
+
+Dien meminta empat caption tertentu dihapus, yaitu Interactive illustrations only — no data sent or payment made, Demo methods on testnet / Outcomes depend on the author, method and context, Permission illustration only — no grant created or case tested, serta App availability / unsigned payout / demo rating bukan bukti payment/adoption/quality. Caption tersebut dihapus dari landing, tanpa mengubah status implementasi atau batas bukti di dokumen. Heading One marketplace / Expertise on both sides beserta deskripsinya dipusatkan. Compliance gate tidak menemukan konflik pada revisi presentasi ini.
+
+
+## 88. Produk lebih dahulu, guard sebagai contoh read-only
+
+Dien menegaskan section setelah hero harus menjelaskan produk utama, yaitu marketplace tempat expert menjual akses metode privat dan pembeli memakai keahlian itu untuk data sensitifnya. Wallet Allowance Guard adalah salah satu metode, bukan keseluruhan produk. Metode lain tetap diperlihatkan agar pengunjung tidak mengira Kalis hanya untuk wallet.
+
+Alur demonstrasi memakai Wallet Allowance Guard saja dan bersifat read-only, tanpa pilihan metode, input nilai atau tombol simulasi. Lima fragmen UI yang tersambung menjelaskan allowance, sandbox wallet, proposal AI, pemeriksaan guard dan persetujuan/pembayaran. Progres menyorot tahap secara otomatis sekali ketika alur masuk viewport, tidak melakukan transaksi. Desktop horizontal dan mobile vertikal. Penjelasan ringkas dengan tautan bukti testnet dan batas synthetic/manual signing. Ini menggantikan alur input interaktif contoh portofolio/tender/gaji pada section demonstrasi.
+
+Urutan lokal kini hero, penjelasan marketplace privat dengan diagram expert/metode dan buyer/data, teknologi/konektor, kemudian satu contoh guard. Bagian marketplace tetap menampilkan portofolio, tender dan negosiasi gaji sebagai tautan ringkasan baca-saja. Layout/palet/font/navbar terbaru dipertahankan. Tidak ada rollback atas kode aplikasi, konektor, metode atau pekerjaan Claude. Build lulus dan npm test sebelumnya 29+3 lulus. Belum deployment atau persetujuan visual final. Compliance gate tidak menemukan konflik.
+
+## 89. Pekerjaan Claude dalam sesi 14 sampai 15 November 2026
+
+Dicatat atas permintaan Dien sebagai pelengkap bagian 72, 73 dan 82. Bagian ini menambah, tidak menggantikan, catatan Codex. Semua transaksi di NEAR testnet. Bagian yang belum diverifikasi ditulis apa adanya.
+
+### Privasi dan runner
+- Migrasi lima perlindungan dari Codex diselesaikan, diuji lokal (27 cek protokol, 13 cek relay, bukti browser), lalu runner privat `scientivan.testnet/kalis-private` di-deploy dengan kunci segel yang dibuat di TEE. Storage OutLayer testnet diprobe dan lulus.
+- Atas keputusan Dien (pilihan 1), data milik pemilik untuk lima perlindungan disimpan terenkripsi di browser (vault perangkat) dan TEE hanya dipakai untuk aksi yang ditegakkan terhadap metode. Membaca catatan lewat TEE butuh 295,5 detik di production, lewat vault 45 ms simpan dan 165 ms tampil. Runner build `cd95487f39bda73e054a569ac806c93cad11883d6a4e8651860e6fa7c9c39c19`, kedaluwarsa request 900 detik.
+- Dua bug diperbaiki: kunci TEE di web hanya dibaca dari env yang tidak pernah diisi, dan request kedaluwarsa sebelum antrean testnet selesai.
+- Prompt dan sumber rahasia penjual (`methods/*/seller-private`) sempat terkirim ke VPS dalam bentuk plaintext. Folder dihapus dari VPS dan prosedur deploy kini mengecualikannya. Folder itu tidak pernah masuk git.
+
+### Deployment
+- Domain diganti ke ejaan Kalis. App `https://app.kalis.scientivan.dev` di Vercel, API `https://api.kalis.scientivan.dev` di VPS `tinjau-vps` (systemd `kalis-backend`, Caddy TLS). `kalis.scientivan.dev` dialihkan sementara ke app sampai landing Codex selesai.
+- RPC `rpc.testnet.near.org` deprecated dan menolak request (429). Backend sudah memakai `rpc.testnet.fastnear.com`, dan pembaca saldo allowance di web diganti ke sana.
+
+### Marketplace dan konektor
+- Logo Meeting K dipakai sebagai favicon dan tanda di sidebar.
+- Semua kartu metode memakai ilustrasi use case dan ikon konektor di bawah nama penjual. Enam metode Upcoming hanya ada di frontend dan tidak bisa dibeli.
+- Urutan default Newest, sehingga metode Web3 terbaru tampil paling atas. Angka "checks" diganti jumlah pemakaian (run Released). Run yang dibuat lewat backend lokal agent dihitung dari daftar `app/methods/onchain-runs.json` yang dicek ulang ke `get_run` di kontrak setiap backend menyala.
+- Istilah Connections menjadi Connectors. Konektor diurutkan Web3 lalu Web2, dengan pencarian dan filter. Semua konektor masih mock kecuali Wallet allowance yang membuat sandbox nyata.
+- Chip "Powered by …" menyebut teknologi NEAR per halaman. Tombol info dipindah ke samping ringkasan halaman. Langkah metode tampil sebagai kartu alur berpanah.
+
+### AI Security & Defense
+- Lima metode guard live, ringkasan dan bukti di subbagian bagian 82 serta `app/methods/<id>/evidence/` dan `README.md` masing-masing.
+- Pekerjaan lanjutan (deteksi injection berlapis dan pembacaan data on-chain lewat runner terpisah `scientivan.testnet/kalis-guard-runner`) sedang berjalan saat pencatatan ini. Angka yang tercatat di README metode (14 dari 14 serangan uji diblok dengan AI, 0 dari 6 pembayaran normal diblok) berasal dari set uji sintetis buatan penulis aturan yang sama, belum diverifikasi ulang oleh sesi utama dan bukan benchmark.
+
+### Social Money
+- Rincian dan semua hash ada di `docs-social-money.md`. Kontrak market di-upgrade (tx `69Us5GWxzjzVrg42rQkisNYDVMXNRiU8M9eTc3y2jjcu`) setelah uji di akun terpisah, kontrak pool baru `kalis-pools-1114.testnet`.
+- Belum selesai: tip dan stake belum dicoba lewat dompet browser sungguhan, proposal 6 (refund stake) belum di-vote, tampilan run bersama belum dicek visual.
+
+### Track
+- Dien memutuskan mengikuti empat track: Privacy & Private AI (utama), Social Money, AI Security & Defense, dan Open Innovation. Strategi dan analisis risiko ada di `TRACK_STRATEGY_2026-11-14.md`.
+
