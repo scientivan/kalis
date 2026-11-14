@@ -270,10 +270,13 @@ async function settle(runId, body) {
   const v = method.versions.find((x) => x.number === onChain.version);
   const total = BigInt(onChain.amount);
   const dao = (await view(config.market, "get_config")).dao;
-  const toSeller = total * BigInt(100 - v.dao_share_pct - PLATFORM_SHARE_PCT) / 100n;
+  const bps = await view(config.market, "get_contributor_bps", { method_id: onChain.method_id, number: onChain.version }).catch(() => []);
+  const share = total * BigInt(100 - v.dao_share_pct - PLATFORM_SHARE_PCT) / 100n;
+  const toContrib = (v.contributors || []).reduce((a, c, i) => (c === method.owner ? a : a + share * BigInt(bps?.[i] || 0) / 10000n), 0n);
+  const toSeller = share - toContrib;
   const toDao = total * BigInt(v.dao_share_pct) / 100n;
   const payouts = after.status === "Released"
-    ? { seller: { account: method.owner, near: toNear(toSeller), amount: money(toSeller) }, dao: { account: dao, near: toNear(toDao), amount: money(toDao) }, platform: { near: toNear(total - toSeller - toDao), amount: money(total - toSeller - toDao) } }
+    ? { seller: { account: method.owner, near: toNear(toSeller), amount: money(toSeller) }, dao: { account: dao, near: toNear(toDao), amount: money(toDao) }, platform: { near: toNear(total - share - toDao), amount: money(total - share - toDao) }, ...(toContrib > 0n ? { contributors: { near: toNear(toContrib), amount: money(toContrib), paid_by: "market_contract" } } : {}) }
     : { buyer_refund: { account: onChain.buyer, near: toNear(total), amount: money(total) } };
   const royalty = after.status === "Released" ? await payRoyalty(runId).catch((e) => ({ error: e.message })) : null; // social-api.js: contributor royalty
   return { settle_tx: r.txHash, settle_tx_url: `${config.explorer}/transactions/${r.txHash}`, status: after.status, reason: after.reason, payouts, royalty, run: await runView(runId) };

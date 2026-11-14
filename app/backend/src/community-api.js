@@ -462,7 +462,9 @@ export function registerCommunityRoutes(route) {
     const f = path.join(dir, `${ctr.candidate.code_hash}.json`);
     if (!fs.existsSync(f)) { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(f, JSON.stringify({ method_id: ctr.method_id, code_hash: ctr.candidate.code_hash, tee_pubkey: config.runner.teePubkey, sealed: ctr.candidate.sealed, from_contribution: ctr.id })); }
     const args = { method_id: ctr.method_id, code_hash: ctr.candidate.code_hash, manifest_hash: v.manifest_hash, runner_hash: v.runner_hash, price: v.price, dao_share_pct: v.dao_share_pct,
-      parent: v.number, contributors: [ctr.author_account].filter(Boolean), note: `Bounty ${ctr.bounty_id}, contribution ${ctr.id}, test ${lastCompletedTest(ctr).id}` };
+      parent: v.number, contributors: [ctr.author_account].filter(Boolean),
+      // Royalty paid by the market contract at settle: 10% of the seller share per contributor (1000 bps), fixed at publish time.
+      contributor_bps: [ctr.author_account].filter(Boolean).map(() => 1000), note: `Bounty ${ctr.bounty_id}, contribution ${ctr.id}, test ${lastCompletedTest(ctr).id}` };
     const publish = { requested_at: db.nowIso(), contract_call: call(config.market, "publish_version", args, "100000000000000000000000", 100, method.owner), bound_to: { code_hash: ctr.candidate.code_hash, test_run: lastCompletedTest(ctr).id } };
     return { contribution: contributionView(db.put("contributions", id, { ...ctr, publish })), publish: { ...publish, published_version: existing?.number ?? null }, replayed: false };
   });

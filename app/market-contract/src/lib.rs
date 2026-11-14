@@ -25,6 +25,20 @@ const MAX_CONTRIBUTORS: usize = 10;
 const PLATFORM_SHARE_PCT: u8 = 10;
 const MIN_DAO_SHARE_PCT: u8 = 10;
 const COMPLETION_PREFIX: &str = "kalis-completion:v1:";
+/// Contributor royalty basis points (of the seller share) live under their own
+/// storage prefix, so the `Market` and `Version` borsh layouts stay unchanged
+/// and no migration is needed for versions published before this upgrade.
+const CONTRIB_BPS_PREFIX: &[u8] = b"cbps";
+/// Contributors together may take at most half of the seller share.
+const MAX_CONTRIB_BPS_TOTAL: u32 = 5_000;
+
+fn contrib_bps_map() -> LookupMap<String, Vec<u16>> {
+    LookupMap::new(CONTRIB_BPS_PREFIX)
+}
+
+fn contrib_key(method_id: &str, number: u32) -> String {
+    format!("{method_id}#{number}")
+}
 
 #[near(serializers = [borsh, json])]
 #[derive(Clone)]
@@ -221,6 +235,7 @@ impl Market {
         parent: Option<u32>,
         contributors: Option<Vec<AccountId>>,
         note: Option<String>,
+        contributor_bps: Option<Vec<u16>>,
     ) -> u32 {
         let caller = env::predecessor_account_id();
         let mut method = self.methods.get(&method_id).cloned().unwrap_or_else(|| env::panic_str("unknown method_id"));
@@ -236,6 +251,12 @@ impl Market {
         }
         let contributors = contributors.unwrap_or_default();
         require!(contributors.len() <= MAX_CONTRIBUTORS, "at most 10 contributors");
+        let contributor_bps = contributor_bps.unwrap_or_default();
+        if !contributor_bps.is_empty() {
+            require!(contributor_bps.len() == contributors.len(), "contributor_bps must have one entry per contributor");
+            let total: u32 = contributor_bps.iter().map(|b| *b as u32).sum();
+            require!(total <= MAX_CONTRIB_BPS_TOTAL, "contributor_bps total must be at most 5000 (half of the seller share)");
+        }
         let note = note.unwrap_or_default();
         require!(note.len() <= MAX_NOTE, "note: at most 500 chars");
         let before = env::storage_usage();
@@ -248,6 +269,14 @@ impl Market {
             "method_id": method_id, "number": number, "code_hash": v.code_hash, "manifest_hash": v.manifest_hash,
             "runner_hash": v.runner_hash, "price": v.price, "dao_share_pct": v.dao_share_pct, "parent": v.parent, "contributors": v.contributors
         }));
+        if contributor_bps.iter().any(|b| *b > 0) {
+            emit("contributor_royalty_declared", near_sdk::serde_json::json!({
+                "method_id": method_id, "number": number, "contributors": v.contributors, "bps_of_seller_share": contributor_bps
+            }));
+            let mut m = contrib_bps_map();
+            m.insert(contrib_key(&method_id, number), contributor_bps);
+            m.flush();
+        }
         self.versions.get_mut(&method_id).expect("versions").push(v);
         method.version_count = number;
         self.methods.insert(method_id, method);
@@ -303,7 +332,18 @@ impl Market {
             let total = run.amount.as_yoctonear();
             let to_dao = total * v.dao_share_pct as u128 / 100;
             let to_platform = total * PLATFORM_SHARE_PCT as u128 / 100;
-            let to_seller = total - to_dao - to_platform;
+            let seller_share = total - to_dao - to_platform;
+            let bps = contrib_bps_map().get(&contrib_key(&run.method_id, run.version)).cloned().unwrap_or_default();
+            let mut paid_contributors = Vec::new();
+            let mut to_contributors: u128 = 0;
+            for (who, b) in v.contributors.iter().zip(bps.iter()) {
+                let amount = seller_share * (*b as u128) / 10_000;
+                if amount == 0 || *who == owner { continue; }
+                to_contributors += amount;
+                let _ = Promise::new(who.clone()).transfer(NearToken::from_yoctonear(amount));
+                paid_contributors.push(near_sdk::serde_json::json!({"account": who, "amount": amount.to_string(), "bps_of_seller_share": b}));
+            }
+            let to_seller = seller_share - to_contributors;
             let _ = Promise::new(owner.clone()).transfer(NearToken::from_yoctonear(to_seller));
             let _ = Promise::new(self.dao.clone()).transfer(NearToken::from_yoctonear(to_dao));
             let _ = Promise::new(self.platform.clone()).transfer(NearToken::from_yoctonear(to_platform));
@@ -311,7 +351,8 @@ impl Market {
             run.reason = "every stage succeeded".into();
             emit("run_released", near_sdk::serde_json::json!({
                 "run_id": run_id, "seller": owner, "to_seller": to_seller.to_string(), "dao": self.dao, "to_dao": to_dao.to_string(),
-                "platform": self.platform, "to_platform": to_platform.to_string()
+                "platform": self.platform, "to_platform": to_platform.to_string(),
+                "contributors": paid_contributors, "to_contributors": to_contributors.to_string()
             }));
         } else {
             let _ = Promise::new(run.buyer.clone()).transfer(run.amount);
@@ -338,6 +379,12 @@ impl Market {
     }
 
     // ----- views -----
+
+    /// Royalty basis points (of the seller share) per contributor, in the same
+    /// order as `Version.contributors`. Empty when none were declared.
+    pub fn get_contributor_bps(&self, method_id: String, number: u32) -> Vec<u16> {
+        contrib_bps_map().get(&contrib_key(&method_id, number)).cloned().unwrap_or_default()
+    }
 
     pub fn get_config(&self) -> ConfigView {
         ConfigView {
@@ -409,8 +456,34 @@ mod tests {
         let mut m = Market::new(accounts(0), accounts(3), to_hex(&key().verifying_key().to_bytes()), 60);
         ctx(1, 100, 0);
         m.register_method("portfolio-rebalance".into(), "Rebalance".into());
-        m.publish_version("portfolio-rebalance".into(), H1.into(), H2.into(), H1.into(), NearToken::from_millinear(50), 20, None, None, None);
+        m.publish_version("portfolio-rebalance".into(), H1.into(), H2.into(), H1.into(), NearToken::from_millinear(50), 20, None, None, None, None);
         m
+    }
+
+    #[test]
+    fn contributor_royalty_paid_from_seller_share() {
+        let mut m = setup();
+        ctx(1, 100, 0);
+        m.publish_version("portfolio-rebalance".into(), H1.into(), H2.into(), H1.into(), NearToken::from_millinear(50), 20, Some(1),
+            Some(vec![accounts(4), accounts(5)]), None, Some(vec![1_000, 500]));
+        assert_eq!(m.get_contributor_bps("portfolio-rebalance".into(), 2), vec![1_000, 500]);
+        assert!(m.get_contributor_bps("portfolio-rebalance".into(), 1).is_empty());
+        ctx(2, 100, 1);
+        m.pay_for_run("rc".into(), "portfolio-rebalance".into(), 2, D1.into());
+        let rec = record("rc", true, D1);
+        assert_eq!(m.settle("rc".into(), rec.clone(), sign(&rec)), RunStatus::Released);
+        let logs = near_sdk::test_utils::get_logs().join("\n");
+        // 50 mNEAR: dao 10, platform 5, seller share 35; contributors 3.5 + 1.75
+        assert!(logs.contains("\"to_contributors\":\"5250000000000000000000\""), "{logs}");
+    }
+
+    #[test]
+    #[should_panic(expected = "at most 5000")]
+    fn contributor_bps_capped() {
+        let mut m = setup();
+        ctx(1, 100, 0);
+        m.publish_version("portfolio-rebalance".into(), H1.into(), H2.into(), H1.into(), NearToken::from_millinear(50), 20, Some(1),
+            Some(vec![accounts(4)]), None, Some(vec![6_000]));
     }
 
     #[test]
@@ -420,7 +493,7 @@ mod tests {
         m.transfer_method_owner("portfolio-rebalance".into(), accounts(4));
         assert_eq!(m.get_method("portfolio-rebalance".into()).unwrap().owner, accounts(4));
         ctx(4, 100, 0);
-        m.publish_version("portfolio-rebalance".into(), H1.into(), H2.into(), H1.into(), NearToken::from_millinear(50), 20, Some(1), None, None);
+        m.publish_version("portfolio-rebalance".into(), H1.into(), H2.into(), H1.into(), NearToken::from_millinear(50), 20, Some(1), None, None, None);
     }
 
     #[test]
@@ -487,7 +560,7 @@ mod tests {
     fn rejects_low_dao_share() {
         let mut m = setup();
         ctx(1, 100, 0);
-        m.publish_version("portfolio-rebalance".into(), H1.into(), H2.into(), H1.into(), NearToken::from_millinear(50), 5, None, None, None);
+        m.publish_version("portfolio-rebalance".into(), H1.into(), H2.into(), H1.into(), NearToken::from_millinear(50), 5, None, None, None, None);
     }
 
     #[test]

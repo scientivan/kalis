@@ -1,5 +1,6 @@
 // Social Money (testnet only, no token, no yield):
-// 1. Contributor royalty. When a released run paid for a version whose on-chain `contributors` list is not
+// 1. Contributor royalty. Preferred path: a version published with contributor_bps is paid by the market
+//    contract inside settle (from the seller share); this file then only records it. Legacy path below: when a released run paid for a version whose on-chain `contributors` list is not
 //    empty (a version published from an accepted bounty contribution), the platform account pays
 //    ROYALTY_PCT of the run price to those contributors in a separate NEAR transfer. The market contract
 //    does not pay contributors itself (its settle splits only seller, DAO, platform), so this royalty comes
@@ -8,17 +9,23 @@
 //    unsigned NEAR transfer; the buyer's wallet signs it. The tip is recorded only after the backend
 //    reads the transaction on chain (signer = on-chain buyer of the run, receiver, amount).
 // 3. Stake-backed rating. A review may carry a 0.01 to 0.1 NEAR stake, sent by the run's buyer to the
-//    Kalis community fund (Sputnik DAO). It is a donation: it is not returned and earns nothing. It only
-//    shows conviction next to the rating. Recorded after the transfer is read on chain.
+//    Kalis community fund (Sputnik DAO). It earns nothing. Since 2026-11-14 it is a refundable deposit:
+//    the DAO holds it for STAKE_HOLD (7 days). If no council member flags the review in that window, the
+//    staker may ask for it back; the backend then files a Sputnik Transfer proposal (signed by the
+//    platform account, which pays the proposal bond) and the council approves or rejects it on chain.
+//    A flagged stake stays in the fund as a donation. Stakes made before this change keep their
+//    original terms (donation, not returned).
 import { connect, keyStores, KeyPair } from "near-api-js";
 import * as db from "./db.js";
 import { config } from "./config.js";
 import { rpc, view, clearReadCache } from "./near.js";
+import { principal } from "./principal.js";
 import { ApiError, toNear, money, chainRun, getMethod, YOCTO } from "./market.js";
 
 export const ROYALTY_PCT = 5; // of the run price, paid from the platform's 10% fee
 const TIP_MIN = 10n ** 22n, TIP_MAX = 10n ** 24n;          // 0.01 to 1 NEAR
 const STAKE_MIN = 10n ** 22n, STAKE_MAX = 10n ** 23n;      // 0.01 to 0.1 NEAR
+const STAKE_HOLD_MS = Number(process.env.KALIS_STAKE_HOLD_MINUTES ?? 7 * 24 * 60) * 60_000; // testnet demo may shorten it
 const TX = /^[1-9A-HJ-NP-Za-km-z]{43,44}$/;
 const explorer = (h) => `${config.explorer}/transactions/${h}`;
 
@@ -82,6 +89,21 @@ export async function payRoyalty(runId) {
     const { run, method, v } = await releasedRun(runId);
     const contributors = v?.contributors || [];
     if (!contributors.length) return { run_id: runId, applies: false, reason: "This version has no community contributors, so no royalty is due." };
+    // Contract path (market upgrade 2026-11-14): when the version declared contributor_bps at publish time,
+    // the market contract itself paid the contributors inside settle. The platform must not pay again.
+    const bps = await contractRoyaltyBps(run.method_id, run.version);
+    if (bps.some((b) => b > 0)) {
+      const sellerShare = BigInt(run.amount) * BigInt(100 - v.dao_share_pct - 10) / 100n;
+      const settleTx = db.get("runs", runId)?.settle_tx || null;
+      const transfers = contributors.map((c, i) => ({ account: c, bps_of_seller_share: bps[i] || 0, yocto: (sellerShare * BigInt(bps[i] || 0) / 10000n).toString(), tx_hash: settleTx, tx_url: settleTx ? explorer(settleTx) : null }))
+        .filter((t) => t.account !== method.owner && t.yocto !== "0");
+      const total = transfers.reduce((a, t) => a + BigInt(t.yocto), 0n);
+      const row = { run_id: runId, applies: true, method_id: run.method_id, version: run.version, seller: method.owner, payer: config.market,
+        funded_from: "seller_share", paid_by: "market_contract", yocto: total.toString(), transfers, tx_hash: settleTx, paid_at: db.nowIso(),
+        note: "The market contract paid the contributors inside settle, from the seller share, at the rates declared when this version was published. Testnet NEAR." };
+      db.put("royalties", runId, row);
+      return { ...royaltyView(row), replayed: false };
+    }
     const total = BigInt(run.amount) * BigInt(ROYALTY_PCT) / 100n;
     const each = total / BigInt(contributors.length);
     const acct = await platformAccount();
@@ -97,6 +119,30 @@ export async function payRoyalty(runId) {
     db.put("royalties", runId, row);
     return { ...royaltyView(row), replayed: false };
   });
+}
+
+async function contractRoyaltyBps(methodId, number) {
+  try { return (await view(config.market, "get_contributor_bps", { method_id: methodId, number })) || []; }
+  catch { return []; } // older contract without the view: fall back to the platform-fee path
+}
+
+const stakeTerms = (dao) => `The stake is held by the Kalis community fund (${dao}) as a deposit and earns nothing. After ${Math.round(STAKE_HOLD_MS / 86_400_000 * 10) / 10} days, if no council member flagged the review, you can ask for it back: Kalis files a refund proposal and the council approves it on chain. A flagged stake stays in the fund as a donation. Testnet NEAR.`;
+
+async function daoPolicy() {
+  const dao = await daoId();
+  const p = await view(dao, "get_policy");
+  return { dao, council: p.roles.find((r) => r.name === "council")?.kind?.Group || [], proposal_bond: p.proposal_bond };
+}
+
+async function stakeView(st) {
+  const v = { ...st, amount: money(st.yocto), tx_url: explorer(st.tx_hash), state: st.state || (st.kind === "donation_to_fund" ? "donated" : "held") };
+  if (st.refund?.proposal_id != null) {
+    const pr = await view(st.refund.dao, "get_proposal", { id: st.refund.proposal_id }).catch(() => null);
+    v.refund = { ...st.refund, tx_url: explorer(st.refund.tx_hash), proposal_status: pr?.status || "unknown" };
+    if (pr?.status === "Approved") v.state = "refunded";
+    if (pr?.status === "Rejected" || pr?.status === "Removed") v.state = "refund_rejected";
+  }
+  return v;
 }
 
 const reviewStake = (reviewId) => Object.values(db.all("review_stakes")).find((s) => s.review_id === reviewId) || null;
@@ -166,7 +212,7 @@ export function registerSocialRoutes(route) {
     const yocto = parseNear(b?.amount_near, STAKE_MIN, STAKE_MAX, "amount_near");
     const dao = await daoId();
     return { review_id: rid, amount: money(yocto), contract_call: transferCall(dao, yocto, run.buyer),
-      terms: `The stake is a donation to the Kalis community fund (${dao}). It is not returned and earns nothing. It only shows how sure you are about this rating. Testnet NEAR.`,
+      terms: stakeTerms(dao),
       next: `After the wallet signs, POST /api/reviews/${rid}/stake/confirm with {tx_hash}.` };
   });
 
@@ -182,7 +228,56 @@ export function registerSocialRoutes(route) {
     if (t.receiver !== dao) throw new ApiError(422, "bad_recipient", `The stake must go to the community fund ${dao}`);
     if (t.yocto < STAKE_MIN || t.yocto > STAKE_MAX) throw new ApiError(422, "amount_out_of_range", "The stake is outside 0.01 to 0.1 NEAR");
     const row = db.put("review_stakes", t.tx_hash, { id: t.tx_hash, review_id: rid, run_id: rv.run_id, method_id: rv.method_id, from: t.signer, to: dao,
-      yocto: t.yocto.toString(), tx_hash: t.tx_hash, kind: "donation_to_fund", created_at: db.nowIso() });
-    return { stake: { ...row, amount: money(row.yocto), tx_url: explorer(row.tx_hash) }, replayed: false };
+      yocto: t.yocto.toString(), tx_hash: t.tx_hash, kind: "refundable_deposit", created_at: db.nowIso(),
+      refundable_after: new Date(Date.now() + STAKE_HOLD_MS).toISOString(), state: "held" });
+    return { stake: await stakeView(row), replayed: false };
+  });
+
+  route("GET", /^\/api\/reviews\/([^/]+)\/stake$/, async (_q, [rid]) => {
+    const st = reviewStake(rid);
+    if (!st) throw new ApiError(404, "no_stake", "This review carries no stake");
+    return { stake: await stakeView(st) };
+  });
+
+  // A council member (read from the DAO policy on chain) flags a staked review. The stake then stays donated.
+  route("POST", /^\/api\/reviews\/([^/]+)\/stake\/flag$/, async (_q, [rid], b, req) => {
+    const st = reviewStake(rid);
+    if (!st) throw new ApiError(404, "no_stake", "This review carries no stake");
+    const p = principal(req);
+    if (p.kind !== "near_account") throw new ApiError(401, "login_required", "Sign in with a council NEAR account to flag a review");
+    const pol = await daoPolicy();
+    if (!pol.council.includes(p.account_id)) throw new ApiError(403, "not_council", `${p.account_id} is not in the council of ${pol.dao}`);
+    if (st.refund) throw new ApiError(409, "refund_filed", "A refund proposal already exists; vote it down on the DAO instead");
+    const reason = String(b?.reason || "").trim().slice(0, 300);
+    if (!reason) throw new ApiError(400, "reason_required", "Say why the review is flagged");
+    const row = db.put("review_stakes", st.id, { ...st, state: "flagged_donated", flag: { by: p.account_id, reason, at: db.nowIso() } });
+    return { stake: await stakeView(row) };
+  });
+
+  // The staker asks for the deposit back after the hold window. Idempotent: one proposal per stake.
+  route("POST", /^\/api\/reviews\/([^/]+)\/stake\/refund$/, async (_q, [rid], _b, req) => {
+    const p = principal(req);
+    if (p.kind !== "near_account") throw new ApiError(401, "login_required", "Sign in with the NEAR account that sent the stake");
+    return once(`stake-refund:${rid}`, async () => {
+      const st = reviewStake(rid);
+      if (!st) throw new ApiError(404, "no_stake", "This review carries no stake");
+      if (st.from !== p.account_id) throw new ApiError(403, "not_staker", `Only ${st.from} can ask for this stake back`);
+      if (st.refund?.proposal_id != null) return { stake: await stakeView(st), replayed: true };
+      if (st.kind !== "refundable_deposit") throw new ApiError(409, "donation", "This stake was made as a donation before refunds existed, so it stays in the fund");
+      if (st.state === "flagged_donated") throw new ApiError(409, "flagged", "A council member flagged this review, so the stake stays in the fund as a donation");
+      if (Date.now() < Date.parse(st.refundable_after)) throw new ApiError(409, "still_held", `The stake is held until ${st.refundable_after}`);
+      const pol = await daoPolicy();
+      const acct = await platformAccount();
+      const description = `Kalis stake refund: return ${toNear(BigInt(st.yocto))} NEAR to ${st.from} for review ${rid} (stake tx ${st.tx_hash}). No council flag during the hold window. Testnet.`;
+      const out = await acct.functionCall({ contractId: pol.dao, methodName: "add_proposal",
+        args: { proposal: { description, kind: { Transfer: { token_id: "", receiver_id: st.from, amount: st.yocto } } } },
+        gas: 150n * 10n ** 12n, attachedDeposit: BigInt(pol.proposal_bond) });
+      const sv = out.status?.SuccessValue;
+      if (sv == null) throw new ApiError(502, "proposal_failed", `add_proposal failed: ${JSON.stringify(out.status).slice(0, 200)}`);
+      const proposalId = Number(Buffer.from(sv, "base64").toString());
+      clearReadCache();
+      const row = db.put("review_stakes", st.id, { ...st, state: "refund_proposed", refund: { proposal_id: proposalId, dao: pol.dao, tx_hash: out.transaction.hash, filed_by: acct.accountId, filed_at: db.nowIso() } });
+      return { stake: await stakeView(row), replayed: false };
+    });
   });
 }

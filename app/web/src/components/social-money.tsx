@@ -1,5 +1,5 @@
 "use client";
-// Social Money panels: contributor royalty, buyer tip, stake-backed rating. Testnet NEAR only.
+// Social Money panels: contributor royalty (paid by the market contract at settle), buyer tip, stake-backed rating. Testnet NEAR only.
 // Money moves in plain NEAR transfers. Tips and stakes are signed by the buyer's wallet; Kalis records them
 // only after the backend reads the transfer on chain.
 import { useEffect, useState } from "react";
@@ -10,10 +10,10 @@ import { icon } from "./shell";
 import s from "./social-money.module.css";
 
 type Amount = { display: string; value: string };
-type Royalty = { applies: boolean; paid?: boolean; amount?: Amount; transfers?: { account: string; tx_url: string }[]; tx_url?: string; pct_of_price: number };
+type Royalty = { applies: boolean; paid?: boolean; paid_by?: string; amount?: Amount; transfers?: { account: string; tx_url: string }[]; tx_url?: string; pct_of_price?: number };
 type Tip = { id: string; to: string; role: string; amount: Amount; tx_url: string };
 type Social = { status: string; buyer: string; seller: string; contributors: string[]; royalty: Royalty; tips: Tip[] };
-type Stake = { amount: Amount; tx_url: string };
+type Stake = { amount: Amount; tx_url: string; kind?: string; state?: string; refundable_after?: string; refund?: { proposal_id: number; proposal_status: string; tx_url: string } };
 
 function hashOf(out: unknown): string | null {
   const first = Array.isArray(out) ? out[0] : out;
@@ -51,7 +51,8 @@ export function RunSocialMoney({ runId }: { runId: string }) {
     setReviewId(e?.existing_review_id || null);
     if (e?.existing_review_id && e.method_id) {
       const m = await backend<{ stakes: { by_review: Record<string, Stake> } }>(`methods/${encodeURIComponent(e.method_id)}/social`).catch(() => null);
-      setStake(m?.stakes.by_review[e.existing_review_id] || null);
+      const st = await backend<{ stake: Stake }>(`reviews/${encodeURIComponent(e.existing_review_id)}/stake`).catch(() => null);
+      setStake(st?.stake || m?.stakes.by_review[e.existing_review_id] || null);
     }
   };
   useEffect(() => { load().catch(() => setD(null)); }, [runId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -72,6 +73,20 @@ export function RunSocialMoney({ runId }: { runId: string }) {
     await sign(r.contract_call, async (h) => { await backend(`reviews/${encodeURIComponent(reviewId)}/stake/confirm`, { tx_hash: h }); setMsg("Stake recorded from the chain."); }, manual);
   });
 
+  const askRefund = run("Asking refund", async () => {
+    if (!reviewId) return;
+    await backend(`reviews/${encodeURIComponent(reviewId)}/stake/refund`, {});
+    setMsg("Refund proposal filed on the DAO. The council votes on it.");
+  });
+  const stakeLine = (x: Stake) => {
+    if (x.kind !== "refundable_deposit") return `Your rating carries ${x.amount.display}, given to the Kalis community fund as a donation under the earlier terms.`;
+    if (x.state === "flagged_donated") return `A council member flagged this review, so your ${x.amount.display} stays in the community fund as a donation.`;
+    if (x.state === "refunded") return `Your ${x.amount.display} came back after the council approved the refund proposal.`;
+    if (x.refund) return `Refund proposal ${x.refund.proposal_id} is on the DAO with status ${x.refund.proposal_status}.`;
+    const when = x.refundable_after ? new Date(x.refundable_after).toLocaleString() : "the hold ends";
+    return `Your rating carries ${x.amount.display}, held by the community fund. If nobody on the council flags the review, you can ask for it back after ${when}.`;
+  };
+  const refundable = !!stake && stake.kind === "refundable_deposit" && stake.state === "held" && !!stake.refundable_after && Date.parse(stake.refundable_after) <= Date.now();
   const roy = d.royalty;
   return <section className={`card ${s.wrap}`} aria-label="Royalty, tips and rating stake">
     <div className={s.row}>
@@ -79,8 +94,8 @@ export function RunSocialMoney({ runId }: { runId: string }) {
       <div className={s.body}>
         <b>Contributor royalty</b>
         {roy.applies && roy.amount
-          ? <span>{roy.amount.display} went to {roy.transfers?.map((t) => t.account).join(", ")}, who improved this version through a bounty. Kalis paid it from its own 10% fee, so the seller and fund shares stay the same.</span>
-          : roy.applies ? <span>This version has community contributors. Their {roy.pct_of_price}% royalty is paid from the Kalis fee when the run settles.</span>
+          ? <span>{roy.amount.display} went to {roy.transfers?.map((t) => t.account).join(", ")}, who improved this version. {roy.paid_by === "market_contract" ? "The market contract paid it inside the settlement, from the seller share agreed when the version was published." : "Kalis paid it from its own 10% fee, so the seller and fund shares stay the same."}</span>
+          : roy.applies ? <span>This version has community contributors. Their royalty is paid when the run settles.</span>
           : <span>No community contributor worked on this version, so no royalty applies.</span>}
       </div>
       {roy.tx_url && <a className="use" href={roy.tx_url} target="_blank" rel="noreferrer">{icon("link")}Royalty on NEAR</a>}
@@ -106,8 +121,9 @@ export function RunSocialMoney({ runId }: { runId: string }) {
       <span className={s.ic}>{icon("check")}</span>
       <div className={s.body}>
         <b>Back your rating with NEAR</b>
-        {stake ? <span>Your rating carries {stake.amount.display}, given to the Kalis community fund. <a href={stake.tx_url} target="_blank" rel="noreferrer">View on NEAR</a></span>
-          : <span>{reviewId ? "Give 0.01 to 0.1 testnet NEAR to the community fund to show you stand behind your rating. It is a donation. It is not returned and earns nothing." : "Rate this run first. Then you can back the rating with a small donation to the community fund."}</span>}
+        {stake ? <span>{stakeLine(stake)} <a href={stake.refund?.tx_url || stake.tx_url} target="_blank" rel="noreferrer">View on NEAR</a></span>
+          : <span>{reviewId ? "Put 0.01 to 0.1 testnet NEAR behind your rating. The community fund holds it for 7 days and it earns nothing. If no council member flags the review, you can ask for it back. A flagged stake stays in the fund." : "Rate this run first. Then you can back the rating with a small refundable stake."}</span>}
+        {refundable && mine && <div className={s.form}><button className="view" disabled={!!busy} onClick={askRefund}>{busy === "Asking refund" ? "Filing proposal" : "Ask for my stake back"}</button></div>}
         {reviewId && !stake && <div className={s.form}>
           <label className={s.amt}><input inputMode="decimal" value={stakeAmt} onChange={(e) => setStakeAmt(e.target.value)} aria-label="Stake in NEAR" /><span>NEAR</span></label>
           <button className="view" disabled={!mine || !!busy} onClick={sendStake}>{busy === "Backing rating" ? "Waiting for wallet" : "Back rating"}</button>
@@ -140,9 +156,9 @@ export function FundSocialMoney() {
   useEffect(() => { backend<typeof d>("social/summary").then(setD).catch(() => setD(null)); }, []);
   if (!d) return null;
   const cells: [string, Sum, string][] = [
-    ["Royalties to contributors", d.royalties, `${d.royalty_pct_of_price}% of each paid run on an improved version, paid from the Kalis fee.`],
+    ["Royalties to contributors", d.royalties, "Paid by the market contract at settlement on improved versions, from the seller share."],
     ["Tips from buyers", d.tips, "Sent straight from buyer wallets to sellers and contributors."],
-    ["Rating stakes given to the fund", d.stakes, "Donations that back a rating. Not returned, no yield."],
+    ["Rating stakes given to the fund", d.stakes, "Held by the fund behind a rating. Refundable after 7 days unless flagged. No yield."],
   ];
   return <div className={s.fund} aria-label="Social money on testnet">
     {cells.map(([t, x, note]) => <div className={s.cell} key={t}><b className={s.num}>{x.total.display}</b><b>{t}</b><span>{x.count} on testnet. {note}</span></div>)}
