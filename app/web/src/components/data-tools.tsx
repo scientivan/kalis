@@ -27,10 +27,8 @@ export function ActionFeedback({
 }
 function Tool({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="card list-card">
-      <div className="toolbar">
-        <h2 className="list-title">{title}</h2>
-      </div>
+    <section className="card list-card se">
+      <header className="se-head"><div><h2>{title}</h2></div></header>
       <div className="dpane">{children}</div>
     </section>
   );
@@ -72,7 +70,7 @@ export function ConnectionCreate({ onChanged }: { onChanged: () => void }) {
     }
   }
   return (
-    <Tool title="Add a connection">
+    <Tool title="Add a Connection">
       <div className="note-row">
         <div>
           <p>
@@ -87,13 +85,13 @@ export function ConnectionCreate({ onChanged }: { onChanged: () => void }) {
         </div>
       </div>
       {open && (
-        <form className="nform" onSubmit={save}>
-          <Dropdown
+        <form className="se-form" onSubmit={save}>
+          <div className="se-fx"><span className="se-fx-l">App</span><Dropdown
             label="App"
             value={connector}
             options={options}
             onChange={setConnector}
-          />
+          /><span className="se-fx-h">Mock apps only. All data is synthetic.</span></div>
           <button
             type="button"
             className="view"
@@ -124,8 +122,8 @@ export function ConnectionCreate({ onChanged }: { onChanged: () => void }) {
           >
             Use demo token
           </button>
-          <label className="fx">
-            <span className="fx-label">Access token</span>
+          <label className="se-fx">
+            <span className="se-fx-l">Access Token</span>
             <input
               type="password"
               autoComplete="off"
@@ -133,9 +131,10 @@ export function ConnectionCreate({ onChanged }: { onChanged: () => void }) {
               value={token}
               onChange={(e) => setToken(e.target.value)}
             />
+            <span className="se-fx-h">Held by the Kalis backend, never by a method.</span>
           </label>
-          <label className="fx">
-            <span className="fx-label">Expires in minutes</span>
+          <label className="se-fx">
+            <span className="se-fx-l">Expires In</span>
             <input
               type="number"
               min="1"
@@ -143,11 +142,12 @@ export function ConnectionCreate({ onChanged }: { onChanged: () => void }) {
               value={ttl}
               onChange={(e) => setTtl(e.target.value)}
             />
+            <span className="se-fx-h">Minutes until the connection stops working.</span>
           </label>
-          <div className="note-row">
-            Scope is read only. Trading, transfers and edits are not permitted.
+          <div className="se-note rp-wide">
+            <span><b>Read only.</b> Trading, transfers and edits are not permitted.</span>
           </div>
-          <div className="nf-foot full">
+          <div className="se-nav rp-wide">
             <button
               type="button"
               className="view"
@@ -158,6 +158,7 @@ export function ConnectionCreate({ onChanged }: { onChanged: () => void }) {
             >
               Cancel
             </button>
+            <span />
             <button className="primary-btn" disabled={busy}>
               {busy ? "Connecting" : "Connect"}
             </button>
@@ -211,14 +212,14 @@ export function DocumentUpload({ onChanged }: { onChanged: () => void }) {
     }
   }
   return (
-    <Tool title="Read a document">
-      <form className="nform" onSubmit={submit}>
-        <div className="note-row full">
+    <Tool title="Read a Document">
+      <form className="se-form" onSubmit={submit}>
+        <div className="se-note rp-wide">
           The Kalis backend sees this document on its way to private AI. Do not
           upload private documents. Extracted text is returned once and kept
           only in this page.
         </div>
-        <Dropdown
+        <div className="se-fx"><span className="se-fx-l">Method</span><Dropdown
           label="Method"
           value={method}
           options={[
@@ -226,9 +227,9 @@ export function DocumentUpload({ onChanged }: { onChanged: () => void }) {
             ...methods.map((m) => ({ value: m.method_id, label: m.title })),
           ]}
           onChange={setMethod}
-        />
-        <label className="fx">
-          <span className="fx-label">Public document</span>
+        /><span className="se-fx-h">The method whose inputs the document fills.</span></div>
+        <label className="se-fx">
+          <span className="se-fx-l">Public Document</span>
           <input
             type="file"
             required
@@ -238,8 +239,9 @@ export function DocumentUpload({ onChanged }: { onChanged: () => void }) {
               setResult(null);
             }}
           />
+          <span className="se-fx-h">PDF, PNG, JPEG or WebP. Public documents only.</span>
         </label>
-        <div className="nf-foot full">
+        <div className="se-nav rp-wide"><span />
           <button className="primary-btn" disabled={busy || !method || !file}>
             {busy ? "Reading document" : "Read document"}
           </button>
@@ -248,7 +250,7 @@ export function DocumentUpload({ onChanged }: { onChanged: () => void }) {
       <ActionFeedback error={error} />
       {result && (
         <div className="dblock">
-          <h3>Extraction review</h3>
+          <h3>Extraction Review</h3>
           <div className="note-row">
             {String(
               result.operator_visibility ||
@@ -314,9 +316,9 @@ export function NoteCreate({ onChanged }: { onChanged: () => void }) {
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   return (
-    <Tool title="Add a note">
+    <Tool title="Add a Note">
       <form
-        className="nform"
+        className="se-form"
         onSubmit={async (e) => {
           e.preventDefault();
           setBusy(true);
@@ -335,20 +337,18 @@ export function NoteCreate({ onChanged }: { onChanged: () => void }) {
           }
         }}
       >
-        <label className="fx tall full">
-          <span className="fx-label">Note</span>
+        <label className="se-fx rp-wide">
+          <span className="se-fx-l">Note</span>
           <textarea
             required
+            rows={3}
             maxLength={10000}
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
+          <span className="se-fx-h">Notes are kept on the Kalis backend. Methods may read only the notes their policy permits.</span>
         </label>
-        <div className="nf-foot full">
-          <div className="note-row">
-            Notes are kept on the Kalis backend. Methods may read only the notes
-            their policy permits.
-          </div>
+        <div className="se-nav rp-wide"><span />
           <button className="primary-btn" disabled={busy || !text.trim()}>
             {busy ? "Saving" : "Add note"}
           </button>
@@ -568,7 +568,7 @@ export function PreparationSources({
   if (!available.length) return null;
   return (
     <div className="dblock">
-      <h2 className="h3">Choose an input source</h2>
+      <h2 className="h3">Choose an Input Source</h2>
       <div className="note-row">
         Load a declared source, review its content and choose the value for an
         input. Local Office files stay on this device. Uploaded documents and

@@ -1,5 +1,7 @@
 "use client";
 import { useMethodTitles } from "../lib/labels";
+import { Fx } from "./form-kit";
+import { icon } from "./shell";
 import { useEffect, useState } from "react";
 import { backend, request } from "../lib/backend/client";
 import { useNearAuth } from "../lib/near/auth";
@@ -131,81 +133,25 @@ export function AccountEditors() {
   }
   if (!auth.session) return null;
   return (
-    <section className="card list-card">
-      <div className="toolbar">
-        <h2 className="list-title">Profile and preferences</h2>
-      </div>
-      <div className="dpane">
-        <form
-          className="nform"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void save("profile");
-          }}
-        >
-          <label className="fx">
-            <span className="fx-label">Display name</span>
-            <input
-              value={profile.display_name || ""}
-              maxLength={120}
-              onChange={(e) =>
-                setProfile({ ...profile, display_name: e.target.value })
-              }
-            />
-          </label>
-          <label className="fx tall full">
-            <span className="fx-label">About you</span>
-            <textarea
-              value={profile.bio || ""}
-              maxLength={2000}
-              onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-            />
-          </label>
-          <div className="nf-foot full">
-            <button className="primary-btn" disabled={busy}>
-              Save profile
-            </button>
-          </div>
+    <section className="card list-card se">
+      <header className="se-head"><div><h2>Profile and Preferences</h2><span>What other people see about you, and how Kalis runs jobs for you.</span></div></header>
+      <div className="se-panel">
+        <div className="se-io">
+        <form className="se-box" onSubmit={(e) => { e.preventDefault(); void save("profile"); }}>
+          <header><b>{icon("m-person")}Public Profile</b><span>Shown next to your methods, reviews and proposals.</span></header>
+          <Fx label="Display Name" hint="Up to 120 characters."><input value={profile.display_name || ""} maxLength={120} onChange={(e) => setProfile({ ...profile, display_name: e.target.value })} /></Fx>
+          <Fx label="About You" hint="A short line about your expertise. Leave out private data."><textarea rows={3} value={profile.bio || ""} maxLength={2000} onChange={(e) => setProfile({ ...profile, bio: e.target.value })} /></Fx>
+          <div className="se-actions"><button className="primary-btn" disabled={busy}>Save profile</button></div>
         </form>
         {prefs && (
-          <form
-            className="nform"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void save("preferences");
-            }}
-          >
-            <label className="fx tall full">
-              <span className="fx-label">
-                Preferred private models, one ID per line
-              </span>
-              <textarea
-                value={models}
-                onChange={(e) => setModels(e.target.value)}
-              />
-            </label>
-            <div className="note-row full">
-              Leave models empty to use each method’s allowed models.
-              Preferences can narrow that list and do not give consent for a
-              job.
-            </div>
-            <label className="consent">
-              <input
-                type="checkbox"
-                checked={prefs.reduced_motion}
-                onChange={(e) =>
-                  setPrefs({ ...prefs, reduced_motion: e.target.checked })
-                }
-              />
-              <span>Prefer reduced motion</span>
-            </label>
-            <div className="nf-foot full">
-              <button className="primary-btn" disabled={busy}>
-                Save preferences
-              </button>
-            </div>
+          <form className="se-box" onSubmit={(e) => { e.preventDefault(); void save("preferences"); }}>
+            <header><b>{icon("lock")}Run Preferences</b><span>Preferences narrow what a method may use. They never give consent for a job.</span></header>
+            <Fx label="Preferred Private Models" hint="One model ID per line. Leave empty to use each method's allowed models."><textarea rows={3} value={models} onChange={(e) => setModels(e.target.value)} /></Fx>
+            <label className="consent"><input type="checkbox" checked={prefs.reduced_motion} onChange={(e) => setPrefs({ ...prefs, reduced_motion: e.target.checked })} /><span>Prefer reduced motion</span></label>
+            <div className="se-actions"><button className="primary-btn" disabled={busy}>Save preferences</button></div>
           </form>
         )}
+        </div>
         <ActionFeedback error={error} message={message} />
       </div>
     </section>

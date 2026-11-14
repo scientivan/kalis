@@ -961,3 +961,67 @@ svg.i { width: 20px; height: 20px; flex: none }
 .reference .se-io .se-box:nth-child(2) .se-flist li { grid-template-columns:minmax(0,1fr) 112px }
 .reference .se-type { overflow:hidden; text-overflow:ellipsis }
 .reference .se-priv { min-width:86px; justify-content:center }
+/* Shared step forms (form-kit.tsx): right column stacks, run page, compact rows so each step fits one laptop viewport. */
+.reference .se-col { display:grid; gap:16px; align-content:start; min-width:0 }
+.reference .se-col .se-checks { grid-template-columns:1fr }
+.reference .se-flist li input { min-height:34px !important; padding:6px 10px !important }
+.reference .se-flist { gap:5px }
+.reference .se-step:disabled { cursor:not-allowed; opacity:.55 }
+.reference .se-step:disabled:hover { background:transparent; border-color:transparent }
+.reference .se-head .ph-title { display:flex; align-items:center; gap:12px; min-width:0 }
+.reference .rp .se-body { min-height:0 }
+.reference .rp .se-split { grid-template-columns:minmax(0,1fr) 300px }
+.reference .rp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px 14px }
+.reference .rp-wide { grid-column:1 / -1 }
+.reference .rp-priv { display:inline-flex; align-items:center; gap:4px; margin-left:8px; padding:1px 7px; border:1px solid var(--blue); border-radius:999px; font-size:11.5px; font-weight:700; color:var(--blue); vertical-align:1px }
+.reference .rp-priv svg { width:11px; height:11px }
+.reference .rp-side { display:grid; gap:14px; align-content:start; position:sticky; top:16px }
+.reference .rp-side .se-split-card { position:static }
+.reference .rp-terms .consent { font-size:13.5px; font-weight:500; line-height:1.4 }
+.reference .rp-models { display:grid; gap:6px }
+.reference .rp-bad { color:#b4321f }
+.reference .rp-dl { display:grid; gap:8px; margin:0 }
+.reference .rp-dl > div { display:flex; justify-content:space-between; gap:12px; padding-bottom:8px; border-bottom:1px dashed var(--line) }
+.reference .rp-dl > div:last-child { border-bottom:0; padding-bottom:0 }
+.reference .rp-dl dt { font-size:13.5px; font-weight:600; color:var(--ink2) }
+.reference .rp-dl dd { margin:0; font-size:14px; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; overflow-wrap:anywhere }
+.reference .se-fx .dd, .reference .se-fx .dd-btn { width:100% }
+@media (max-width:1100px) { .reference .rp .se-split { grid-template-columns:1fr } .reference .rp-side { position:static } }
+.reference .rp-grid { grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px 14px }
+.reference .rp .se-fields { gap:12px }
+.reference .rp .se-box { padding:12px 14px; gap:8px }
+.reference .rp .se-box header { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px }
+.reference .rp .se-fx { gap:5px }
+.reference .rp .se-fx-h { display:flex; flex-wrap:wrap; align-items:center; gap:0 }
+.reference .rp-priv { margin:0 6px 0 0 }
+.reference .rp .se-panel { gap:14px; padding:16px 22px }
+.reference .rp-cap-row { display:flex; justify-content:space-between; align-items:baseline; gap:10px }
+.reference .rp-price { font-size:15px; font-weight:800; font-variant-numeric:tabular-nums }
+.reference .rp-terms { gap:10px }
+.reference .rp .se-step { padding:8px 10px }
+.reference .se-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 16px; padding:16px 20px; align-items:start }
+.reference .dblock .se-form, .reference details .se-form { padding:12px 0 0 }
+.reference .se-form .se-nav { margin-top:0 }
+.reference .se-form .se-nav > span:empty { flex:1 }
+@media (max-width:720px) { .reference .se-form { grid-template-columns:1fr; padding:14px } .reference .se-nav { flex-wrap:wrap } .reference .se-nav > span { flex-basis:100%; order:-1; text-align:left } }
+.reference .rp .se-steps { gap:2px; padding:12px 10px }
+.reference .rp .se-step { padding:6px 8px }
+.reference .rp .se-step-t span { display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden }
+.reference .rp .se-head { padding:12px 20px }
+.reference .se-io { gap:12px }
+.reference .se-io .se-box { padding:12px 14px; gap:8px }
+.reference .se-io .se-box header { display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 10px }
+.reference .se-flist li input { min-height:30px !important; padding:4px 10px !important }
+.reference .se-io .se-priv { height:26px }
+.reference .se-checkbox .se-checks { grid-template-columns:1fr 1fr; gap:4px 18px }
+.reference .se-checkbox .se-checks span { font-size:13px }
+.reference .se-panel { gap:14px; padding:16px 22px }
+@media (max-width:820px) { .reference .se-checkbox .se-checks { grid-template-columns:1fr } }
+.reference .se-checkbox .se-checks { grid-template-columns:repeat(3,minmax(0,1fr)) }
+.reference .se-head { padding:12px 20px }
+@media (max-width:1100px) { .reference .se-checkbox .se-checks { grid-template-columns:1fr 1fr } }
+.reference .se-body { min-height:480px }
+.reference .se-io > form.se-box { display:flex; flex-direction:column } .reference .se-io > form.se-box .se-actions { margin-top:auto }
+.reference .se-form6 { grid-template-columns:repeat(6,minmax(0,1fr)) }
+.reference .se-form6 .s2 { grid-column:span 2 } .reference .se-form6 .s3 { grid-column:span 3 }
+@media (max-width:720px) { .reference .se-form6 { grid-template-columns:1fr } .reference .se-form6 .s2, .reference .se-form6 .s3 { grid-column:auto } }

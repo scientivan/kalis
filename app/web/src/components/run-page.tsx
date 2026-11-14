@@ -12,7 +12,10 @@ import { useNearAuth, type ContractCall } from "../lib/near/auth";
 import { WalletReview, walletError } from "./wallet-review";
 import { PreparationSources } from "./data-tools";
 import { Capability } from "./capability";
-import { PageInfo, Segmented, Dropdown } from "./controls";
+import { PageInfo, Dropdown } from "./controls";
+import { Fx, StepRail, Msg } from "./form-kit";
+import { ManifestInput, type ManifestField } from "./manifest-fields";
+import { statusLabel } from "../lib/labels";
 
 type Field = { id: string; label: string; type?: string; unit?: string; required?: boolean; private?: boolean; help?: string; enum?: string[]; items?: { type?: string }; display?: string; source?: string; min?: number; max?: number };
 type Manifest = { inputs?: { fields?: Field[]; sample?: Record<string, unknown> }; outputs?: { fields?: Field[]; status_field?: string }; steps?: { id: string; what: string }[]; buyer_checks?: unknown[]; ai?: { allowed?: string[] }; listing?: { outcome?: string } };
@@ -26,6 +29,9 @@ type Verdict = { status: string; reasons: string[] };
 type CheckResult = { results: { id: string; description: string; status: string; message: string }[] };
 
 const STAGES = ["Your data", "Pay", "Run", "Result"];
+const STAGE_TITLE: Record<string, string> = { "Your data": "Your Data", Pay: "Pay", Run: "Run", Result: "Result" };
+const STAGE_HINT: Record<string, string> = { "Your data": "Fill in your values, they stay sealed", Pay: "Check the cost and pay into escrow", Run: "The method runs in a locked chip", Result: "Open, check and release payment" };
+const ESCROW: Record<string, string> = { NotPaid: "Not paid yet", Paid: "Held in escrow", Released: "Paid to the expert", Refunded: "Refunded to you", Reclaimed: "Taken back by you" };
 const VERDICT_TEXT: Record<string, string> = { safe: "Safe to use", attention: "Needs your attention", do_not_use: "Do not use" };
 // The sealing secret lives only in this tab's memory. It is never stored or sent.
 const secrets = new Map<string, { sealed: Sealed; input: Record<string, unknown>; version: Version; manifest: Manifest; completionKey: string }>();
@@ -97,6 +103,7 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
   const m: Manifest = v?.manifest || {};
   const stage = answer ? 3 : runId && secrets.has(runId) ? 2 : runId ? 3 : 0;
   const [view, setView] = useState<string | null>(null);
+  const [dataPage, setDataPage] = useState(0);
   const current = view || STAGES[Math.min(stage, 3)];
   useEffect(() => { setView(null); }, [stage]);
 
@@ -210,88 +217,130 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
   });
 
   const status = settled?.status || chain?.status;
+  const escrowText = status ? ESCROW[status] || statusLabel(status.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase()) : "Not paid yet";
+  const price = v?.price_amount?.display || (v ? `${v.price_near} NEAR` : "");
+  const fields = m.inputs?.fields || [];
+  const complex = (f: Field) => f.type === "object" || (f.type === "array" && !!(f as ManifestField).items?.fields);
+  const setField = (id: string, x: string) => { setValues(old => ({ ...old, [id]: x })); setSources(old => ({ ...old, [id]: { kind: "typed", reviewed_by_buyer: true } })); };
+  const fieldInput = (f: Field) => {
+    const hint = [f.unit, f.required ? "" : "Optional", f.type === "array" ? "Separate values with commas" : ""].filter(Boolean).join(", ");
+    const hintNode = (hint || f.help || f.private) ? <>{f.private && <span className="rp-priv">{icon("lock")}Private</span>}{hint}{hint && f.help ? ". " : ""}{f.help}</> : undefined;
+    const label = f.label;
+    if (f.type === "boolean" || f.enum) return <div className="se-fx" key={f.id}><span className="se-fx-l">{label}</span><Dropdown label={f.label} value={values[f.id] || (f.enum ? f.enum[0] : "false")} onChange={x => setField(f.id, x)} options={f.enum ? f.enum.map(o => ({ value: o, label: o.charAt(0).toUpperCase() + o.slice(1) })) : [{ value: "true", label: "Yes" }, { value: "false", label: "No" }]} />{hintNode && <span className="se-fx-h">{hintNode}</span>}</div>;
+    return <div className={f.type === "text" ? "rp-wide" : ""} key={f.id}><Fx label={label} hint={hintNode}>{f.type === "text" ? <textarea rows={2} value={values[f.id] || ""} onChange={e => setField(f.id, e.target.value)} /> : <input inputMode={f.type === "array" || f.type === "string" ? "text" : "decimal"} value={values[f.id] || ""} onChange={e => setField(f.id, e.target.value)} />}</Fx></div>;
+  };
+  const privateFields = fields.filter(f => f.private && !complex(f)), plainFields = fields.filter(f => !f.private && !complex(f)), groups = fields.filter(complex);
+  const groupValue = (f: Field) => { try { return JSON.parse(values[f.id] || ""); } catch { return undefined; } };
+  const dataPages = [
+    ...(privateFields.length ? [{ id: "d:private", title: "Private Values", hint: "Sealed on this device before anything is sent" }] : []),
+    ...(plainFields.length ? [{ id: "d:details", title: "Other Details", hint: "Also sealed, used to shape the answer" }] : []),
+    ...groups.map(g => ({ id: `d:${g.id}`, title: g.label, hint: g.help || (g.type === "array" ? "A list you can add rows to" : `${((g as ManifestField).fields || []).length} related values`) })),
+  ];
+  const page = dataPages[Math.min(dataPage, Math.max(0, dataPages.length - 1))];
+  const railId = current === "Your data" ? page?.id || "Your data" : current;
+  const reachable = (s: string) => STAGES.indexOf(s) <= stage || (s === "Pay" && consent);
+  const idx = STAGES.indexOf(current);
+  const allowed = (s: string) => reachable(s) && setView(s);
+  const termsOk = consent && input.ok && (v?.method_kind?.kind !== "prompt" || promptConsent);
+  const statusCard = <section className="se-split-card rp-status" aria-label="Run status">
+    <b className="se-cap">Run Status</b>
+    <dl>
+      <div><dt>Price per run</dt><dd>{price}</dd></div>
+      <div><dt>Your payment</dt><dd>{escrowText}</dd></div>
+      <div><dt>Method version</dt><dd>Version {v?.number}</dd></div>
+      {!!events.length && <div><dt>Latest progress</dt><dd>{statusLabel(events[events.length - 1].phase)}<small>{new Date(events[events.length - 1].at).toLocaleTimeString()}</small></dd></div>}
+    </dl>
+    {(payTx || settled?.settle_tx_url) && <div className="uses">{payTx && <a className="use" href={payTx} target="_blank" rel="noreferrer">{icon("link")}Payment on NEAR</a>}{settled?.settle_tx_url && <a className="use" href={settled.settle_tx_url} target="_blank" rel="noreferrer">{icon("link")}Settlement on NEAR</a>}</div>}
+    {chain?.reclaimable && <button className="view" disabled={!!busy} onClick={reclaim}>Take my payment back</button>}
+    {chain?.reclaim_after_ns && chain.status === "Paid" && <span className="se-foot-note">You can take the payment back after {new Date(Number(BigInt(chain.reclaim_after_ns)/1000000n)).toLocaleString()} if the run does not finish.</span>}
+    {operation && <button className="view" disabled={!!busy} onClick={()=>act("Checking progress",async()=>{const op=await backend<{status:string;kind:string;error?:{message:string}}>(`operations/${operation}`);if(op.status === "succeeded"&&op.kind === "execution"){const s=secrets.get(runId);if(s){displayExecution(s,await backend<Execution>(`runs/${encodeURIComponent(runId)}/execution`));setView("Result");}}else if(op.status !== "succeeded")throw new Error(op.error?.message||`The job is ${statusLabel(op.status).toLowerCase()}.`);})}>Check progress again</button>}
+    <span className="se-foot-note">Your data and answer never leave this browser unsealed.</span>
+  </section>;
+
   return <Capability id="run_drafts_quotes"><AppShell active={status === "Released" || status === "Refunded" ? "Results" : "Ongoing"}>
-    <section className="card ph">
-      <div className="ph-title">
-        <Link className="ghost-ic" href={d ? `/marketplace/${encodeURIComponent(d.method_id)}` : "/marketplace"} aria-label="Back" title="Back"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg></Link>
-        <h1>{d ? d.title : "Run privately"}</h1>
+    {error && !d && <section className="card ph" role="alert"><p className="form-error">{error}</p></section>}
+    {d && v && <section className="card list-card se rp">
+      <header className="se-head">
+        <div className="ph-title"><Link className="ghost-ic" href={`/marketplace/${encodeURIComponent(d.method_id)}`} aria-label="Back to the method" title="Back to the method"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg></Link><div><h2>{d.title}</h2><span>Private run of version {v.number}</span></div></div>
+        <div className="se-head-acts"><span className={`kchip ${status === "Released" ? "" : "se-chip-wait"}`}>{escrowText}</span><PageInfo title="What Happens in a Private Run" points={[{ icon: icon("lock"), text: "Your data is sealed in this browser. Only ciphertext leaves." }, { icon: icon("coins"), text: "Your payment waits in escrow until every step works." }, { icon: icon("check"), text: "The answer opens here, and your device checks it." }]} /></div>
+      </header>
+      <div className="se-body">
+        <StepRail label="Run steps" steps={[...dataPages, ...STAGES.slice(1).map(s => ({ id: s, title: STAGE_TITLE[s], hint: STAGE_HINT[s] }))]} current={railId} done={Object.fromEntries([...dataPages.map(p => [p.id, stage > 0 || !!quote]), ...STAGES.map((s, i) => [s, i < stage || (s === "Result" && !!answer)])])} disabled={Object.fromEntries(STAGES.map(s => [s, !reachable(s)]))} onPick={id => { const i = dataPages.findIndex(p => p.id === id); if (i >= 0) { setDataPage(i); setView("Your data"); } else allowed(id); }} />
+        <div className="se-panel">
+          <div className="se-panel-head"><h3>{current === "Your data" && page ? page.title : STAGE_TITLE[current]}</h3><p>{current === "Your data" && page ? `${page.hint}. Part ${dataPage + 1} of ${dataPages.length} of your data.` : `${STAGE_HINT[current]}.`}</p></div>
+          <div className="se-split">
+            <div className="se-fields">
+              {current === "Your data" && <>
+                {dataPage === 0 && <PreparationSources methodId={d.method_id} runId={runId || undefined} fields={fields} onValue={(fieldId,value,source)=>{setValues(old=>({...old,[fieldId]:typeof value === "string" ? value : JSON.stringify(value)}));setSources(old=>({...old,[fieldId]:source}));}}/>}
+                {page?.id === "d:private" && <div className="rp-grid">{privateFields.map(fieldInput)}</div>}
+                {page?.id === "d:details" && <div className="rp-grid">{plainFields.map(fieldInput)}</div>}
+                {groups.filter(f => page?.id === `d:${f.id}`).map(f => { const mf = f as ManifestField; const gv = groupValue(f); const obj = gv && typeof gv === "object" && !Array.isArray(gv) ? gv as Record<string, unknown> : {};
+                  return mf.type === "object" ? <div className="rp-grid" key={f.id}>{(mf.fields || []).map(child => <ManifestInput key={child.id} field={child} value={obj[child.id]} onChange={next => setField(f.id, JSON.stringify({ ...obj, [child.id]: next }))} />)}</div>
+                    : <ManifestInput key={f.id} field={{ ...mf, label: "Items", help: undefined }} value={gv} onChange={next => setField(f.id, next === undefined ? "" : JSON.stringify(next))} />; })}
+              </>}
+              {current === "Pay" && <>
+                <Dropdown label="Payment" value={payment} onChange={setPayment} options={[{value:"demo_topup",label:"Test top-up (no real money)"},{value:"wallet",label:"NEAR wallet"}]}/>
+                {quote ? <section className="se-box"><header><b>{icon("coins")}Cost of This Run</b><span>This quote is valid until {new Date(quote.expires_at).toLocaleTimeString()}.</span></header>
+                  <dl className="rp-dl">{Object.entries({"Method price":quote.method_price,"Storage deposit":quote.storage_deposit,"Infrastructure, paid by Kalis":quote.infra_fee,"Network fee, at most":quote.gas,"Most you can pay":quote.max_total}).map(([label,money])=><div key={label}><dt>{label}</dt><dd>{money?.display || "Unavailable"}</dd></div>)}</dl></section>
+                  : <p className="se-empty">Go back to Your Data and press See the cost first.</p>}
+                <div className="se-note">{icon("info")}<span>Wallet payment needs your connected NEAR testnet account. A submitted payment is never retried automatically.</span></div>
+              </>}
+              {current === "Run" && <section className="se-box"><header><b>{icon("play")}{busy ? "Running in the Locked Chip" : "Steps That Will Run"}</b><span>{busy ? "This can take up to four minutes. Keep this tab open." : "Keep this tab open. The key that opens your answer lives only here."}</span></header>
+                <ol className={`steps ${busy ? "live" : ""}`}>{(m.steps || []).map((s, i) => <li key={s.id} style={{ "--i": i } as React.CSSProperties}><span className="sn">{i + 1}</span><span>{s.what}</span></li>)}</ol></section>}
+              {current === "Result" && <>
+                {!answer && <div className="se-note">{icon("info")}<span>{runId && !secrets.has(runId) ? "This tab did not seal this run, so it cannot open the answer. Your payment status is on the right." : "The answer appears here after the run."}</span></div>}
+                {verdict && <div className={`verdict v-${verdict.status}`}><b>{VERDICT_TEXT[verdict.status] || statusLabel(verdict.status)}</b>{verdict.reasons.map(r => <span key={r}>{r}</span>)}</div>}
+                {answer && <section className="se-box"><header><b>{icon("file")}Your Answer</b></header><dl className="rp-dl">{(m.outputs?.fields || []).map(f => <div key={f.id}><dt>{f.label}</dt><dd>{show(answer[f.id])}{f.unit && answer[f.id] !== undefined ? ` ${f.unit}` : ""}</dd></div>)}</dl></section>}
+                {checks && <section className="se-box"><header><b>{icon("shield")}Your Checks</b></header><div className="rows">{checks.results.map(c => <div className="row" key={c.id}><span className={`okdot s-${c.status}`} aria-hidden="true">{icon(c.status === "pass" ? "check" : "info")}</span><span className="two"><b>{c.description}</b><span>{c.status === "pass" ? "Passed" : c.status === "not_applicable" ? "Does not apply to this answer" : c.message}</span></span></div>)}</div></section>}
+                {proof.length > 0 && <section className="se-box"><header><b>{icon("check")}Proof</b></header><div className="uses">{proof.map(p => <span className={`use ${p.ok ? "" : "bad"}`} key={p.label}>{icon(p.ok ? "check" : "info")}{p.label}</span>)}</div></section>}
+                {!!aiCalls.length && <details className="se-more"><summary>Private AI call evidence</summary><pre className="backend-data">{JSON.stringify(aiCalls,null,2)}</pre></details>}
+              </>}
+              {runId && !answer && secrets.has(runId) && <button className="view" disabled={!!busy} onClick={openExisting}>Open completed answer on this device</button>}
+              {pendingCall && !reviewing && chain?.status !== "Paid" && chain?.status !== "Reclaimed" && <div className="se-warn"><p>{walletErr || "The payment is prepared but not signed yet. Nothing has been paid."}</p><div className="se-actions"><button className="primary-btn" disabled={walletBusy} onClick={() => setReviewing(lastMode.current)}>Review and sign</button></div></div>}
+              {pendingCall && !reviewing && chain?.status !== "Paid" && <div className="se-note">{icon("info")}<span>If you already signed, the payment may still be confirming on chain. Check its status before signing again. <button className="view" disabled={!!busy} onClick={()=>act("Checking wallet payment",async()=>setChain(await backend(`runs/${encodeURIComponent(runId)}`)))}>Check payment status</button></span></div>}
+              {!!paymentAttempt.current && !runId && <button className="view" onClick={recoverPayment} disabled={!!busy}>Check payment status</button>}
+            </div>
+            <aside className="rp-side">
+              {current === "Your data" && <section className="se-split-card rp-terms" aria-label="Before you pay">
+                <div className="rp-cap-row"><b className="se-cap">Before You Pay</b><b className="rp-price">{price}</b></div>
+                {!!m.ai?.allowed?.length && <div className="rp-models"><span className="se-fx-l">Private Models</span>{m.ai.allowed.map(model=><label className="consent" key={model}><input type="checkbox" checked={models.includes(model)} onChange={e=>setModels(old=>e.target.checked?[...old,model]:old.filter(x=>x!==model))}/><span>{model}</span></label>)}</div>}
+                {v.method_kind?.kind === "prompt" && <label className="consent"><input type="checkbox" checked={promptConsent} onChange={e=>setPromptConsent(e.target.checked)}/><span>I understand this is an AI prompt. Following the seller’s rules cannot be proven, and its answer is at best Needs your attention.</span></label>}
+                <label className="consent"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /><span>I checked my data and agree to pay {price} into escrow.</span></label>
+                {!input.ok && <span className="se-foot-note rp-bad">{input.message}</span>}
+                <span className="se-foot-note">The example values are synthetic. Replace them with your own. They are sealed here and never shown to the expert.</span>
+              </section>}
+              {current === "Pay" && quote && <section className="se-split-card" aria-label="Where the money goes">
+                <b className="se-cap">Where the Method Price Goes</b>
+                <div className="se-bar" role="img" aria-label={`Expert ${quote.allocation_base.seller_pct}%, community ${quote.allocation_base.dao_pct}%, platform ${quote.allocation_base.platform_pct}%`}><i style={{ flex: quote.allocation_base.seller_pct }} className="b1" /><i style={{ flex: quote.allocation_base.dao_pct }} className="b2" /><i style={{ flex: quote.allocation_base.platform_pct }} className="b3" /></div>
+                <dl><div><dt><i className="b1" />Expert</dt><dd>{quote.allocation_base.seller_pct}%</dd></div><div><dt><i className="b2" />Community fund</dt><dd>{quote.allocation_base.dao_pct}%</dd></div><div><dt><i className="b3" />Kalis platform</dt><dd>{quote.allocation_base.platform_pct}%</dd></div></dl>
+                <span className="se-foot-note">{price} waits in the escrow contract. It is released only if every step works. Otherwise you can take it back after the timeout.</span>
+              </section>}
+              {current === "Result" && answer && eligibility?.eligible && !rated && <section className="se-split-card" aria-label="Rate this method">
+                <b className="se-cap">Rate This Method</b>
+                <div className="rate">{[1, 2, 3, 4, 5].map(n => <button key={n} className={n <= rating ? "on" : ""} aria-label={`${n} out of 5`} onClick={() => setRating(n)}>★</button>)}</div>
+                <Fx label="Comment" hint="Optional. Leave out your private data."><textarea rows={2} maxLength={500} value={comment} onChange={e => setComment(e.target.value)} /></Fx>
+                <button className="view" disabled={!rating || !!busy} onClick={rate}>Save rating</button>
+              </section>}
+              {rated && <div className="se-msg">{icon("check")}<span>{rated}</span></div>}
+              {current !== "Your data" && statusCard}
+            </aside>
+          </div>
+          <Msg error={d && v ? error : ""} text={busy} />
+          <footer className="se-nav">
+            <button className="view" disabled={idx <= 0 && dataPage === 0} onClick={() => { if (current === "Your data") setDataPage(Math.max(0, dataPage - 1)); else { setView(STAGES[Math.max(0, idx - 1)]); if (idx === 1) setDataPage(Math.max(0, dataPages.length - 1)); } }}>Back</button>
+            <span>{escrowText}</span>
+            {current === "Your data" && dataPage < dataPages.length - 1 && <button className="primary-btn" onClick={() => setDataPage(dataPage + 1)}>Continue</button>}
+            {current === "Your data" && dataPage >= dataPages.length - 1 && <button className="primary-btn" disabled={!!busy || !termsOk} onClick={prepareQuote}>{busy || "See the cost"}</button>}
+            {current === "Pay" && <button className="primary-btn" disabled={!!busy || !consent || !!runId || !!paymentAttempt.current || (payment === "wallet" && !auth.session)} onClick={pay}>{icon("lock")}{busy || (payment === "wallet" ? "Seal and review payment" : "Seal and pay")}</button>}
+            {current === "Run" && <button className="primary-btn" disabled={!!busy || chain?.status !== "Paid" || !secrets.has(runId) || !!answer} onClick={execute}>{icon("play")}{busy || "Run privately"}</button>}
+            {current === "Result" && answer && !settled && <button className="primary-btn" disabled={!!busy} onClick={settle}>{busy || "Release payment"}</button>}
+          </footer>
+        </div>
       </div>
-      <div className="ph-actions"><PageInfo title="What happens in a private run" points={[{ icon: icon("lock"), text: "Your data is sealed in this browser. Only ciphertext leaves." }, { icon: icon("coins"), text: "Your payment waits in escrow until every step works." }, { icon: icon("check"), text: "The answer opens here, and your device checks it." }]} /></div>
-    </section>
-    {error && <section className="card ph" role="alert"><p className="form-error">{error}</p></section>}
-    {d && v && <div className="detail">
-      <section className="card list-card">
-        <div className="toolbar"><Segmented label="Run stage" options={STAGES} value={current} onChange={s => (STAGES.indexOf(s) <= stage || (s === "Pay" && consent)) && setView(s)} /></div>
-        <div className="dpane" key={current}>
-          {current === "Your data" && <>
-            <div className="dblock">
-              <div className="note-row">{icon("lock")}<span>The example values are synthetic. Replace them with your own. They are sealed here and never shown to the expert.</span></div>
-              <PreparationSources methodId={d.method_id} runId={runId || undefined} fields={m.inputs?.fields || []} onValue={(fieldId,value,source)=>{setValues(old=>({...old,[fieldId]:typeof value === "string" ? value : JSON.stringify(value)}));setSources(old=>({...old,[fieldId]:source}));}}/>
-              <div className="rform">{(m.inputs?.fields || []).map(f => {
-                const set = (x: string) => {setValues({ ...values, [f.id]: x }); setSources(old=>({...old,[f.id]:{kind:"typed",reviewed_by_buyer:true}}));};
-                const label = `${f.label}${f.unit ? ` (${f.unit})` : ""}${f.required ? "" : ", optional"}${f.private ? ", private" : ""}`;
-                if (f.type === "boolean" || f.enum) return <div className="fx-dd" key={f.id} title={f.help}><Dropdown label={label} value={values[f.id] || (f.enum ? f.enum[0] : "false")} onChange={set} options={f.enum ? f.enum.map(o => ({ value: o, label: o.charAt(0).toUpperCase() + o.slice(1) })) : [{ value: "true", label: "Yes" }, { value: "false", label: "No" }]} /></div>;
-                return <label className={`fx ${f.type === "text" ? "tall full" : ""}`} key={f.id} title={f.help}>
-                  <span className="fx-label">{label}</span>
-                  {f.type === "text" ? <textarea rows={3} value={values[f.id] || ""} onChange={e => set(e.target.value)} /> : <input inputMode={f.type === "array" || f.type === "string" ? "text" : "decimal"} value={values[f.id] || ""} onChange={e => set(e.target.value)} placeholder={f.type === "array" ? "Separate with commas" : ""} />}
-                </label>;
-              })}</div>
-              {!input.ok && <p className="form-error">{input.message}</p>}
-            </div>
-            {v.method_kind?.kind === "prompt" && <label className="consent"><input type="checkbox" checked={promptConsent} onChange={e=>setPromptConsent(e.target.checked)}/><span>I understand this is an AI prompt. Following the seller’s rules cannot be proven, and its answer is at best Needs your attention.</span></label>}
-            {!!m.ai?.allowed?.length && <div className="dblock"><h2 className="h3">Private models</h2>{m.ai.allowed.map(model=><label className="consent" key={model}><input type="checkbox" checked={models.includes(model)} onChange={e=>setModels(old=>e.target.checked?[...old,model]:old.filter(x=>x!==model))}/><span>{model}</span></label>)}</div>}
-            <div className="nf-foot"><label className="consent"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /><span>I checked my data and agree to pay {v.price_amount?.display || `${v.price_near} NEAR`} into escrow.</span></label><button className="primary-btn" disabled={!!busy || !consent || !input.ok || (v.method_kind?.kind === "prompt" && !promptConsent)} onClick={prepareQuote}>{busy || "See the cost"}</button></div>
-          </>}
-          {current === "Pay" && <div className="dblock"><h2 className="h3">Pay into escrow</h2>
-            <div className="rows">
-              <Dropdown label="Payment" value={payment} onChange={setPayment} options={[{value:"demo_topup",label:"Test top-up (no real money)"},{value:"wallet",label:"NEAR wallet"}]}/>
-              {quote && Object.entries({"Method price":quote.method_price,"Storage deposit":quote.storage_deposit,"Infrastructure paid by platform":quote.infra_fee,"Gas upper bound":quote.gas,"Maximum total":quote.max_total}).map(([label,money])=><div className="row" key={label}><span>{label}</span><b>{money?.display || "Unavailable"}</b></div>)}
-              {quote && <div className="note-row">Method price split {quote.allocation_base.seller_pct}% expert, {quote.allocation_base.dao_pct}% community, {quote.allocation_base.platform_pct}% platform. Quote expires {new Date(quote.expires_at).toLocaleTimeString()}.</div>}
-              <div className="row"><span className="two"><b>{v.price_amount?.display || `${v.price_near} NEAR`} held by the escrow contract</b><span>Released to the expert, the community fund and Kalis only if every step works. Otherwise you can reclaim it after the timeout.</span></span></div>
-            </div>
-            <div className="nf-foot"><span className="note-row">{icon("info")}<span>Wallet payment requires your connected NEAR testnet account. A submitted payment is never retried automatically.</span></span><button className="primary-btn" disabled={!!busy || !consent || !!runId || !!paymentAttempt.current || (payment === "wallet" && !auth.session)} onClick={pay}>{icon("lock")}{busy || (payment === "wallet" ? "Seal and review payment" : "Seal and pay")}</button></div>
-          </div>}
-          {runId && !answer && secrets.has(runId) && <button className="view" disabled={!!busy} onClick={openExisting}>Open completed answer on this device</button>}
-          {pendingCall && reviewing && <WalletReview call={pendingCall} signer={auth.session?.account_id} busy={walletBusy} error={walletErr}
-            title={reviewing === "pay" ? "Review your payment" : "Review taking your payment back"}
-            explanation={reviewing === "pay" ? `You are about to pay for one private run of ${d?.title || "this method"}, version ${v?.number ?? ""}. The money goes into the Kalis escrow contract, not to the expert. It is released only if every step succeeds, otherwise you can take it back after the timeout.` : "This asks the escrow contract to return your payment for this run to your account. It works only after the timeout has passed."}
-            onConfirm={() => void confirmWallet()} onCancel={() => { setReviewing(null); setWalletErr(""); }}/>}
-          {pendingCall && !reviewing && chain?.status !== "Paid" && chain?.status !== "Reclaimed" && <div className="note-row"><div><p>{walletErr || "The payment is prepared but not signed yet. Nothing has been paid."}</p><button className="primary-btn" disabled={walletBusy} onClick={() => setReviewing(lastMode.current)}>Review and sign</button></div></div>}
-          {pendingCall && !reviewing && chain?.status !== "Paid" && <div className="note-row"><div><p>If you already signed, the payment may still be confirming on chain. Check its status before signing again.</p><button className="view" disabled={!!busy} onClick={()=>act("Checking wallet payment",async()=>setChain(await backend(`runs/${encodeURIComponent(runId)}`)))}>Check payment status</button></div></div>}
-          {!!paymentAttempt.current && !runId && <button className="view" onClick={recoverPayment} disabled={!!busy}>Check payment status</button>}
-          {current === "Run" && <div className="dblock"><h2 className="h3">{busy ? "Running in the locked chip. This can take up to four minutes." : "Ready to run"}</h2>
-            <ol className={`steps ${busy ? "live" : ""}`}>{(m.steps || []).map((s, i) => <li key={s.id} style={{ "--i": i } as React.CSSProperties}><span className="sn">{i + 1}</span><span>{s.what}</span></li>)}</ol>
-            <div className="nf-foot"><span className="note-row">{icon("info")}<span>Keep this tab open. The key that opens your answer lives only here.</span></span><button className="primary-btn" disabled={!!busy || chain?.status !== "Paid" || !secrets.has(runId) || !!answer} onClick={execute}>{icon("play")}{busy || "Run privately"}</button></div>
-          </div>}
-          {current === "Result" && <>
-            {!answer && <div className="note-row">{icon("info")}<span>{runId && !secrets.has(runId) ? "This tab did not seal this run, so it cannot open the answer. The escrow status is on the right." : "The answer appears here after the run."}</span></div>}
-            {verdict && <div className={`verdict v-${verdict.status}`}><b>{VERDICT_TEXT[verdict.status] || verdict.status}</b>{verdict.reasons.map(r => <span key={r}>{r}</span>)}</div>}
-            {answer && <div className="dblock"><h2 className="h3">Your answer</h2><div className="rows">{(m.outputs?.fields || []).map(f => <div className="row" key={f.id}><span className="two"><span>{f.label}</span><b>{show(answer[f.id])}{f.unit && answer[f.id] !== undefined ? ` ${f.unit}` : ""}</b></span></div>)}</div></div>}
-            {checks && <div className="dblock"><h2 className="h3">Your checks</h2><div className="rows">{checks.results.map(c => <div className="row" key={c.id}><span className={`okdot s-${c.status}`} aria-hidden="true">{icon(c.status === "pass" ? "check" : "info")}</span><span className="two"><b>{c.description}</b><span>{c.status === "pass" ? "Passed" : c.status === "not_applicable" ? "Does not apply to this answer" : c.message}</span></span></div>)}</div></div>}
-            {!!aiCalls.length && <details className="dblock"><summary>Private AI call evidence</summary><pre className="backend-data">{JSON.stringify(aiCalls,null,2)}</pre></details>}
-            {proof.length > 0 && <div className="dblock"><h2 className="h3">Proof</h2><div className="uses">{proof.map(p => <span className={`use ${p.ok ? "" : "bad"}`} key={p.label}>{icon(p.ok ? "check" : "info")}{p.label}</span>)}</div></div>}
-            {answer && !settled && <div className="nf-foot"><span className="note-row">{icon("coins")}<span>Release the escrow when you are done. A failed run refunds instead.</span></span><button className="primary-btn" disabled={!!busy} onClick={settle}>{busy || "Settle payment"}</button></div>}
-            {eligibility?.eligible && !rated && <div className="dblock"><h2 className="h3">Rate this method</h2><div className="rate">{[1, 2, 3, 4, 5].map(n => <button key={n} className={n <= rating ? "on" : ""} aria-label={`${n} out of 5`} onClick={() => setRating(n)}>★</button>)}</div>
-              <label className="fx tall full"><span className="fx-label">Comment, optional. Leave out your private data.</span><textarea rows={2} maxLength={500} value={comment} onChange={e => setComment(e.target.value)} /></label>
-              <div className="nf-foot"><span /><button className="primary-btn" disabled={!rating || !!busy} onClick={rate}>Save rating</button></div></div>}
-            {rated && <div className="note-row">{icon("check")}<span>{rated}</span></div>}
-          </>}
-        </div>
-      </section>
-      <aside className="card dside" aria-label="Run summary">
-        <div className="dprice"><small>Price per run</small><b>{v.price_amount?.display || `${v.price_near} NEAR`}</b></div>
-        <div className="rows">
-          <div className="row"><span className="two"><span>Escrow</span><b>{status ? ({ Paid: "Held in escrow", Released: "Released to the expert", Refunded: "Refunded to you" } as Record<string, string>)[status] || status : "Not paid yet"}</b></span></div>
-          {runId && <div className="row"><span className="two"><span>Run</span><b className="hash">{runId}</b></span></div>}
-          <div className="row"><span className="two"><span>Version</span><b>v{v.number}</b></span></div>
-        </div>
-        {(payTx || settled?.settle_tx_url) && <div className="uses">{payTx && <a className="use" href={payTx} target="_blank" rel="noreferrer">{icon("link")}Payment on NEAR</a>}{settled?.settle_tx_url && <a className="use" href={settled.settle_tx_url} target="_blank" rel="noreferrer">{icon("link")}Settlement on NEAR</a>}</div>}
-        {!!events.length && <div className="dblock"><h2 className="h3">Job progress</h2>{events.map((event,i)=><div className="row" key={`${event.at}-${i}`}><span>{event.phase.replaceAll("_"," ")}</span><small>{new Date(event.at).toLocaleTimeString()}</small></div>)}</div>}
-        {chain?.reclaimable && <button className="view" disabled={!!busy} onClick={reclaim}>Take my payment back</button>}
-        {chain?.reclaim_after_ns && chain.status === "Paid" && <div className="note-row">Reclaim available after {new Date(Number(BigInt(chain.reclaim_after_ns)/1000000n)).toLocaleString()}.</div>}
-        {operation && <div className="note-row"><div><p>Operation {operation}</p><button className="view" disabled={!!busy} onClick={()=>act("Checking operation",async()=>{const op=await backend<{status:string;kind:string;error?:{message:string}}>(`operations/${operation}`);if(op.status === "succeeded"&&op.kind === "execution"){const s=secrets.get(runId);if(s){displayExecution(s,await backend<Execution>(`runs/${encodeURIComponent(runId)}/execution`));setView("Result");}}else if(op.status !== "succeeded")throw new Error(op.error?.message||`Operation is ${op.status}.`);})}>Check operation status</button></div></div>}
-        <div className="dside-foot"><span className="hint2">Your data and answer never leave this browser unsealed.</span></div>
-      </aside>
-    </div>}
+      {pendingCall && reviewing && <WalletReview call={pendingCall} signer={auth.session?.account_id} busy={walletBusy} error={walletErr}
+        title={reviewing === "pay" ? "Review Your Payment" : "Review Taking Your Payment Back"}
+        explanation={reviewing === "pay" ? `You are about to pay for one private run of ${d?.title || "this method"}, version ${v?.number ?? ""}. The money goes into the Kalis escrow contract, not to the expert. It is released only if every step succeeds, otherwise you can take it back after the timeout.` : "This asks the escrow contract to return your payment for this run to your account. It works only after the timeout has passed."}
+        onConfirm={() => void confirmWallet()} onCancel={() => { setReviewing(null); setWalletErr(""); }}/>}
+    </section>}
   </AppShell></Capability>;
 }

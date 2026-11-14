@@ -7,6 +7,7 @@ import { sessionHeader } from "../lib/backend/client";
 import { useNearAuth } from "../lib/near/auth";
 import { sealMethod, sha256Hex } from "../lib/backend/crypto";
 import { icon } from "./shell";
+import { Fx } from "./form-kit";
 
 type ContractCall = { receiver_id: string; method_name: string; args: Record<string, unknown>; deposit_yocto: string; gas_tgas: number; signer_must_be?: string };
 type Draft = { id: string; method_id: string; kind: "wasm" | "prompt"; title: string; revision: number; state: string; new_method?: boolean; manifest: Record<string, unknown> | null; price_yocto: string | null; dao_share_pct: number; parent: number | null; artifact: { code_hash: string; size: number; sealed: boolean } | null; seller_prompt_warning_accepted?: { version: string | number }; publication?: Publication | null };
@@ -43,10 +44,10 @@ const TYPE_LABEL: Record<string, string> = { string: "Text", text: "Long text", 
 type StepId = "listing" | "io" | "price" | "sealed" | "publish";
 const STEPS: { id: StepId; title: string; hint: string; icon: string }[] = [
   { id: "listing", title: "Listing", hint: "What buyers see in the Marketplace", icon: "store" },
-  { id: "io", title: "Inputs and answer", hint: "What buyers give and what they get back", icon: "file" },
-  { id: "price", title: "Price and earnings", hint: "Price per run and how it is split", icon: "coins" },
-  { id: "sealed", title: "Sealed method", hint: "Your program or prompt, locked on this device", icon: "lock" },
-  { id: "publish", title: "Review and publish", hint: "Final check, then sign with your wallet", icon: "check" },
+  { id: "io", title: "Inputs and Answer", hint: "What buyers give and what they get back", icon: "file" },
+  { id: "price", title: "Price and Earnings", hint: "Price per run and how it is split", icon: "coins" },
+  { id: "sealed", title: "Sealed Method", hint: "Your program or prompt, locked on this device", icon: "lock" },
+  { id: "publish", title: "Review and Publish", hint: "Final check, then sign with your wallet", icon: "check" },
 ];
 // Map a validation error path to the step that can fix it.
 function stepOf(path: string): StepId {
@@ -122,7 +123,7 @@ export function SellerEditor({ id, onClose, onChanged }: { id: string; onClose: 
       catch { throw new Error("The manifest text is not valid JSON. Fix it or close the manifest text to keep the form values."); }
     }
     const warningVersion = config?.method_kinds?.seller_prompt_warning_version;
-    if (draft.kind === "prompt" && (!accepted || warningVersion === undefined)) throw new Error("Accept the prompt warning in the Sealed method step first.");
+    if (draft.kind === "prompt" && (!accepted || warningVersion === undefined)) throw new Error("Accept the prompt warning in the Sealed Method step first.");
     const value = await request<Draft>(path, "PATCH", { expected_revision: draft.revision, manifest: { ...manifest, dao_share_percent: share }, price_yocto: nearToYocto(price), dao_share_pct: share, parent: draft.parent, ...(draft.kind === "prompt" ? { seller_prompt_warning_accepted: { version: warningVersion } } : {}) });
     setDraft(value); setDirty(false); setValidation(null); setPublication(null); onChanged();
     return value;
@@ -199,18 +200,18 @@ export function SellerEditor({ id, onClose, onChanged }: { id: string; onClose: 
     listing: <div className="se-split">
       <div className="se-fields">
         <Fx label="Title" hint="Say the result the buyer gets, in their words."><input value={str(listing.title)} disabled={locked} maxLength={90} onChange={e => setListing("title", e.target.value)} /></Fx>
-        <Fx label="What the buyer gets" hint="One or two sentences shown on the card."><textarea rows={3} value={str(listing.outcome)} disabled={locked} onChange={e => setListing("outcome", e.target.value)} /></Fx>
+        <Fx label="What the Buyer Gets" hint="One or two sentences shown on the card."><textarea rows={3} value={str(listing.outcome)} disabled={locked} onChange={e => setListing("outcome", e.target.value)} /></Fx>
         <div className="se-row2">
           <Fx label="Goal" hint="Groups the method in the Goal filter."><input value={str(listing.category)} disabled={locked} onChange={e => setListing("category", e.target.value)} /></Fx>
-          <Fx label="Why it is urgent" hint="The moment a buyer needs this."><input value={str(listing.urgency)} disabled={locked} onChange={e => setListing("urgency", e.target.value)} /></Fx>
+          <Fx label="Why It Is Urgent" hint="The moment a buyer needs this."><input value={str(listing.urgency)} disabled={locked} onChange={e => setListing("urgency", e.target.value)} /></Fx>
         </div>
-        <Fx label="Honest limits" hint="Things the method does not do. Press Enter to add one.">
+        <Fx label="Honest Limits" hint="Things the method does not do. Press Enter to add one.">
           <div className="se-chips">{limits.map((l, i) => <span className="se-chip" key={i}>{l}{!locked && <button type="button" aria-label={`Remove ${l}`} onClick={() => setListing("limits", limits.filter((_, j) => j !== i))}><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg></button>}</span>)}
             {!locked && <input className="se-chip-input" placeholder="Add a limit" onKeyDown={e => { const v = (e.target as HTMLInputElement).value.trim(); if (e.key === "Enter" && v) { e.preventDefault(); setListing("limits", [...limits, v]); (e.target as HTMLInputElement).value = ""; } }} />}</div>
         </Fx>
       </div>
       <aside className="se-preview" aria-label="Card preview">
-        <span className="se-preview-cap">{icon("store")}Marketplace card preview</span>
+        <span className="se-preview-cap">{icon("store")}Marketplace Card Preview</span>
         <article className="mcard se-mini"><div className="mcard-top"><span className="mcard-icon" style={{ background: "var(--blue)" }}>{icon("m-person")}</span><span className="kchip">{draft.kind === "prompt" ? "Prompt" : "Program"}</span></div>
           <h3>{str(listing.title) || "Your method title"}</h3><p className="mcard-desc">{str(listing.outcome) || "What the buyer gets appears here."}</p>
           <div className="mcard-meta"><span>{checks.length} checks</span><span>{Array.isArray(m.steps) ? (m.steps as unknown[]).length : 0} steps</span></div>
@@ -218,23 +219,23 @@ export function SellerEditor({ id, onClose, onChanged }: { id: string; onClose: 
       </aside>
     </div>,
     io: <div className="se-io">
-      <FieldList title="The buyer provides" note="Private values are sealed on the buyer's device. Nobody else sees them, you included." fields={inputs} locked={locked} withPrivacy onChange={(i, k, v) => setFieldProp("inputs", i, k, v)} />
-      <FieldList title="The buyer gets back" note="These fields make up the answer the buyer opens on their device." fields={outputs} locked={locked} onChange={(i, k, v) => setFieldProp("outputs", i, k, v)} />
-      <section className="se-box se-span">
-        <header><b>{icon("shield")}Checks on the buyer's device</b><span>{checks.length ? `${checks.length} rules run after the answer opens, so the buyer can trust it without trusting you.` : "No checks yet. Buyers trust methods with checks more."}</span></header>
+      <FieldList title="The Buyer Provides" note="Private values stay sealed, even from you." fields={inputs} locked={locked} withPrivacy onChange={(i, k, v) => setFieldProp("inputs", i, k, v)} />
+      <FieldList title="The Buyer Gets Back" note="Opened only on the buyer's device." fields={outputs} locked={locked} onChange={(i, k, v) => setFieldProp("outputs", i, k, v)} />
+      <section className="se-box se-span se-checkbox">
+        <header><b>{icon("shield")}Checks on the Buyer's Device</b><span>{checks.length ? `${checks.length} rules run after the answer opens, so the buyer can trust it without trusting you.` : "No checks yet. Buyers trust methods with checks more."}</span></header>
         {!!checks.length && <div className="se-checks">{checks.map(c => <span key={c.id}>{icon("check")}{c.description || c.id}</span>)}</div>}
       </section>
     </div>,
     price: <div className="se-split">
       <div className="se-fields">
-        <Fx label="Price per run" hint="What a buyer pays each time they run this version."><div className="se-affix"><input inputMode="decimal" value={price} disabled={locked} onChange={e => { setPrice(e.target.value); touch(); }} /><span>NEAR</span></div></Fx>
-        <Fx label={`Community fund share, ${share}%`} hint={`Goes to the shared fund that pays for improvements. At least ${minShare}%.`}>
+        <Fx label="Price per Run" hint="What a buyer pays each time they run this version."><div className="se-affix"><input inputMode="decimal" value={price} disabled={locked} onChange={e => { setPrice(e.target.value); touch(); }} /><span>NEAR</span></div></Fx>
+        <Fx label={`Community Fund Share, ${share}%`} hint={`Goes to the shared fund that pays for improvements. At least ${minShare}%.`}>
           <input type="range" min={minShare} max={100 - platformPct} step={1} value={share} disabled={locked} onChange={e => { setShare(Number(e.target.value)); touch(); }} className="se-range" />
         </Fx>
         <div className="se-note">{icon("info")}<span><b>{versionLabel}.</b> Buyers who ran an older version keep their results. New runs use this version once it is published.</span></div>
       </div>
       <aside className="se-split-card" aria-label="Earnings per run">
-        <b className="se-cap">Each run of {price || "0"} NEAR is split</b>
+        <b className="se-cap">Each Run of {price || "0"} NEAR Is Split</b>
         <div className="se-bar" role="img" aria-label={`You ${sellerPct}%, community ${share}%, platform ${platformPct}%`}><i style={{ flex: sellerPct }} className="b1" /><i style={{ flex: share }} className="b2" /><i style={{ flex: platformPct }} className="b3" /></div>
         <dl>
           <div><dt><i className="b1" />You</dt><dd>{fmt(priceNum * sellerPct / 100)} NEAR<small>{sellerPct}%</small></dd></div>
@@ -279,12 +280,12 @@ export function SellerEditor({ id, onClose, onChanged }: { id: string; onClose: 
         {!locked && !publication && <div className="se-actions"><button className="view" disabled={!!busy} onClick={() => void validate()}>Check everything</button><button className="primary-btn" disabled={!!busy || !validation?.ok || validation.revision !== draft.revision || dirty} onClick={() => void prepare()}>Prepare wallet request</button></div>}
       </div>
       <aside className="se-split-card" aria-label="Wallet request">
-        <b className="se-cap">What your wallet will sign</b>
+        <b className="se-cap">What Your Wallet Will Sign</b>
         {publication ? <>
           {publication.calls.map((call, i) => <div className="se-call" key={i}><b>{call.method_name === "register_method" ? "Register the method" : call.method_name === "publish_version" ? `Publish version ${publication.expected_version}` : call.method_name}</b><span>On {call.receiver_id}</span><span>Deposit {nearFromYocto(call.deposit_yocto)} NEAR, unused part refunded</span></div>)}
           <span className="se-foot-note">Signed by {publication.signer}. Read the amount and contract in the wallet before you approve.</span>
           {draft.state !== "published" && <button className="primary-btn se-wide" disabled={!!busy || signatureRequested} onClick={() => void sign()}>{icon("wallet")}Review and sign</button>}
-          {draft.state !== "published" && <details className="se-more"><summary>The wallet closed or did not come back</summary><Fx label="Transaction hash, if you have it"><input value={txHash} onChange={e => setTxHash(e.target.value)} /></Fx><button className="view" disabled={!!busy} onClick={() => { setSignatureRequested(false); void confirm(); }}>Check NEAR again</button></details>}
+          {draft.state !== "published" && <details className="se-more"><summary>The wallet closed or did not come back</summary><Fx label="Transaction Hash"><input value={txHash} onChange={e => setTxHash(e.target.value)} /></Fx><button className="view" disabled={!!busy} onClick={() => { setSignatureRequested(false); void confirm(); }}>Check NEAR again</button></details>}
         </> : <p className="se-empty">Run Check everything first. The exact contract calls appear here before any wallet opens.</p>}
       </aside>
     </div>,
@@ -306,7 +307,7 @@ export function SellerEditor({ id, onClose, onChanged }: { id: string; onClose: 
       </nav>
       <div className="se-panel">
         <div className="se-panel-head"><h3>{STEPS[idx].title}</h3><p>{STEPS[idx].hint}.</p></div>
-        {rawOpen ? <Fx label="Manifest text (advanced)" hint="Public. Never put your private prompt, source or credentials here."><textarea className="se-raw" rows={18} spellCheck={false} value={raw} disabled={locked} onChange={e => { setRaw(e.target.value); touch(); }} /></Fx> : panel[step]}
+        {rawOpen ? <Fx label="Manifest Text, Advanced" hint="Public. Never put your private prompt, source or credentials here."><textarea className="se-raw" rows={18} spellCheck={false} value={raw} disabled={locked} onChange={e => { setRaw(e.target.value); touch(); }} /></Fx> : panel[step]}
         {(busy || error || notice) && <div className={`se-msg ${error ? "bad" : ""}`} role={error ? "alert" : "status"}>{icon(error ? "info" : "check")}<span>{error || busy || notice}</span></div>}
         <footer className="se-nav">
           <button className="view" disabled={idx === 0} onClick={() => go(STEPS[Math.max(0, idx - 1)].id)}>Back</button>
@@ -317,10 +318,6 @@ export function SellerEditor({ id, onClose, onChanged }: { id: string; onClose: 
       </div>
     </div>
   </section>;
-}
-
-function Fx({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
-  return <label className="se-fx"><span className="se-fx-l">{label}</span>{children}{hint && <span className="se-fx-h">{hint}</span>}</label>;
 }
 
 function FieldList({ title, note, fields, locked, withPrivacy, onChange }: { title: string; note: string; fields: Field[]; locked: boolean; withPrivacy?: boolean; onChange: (i: number, k: keyof Field, v: unknown) => void }) {

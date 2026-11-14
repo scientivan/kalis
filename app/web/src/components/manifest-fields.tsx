@@ -35,21 +35,23 @@ function emptyValue(field: ManifestField): unknown {
 /** Values are plain data. Percent inputs show 9 for 9%, and emit 0.09 to match manifest v5. */
 export function ManifestInput({ field, value, onChange }: { field: ManifestField; value: unknown; onChange: (value: unknown) => void }) {
   const id = useId();
-  const privateText = field.private ? ", private" : "";
-  const label = `${field.label}${field.type === "percent" ? " (%)" : field.unit ? ` (${field.unit})` : ""}${field.required ? "" : ", optional"}${privateText}`;
-  const help = [field.help, field.private ? "Sensitive value. It is sealed on this device before execution." : "", field.type === "percent" ? "Enter a percentage. For example, 9 is stored as 0.09." : ""].filter(Boolean).join(" ");
+  const unitText = field.type === "percent" ? "Percent" : field.unit || "";
+  const label = field.label;
+  const hint = [unitText, field.required ? "" : "Optional", field.private ? "Private, sealed on this device" : ""].filter(Boolean).join(", ");
+  const help = [field.help, field.type === "percent" ? "Enter 9 for 9%." : ""].filter(Boolean).join(" ");
+  const hintNode = (hint || help) ? <>{hint}{hint && help ? ". " : ""}{help}</> : undefined;
   if (field.type === "object") {
     const object = isObject(value) ? value : {};
-    return <fieldset className={styles.group} title={help}><legend>{label}</legend><div className={styles.fields}>{(field.fields || []).map(child => <ManifestInput key={child.id} field={child} value={object[child.id]} onChange={next => onChange({ ...object, [child.id]: next })} />)}</div>{!field.fields?.length && <p>No editable fields are declared for this object.</p>}</fieldset>;
+    return <fieldset className={styles.group}><legend>{label}</legend>{hintNode && <p className={styles.hint}>{hintNode}</p>}<div className={styles.fields}>{(field.fields || []).map(child => <ManifestInput key={child.id} field={child} value={object[child.id]} onChange={next => onChange({ ...object, [child.id]: next })} />)}</div>{!field.fields?.length && <p>No editable fields are declared for this object.</p>}</fieldset>;
   }
   if (field.type === "array") {
     const array = Array.isArray(value) ? value : Array.from({ length: minItems(field) }, (_, i) => emptyValue(itemSchema(field, i)));
-    return <fieldset className={styles.group} title={help}><legend>{label}</legend><div className={styles.array}>{array.map((item, i) => <div className={styles.item} key={i}><ManifestInput field={itemSchema(field, i)} value={item} onChange={next => onChange(array.map((previous, j) => j === i ? next : previous))} /><button className="view" type="button" disabled={array.length <= minItems(field)} onClick={() => onChange(array.filter((_, j) => j !== i))} aria-label={`Remove item ${i + 1} from ${field.label}`}>Remove</button></div>)}</div><div className={styles.arrayFooter}><span>{array.length} items{minItems(field) ? `, at least ${minItems(field)}` : ""}{Number.isFinite(maxItems(field)) ? `, at most ${maxItems(field)}` : ""}</span><button className="view" type="button" disabled={array.length >= maxItems(field)} onClick={() => onChange([...array, emptyValue(itemSchema(field, array.length))])}>Add item</button></div></fieldset>;
+    return <fieldset className={styles.group}><legend>{label}</legend>{hintNode && <p className={styles.hint}>{hintNode}</p>}<div className={styles.array}>{array.map((item, i) => <div className={styles.item} key={i}><ManifestInput field={itemSchema(field, i)} value={item} onChange={next => onChange(array.map((previous, j) => j === i ? next : previous))} /><button className="view" type="button" disabled={array.length <= minItems(field)} onClick={() => onChange(array.filter((_, j) => j !== i))} aria-label={`Remove item ${i + 1} from ${field.label}`}>Remove</button></div>)}</div><div className={styles.arrayFooter}><span>{array.length} items{minItems(field) ? `, at least ${minItems(field)}` : ""}{Number.isFinite(maxItems(field)) ? `, at most ${maxItems(field)}` : ""}</span><button className="view" type="button" disabled={array.length >= maxItems(field)} onClick={() => onChange([...array, emptyValue(itemSchema(field, array.length))])}>Add item</button></div></fieldset>;
   }
   if (field.type === "boolean" || field.type === "enum" || field.enum) {
     const options = field.type === "boolean" ? [{ value: "true", label: "Yes" }, { value: "false", label: "No" }] : (field.enum || []).map((option, i) => ({ value: String(i), label: String(option) }));
     const selected = field.type === "boolean" ? value === true ? "true" : value === false ? "false" : "" : String((field.enum || []).findIndex(option => option === value));
-    return <div className="fx-dd" title={help}><Dropdown label={label} value={options.some(option => option.value === selected) ? selected : ""} options={[{ value: "", label: "Choose" }, ...options]} onChange={next => onChange(next === "" ? undefined : field.type === "boolean" ? next === "true" : field.enum?.[Number(next)])} /></div>;
+    return <div className="se-fx"><span className="se-fx-l" id={id}>{label}</span><Dropdown label={label} value={options.some(option => option.value === selected) ? selected : ""} options={[{ value: "", label: "Choose" }, ...options]} onChange={next => onChange(next === "" ? undefined : field.type === "boolean" ? next === "true" : field.enum?.[Number(next)])} />{hintNode && <span className="se-fx-h">{hintNode}</span>}</div>;
   }
   const numeric = ["number", "integer", "money", "percent"].includes(field.type || "");
   const displayed = field.type === "percent" && typeof value === "number" ? String(Number((value * 100).toPrecision(12))) : text(value);
@@ -59,7 +61,8 @@ export function ManifestInput({ field, value, onChange }: { field: ManifestField
     const number = Number(raw);
     onChange(Number.isFinite(number) ? field.type === "percent" ? number / 100 : number : raw);
   };
-  return <label className={`fx ${field.type === "text" ? "tall full" : ""}`} htmlFor={id} title={help}><span className="fx-label">{label}</span>{field.type === "text" ? <textarea id={id} rows={3} value={displayed} required={field.required} onChange={event => parse(event.target.value)} /> : <input id={id} type={numeric ? "number" : field.type === "date" ? "date" : "text"} inputMode={numeric ? "decimal" : undefined} step={field.type === "integer" ? 1 : numeric ? "any" : undefined} min={field.min === undefined ? undefined : field.type === "percent" ? field.min * 100 : field.min} max={field.max === undefined ? undefined : field.type === "percent" ? field.max * 100 : field.max} required={field.required} value={displayed} onChange={event => parse(event.target.value)} />}</label>;
+  const control = field.type === "text" ? <textarea id={id} rows={3} value={displayed} required={field.required} onChange={event => parse(event.target.value)} /> : <input id={id} type={numeric ? "number" : field.type === "date" ? "date" : "text"} inputMode={numeric ? "decimal" : undefined} step={field.type === "integer" ? 1 : numeric ? "any" : undefined} min={field.min === undefined ? undefined : field.type === "percent" ? field.min * 100 : field.min} max={field.max === undefined ? undefined : field.type === "percent" ? field.max * 100 : field.max} required={field.required} value={displayed} onChange={event => parse(event.target.value)} />;
+  return <label className={`se-fx ${field.type === "text" ? styles.wide : ""}`} htmlFor={id}><span className="se-fx-l">{label}</span>{control}{hintNode && <span className="se-fx-h">{hintNode}</span>}</label>;
 }
 
 /** Validate the complete value before consent/payment, including nested structures and array bounds. */

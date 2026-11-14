@@ -9,6 +9,7 @@ import { icon } from "./shell";
 import { Segmented } from "./controls";
 import { Capability } from "./capability";
 import { SellerEditor } from "./seller-editor";
+import { Fx } from "./form-kit";
 
 type Mine = { account_id: string; listed: { method_id: string; title: string; version_count: number }[]; drafts: { id: string; method_id: string; title: string; state: string }[] };
 type Row = { method_id: string; title: string; note: string; draft_id?: string };
@@ -104,7 +105,7 @@ function MyMethodsContent({ covers, onChanged, section }: MyMethodsProps) {
     <section className="card ph"><div className="ph-title"><h1>{heading}</h1></div><div className="page-purpose">{icon(section === "Drafts" ? "plus" : "tag")}<p>{section === "Drafts" ? "Start a method and prepare it before publishing. Drafts are not available to buyers." : "Methods you published on NEAR, with their Marketplace pictures."}</p></div></section>
     <section className="card list-card"><div className="toolbar"><h2 className="list-title">{section === "Drafts" ? "Your drafts" : "Published methods"}</h2></div>
       <TileGrid label={section === "Drafts" ? "Your drafts" : "Published methods"}>
-        {section === "Drafts" && <AddTile title={creating ? "Close the form" : "Create method"} desc="Starts a draft. You write the manifest, seal the code and publish with your wallet later." onClick={openCreate} />}
+        {section === "Drafts" && <AddTile title={creating ? "Close the Form" : "Create a Method"} desc="Starts a draft. You write the manifest, seal the code and publish with your wallet later." onClick={openCreate} />}
         {!mine && !loadError && <SkeletonTiles count={3} />}
         {loadError && <ErrorPanel title="We could not load your methods" message={plainError(loadError)} onRetry={() => { setLoadError(""); setReload(n => n + 1); }} />}
         {mine && !rows.length && <StatePanel title={section === "Drafts" ? "No drafts yet" : "Nothing published yet"} text={section === "Drafts" ? "Choose Create method to start one." : "A method appears here after you publish a draft with your wallet."} />}
@@ -119,14 +120,30 @@ function MyMethodsContent({ covers, onChanged, section }: MyMethodsProps) {
             {r.draft_id ? <button className="view" onClick={() => setEditing(r.draft_id!)}>Edit</button> : <button className="view" disabled={saving} onClick={() => void newVersion(r.method_id)}>New version</button>}</>} />; })}
       </TileGrid>
     </section>
-    {section === "Drafts" && creating && <section className="card list-card" id="new"><div className="toolbar"><h2 className="list-title">Create method</h2></div>
-      <form className="nform" onSubmit={createDraft}>
-        <label className="fx"><span className="fx-label">Method ID</span><input required pattern="[A-Za-z0-9_-]{3,48}" title="3 to 48 letters, digits, - or _" value={form.method_id} onChange={e => setForm({ ...form, method_id: e.target.value })} placeholder="cash-forecast" /></label>
-        <label className="fx"><span className="fx-label">Title</span><input required maxLength={120} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Forecast your cash for the next 13 weeks" /></label>
-        <div className="fx-seg"><Segmented label="Kind" options={["Program", "Prompt"]} value={form.kind} onChange={k => setForm({ ...form, kind: k })} /></div>
-        <label className="fx"><span className="fx-label">Goal</span><input maxLength={60} value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Business finance" /></label>
-        <label className="fx tall full"><span className="fx-label">What the buyer gets</span><textarea maxLength={2000} rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="A week-by-week plan that shows when cash runs short" /></label>
-        <div className="nf-foot full"><span className="note-row">{formMsg || "Create a draft, then open it to write the manifest, seal an artifact, validate and publish with your wallet."}</span><button className="primary-btn" disabled={saving}>{saving ? "Saving" : "Create draft"}</button></div>
+    {section === "Drafts" && creating && <section className="card list-card se" id="new">
+      <header className="se-head"><div><h2>Create a Method</h2><span>Start a draft here. You add inputs, price and the sealed method in the editor next.</span></div><div className="se-head-acts"><span className="kchip se-chip-wait">Not saved yet</span></div></header>
+      <form className="se-panel" onSubmit={createDraft}>
+        <div className="se-split">
+          <div className="se-fields">
+            <div className="se-row2">
+              <Fx label="Title" hint="Say the result the buyer gets, in their words."><input required maxLength={120} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Forecast your cash for the next 13 weeks" /></Fx>
+              <Fx label="Method ID" hint="3 to 48 letters, digits, - or _. Used in the method link."><input required pattern="[A-Za-z0-9_-]{3,48}" title="3 to 48 letters, digits, - or _" value={form.method_id} onChange={e => setForm({ ...form, method_id: e.target.value })} placeholder="cash-forecast" /></Fx>
+            </div>
+            <div className="se-row2">
+              <div className="se-fx"><span className="se-fx-l">Kind</span><Segmented label="Kind" options={["Program", "Prompt"]} value={form.kind} onChange={k => setForm({ ...form, kind: k })} /><span className="se-fx-h">{form.kind === "Prompt" ? "A text prompt run by a private AI model." : "A compiled WASM program, the most provable kind."}</span></div>
+              <Fx label="Goal" hint="Groups the method in the Goal filter."><input maxLength={60} value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Business finance" /></Fx>
+            </div>
+            <Fx label="What the Buyer Gets" hint="One or two sentences shown on the card."><textarea maxLength={2000} rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="A week-by-week plan that shows when cash runs short" /></Fx>
+          </div>
+          <aside className="se-preview" aria-label="Card preview">
+            <span className="se-preview-cap">{icon("store")}Marketplace Card Preview</span>
+            <article className="mcard se-mini"><div className="mcard-top"><span className="mcard-icon" style={{ background: "var(--blue)" }}>{icon("m-person")}</span><span className="kchip">{form.kind}</span></div>
+              <h3>{form.title || "Your method title"}</h3><p className="mcard-desc">{form.description || "What the buyer gets appears here."}</p>
+              <div className="mcard-foot"><span className="mcard-price">{form.category || "Goal"}</span><span className="view">View</span></div></article>
+          </aside>
+        </div>
+        {formMsg && <div className="se-msg" role="status">{icon("info")}<span>{formMsg}</span></div>}
+        <footer className="se-nav"><button type="button" className="view" onClick={() => setCreating(false)}>Cancel</button><span>Next you write the manifest, seal the method and publish with your wallet.</span><button className="primary-btn" disabled={saving}>{saving ? "Saving" : "Create draft"}</button></footer>
       </form>
     </section>}
   </>;
