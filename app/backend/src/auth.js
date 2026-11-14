@@ -27,11 +27,12 @@ function borshString(s) {
 }
 
 /** sha256 of the borsh-serialised NEP-413 payload (callbackUrl = None). */
-export function nep413Hash({ message, nonce, recipient }) {
+export function nep413Hash({ message, nonce, recipient, callbackUrl = null }) {
   const tag = Buffer.alloc(4); tag.writeUInt32LE(NEP413_TAG);
   const n = Buffer.from(nonce);
   if (n.length !== 32) throw new ApiError(400, "bad_nonce", "nonce must be 32 bytes");
-  const payload = Buffer.concat([tag, borshString(message), n, borshString(recipient), Buffer.from([0])]);
+  const cb = callbackUrl == null ? Buffer.from([0]) : Buffer.concat([Buffer.from([1]), borshString(String(callbackUrl))]);
+  const payload = Buffer.concat([tag, borshString(message), n, borshString(recipient), cb]);
   return sha256(payload);
 }
 
@@ -79,12 +80,20 @@ export function registerAuthRoutes(route) {
     // One attempt per challenge, whatever the outcome, so a signature cannot be brute-forced against it.
     db.put("auth_challenges", c.id, { ...c, used: true, used_at: db.nowIso() });
     const pk = pubkeyBytes(b?.public_key);
-    let sig;
-    try { sig = Buffer.from(String(b?.signature || ""), "base64"); } catch { sig = Buffer.alloc(0); }
-    if (sig.length !== 64) throw new ApiError(400, "bad_signature", "signature must be 64 bytes, base64");
-    const hash = nep413Hash({ message: c.message, nonce: Buffer.from(c.nonce, "base64"), recipient: c.recipient });
+    // Wallets differ: the signature may be base64 or base58, and some wallets (MyNearWallet) sign the
+    // optional callbackUrl field of the NEP-413 payload. Accept either encoding and both payload forms.
+    const raw = String(b?.signature || "").replace(/^ed25519:/, "");
+    let sig = Buffer.alloc(0);
+    try { sig = Buffer.from(raw, "base64"); } catch { /* not base64 */ }
+    if (sig.length !== 64) { try { sig = Buffer.from(utils.serialize.base_decode(raw)); } catch { sig = Buffer.alloc(0); } }
+    if (sig.length !== 64) throw new ApiError(400, "bad_signature", "signature must be 64 bytes, base64 or base58");
+    const nonce = Buffer.from(c.nonce, "base64");
+    const callbacks = [null, ...(typeof b?.callback_url === "string" && b.callback_url.length <= 2000 ? [b.callback_url] : [])];
     let ok = false;
-    try { ok = ed25519.verify(sig, hash, pk); } catch { ok = false; }
+    for (const callbackUrl of callbacks) {
+      try { ok = ed25519.verify(sig, nep413Hash({ message: c.message, nonce, recipient: c.recipient, callbackUrl }), pk); } catch { ok = false; }
+      if (ok) break;
+    }
     if (!ok) throw new ApiError(401, "signature_invalid", "The signature does not match the challenge and public key");
     const key = await accessKey(c.account_id, b.public_key);
     if (!key) throw new ApiError(401, "key_not_on_account", "This public key is not an access key of the account on chain");

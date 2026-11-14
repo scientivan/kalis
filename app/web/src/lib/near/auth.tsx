@@ -64,10 +64,11 @@ export function NearAuthProvider({ children }: { children: ReactNode }) {
       if (!account) throw new Error("The wallet did not return an account.");
       const ch = await post<{ challenge_id: string; message: string; nonce: string; recipient: string }>("auth/challenge", { account_id: account });
       if (!("signMessage" in wallet) || typeof wallet.signMessage !== "function") throw new Error("This wallet cannot sign a sign-in message. Try MyNearWallet or Meteor.");
-      const signed = await wallet.signMessage({ message: ch.message, recipient: ch.recipient, nonce: Buffer.from(ch.nonce, "base64") });
+      const callbackUrl = window.location.href;
+      const signed = await wallet.signMessage({ message: ch.message, recipient: ch.recipient, nonce: Buffer.from(ch.nonce, "base64"), callbackUrl });
       if (!signed || !signed.signature) throw new Error("The wallet did not return a signature.");
       const v = await post<{ session_token: string; account_id: string; expires_at: string }>("auth/verify", {
-        challenge_id: ch.challenge_id, account_id: account, public_key: signed.publicKey, signature: signed.signature,
+        challenge_id: ch.challenge_id, account_id: signed.accountId || account, public_key: signed.publicKey, signature: signed.signature, callback_url: callbackUrl,
       });
       const s = { token: v.session_token, account_id: v.account_id, expires_at: v.expires_at };
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(s)); setSession(s);
