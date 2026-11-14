@@ -98,7 +98,7 @@ The optional smoke script performs a paid testnet run and consumes configured fu
 
 ## Limits
 
-- The private protections runner is proven only in native development mode on one machine. `PRIVATE_RUNNER_HASH` is still `not-built`, so no attested TEE build exists, and OutLayer testnet support for the needed storage and HTTP features has not been probed. Until it is built, pinned and deployed (which needs Dien's approval), protection pages refuse instead of running.
+- The private protections runner is proven only in native development mode on one machine. `PRIVATE_RUNNER_HASH` is still `not-built`, so no attested TEE build exists, OutLayer testnet storage (atomic set-if-absent and set-if-equals, persistent across calls) was probed successfully with a separate project on 15 November 2026, and outbound HTTP from the TEE was already proven earlier. The private runner itself has not run there yet. Until it is built, pinned and deployed (which needs Dien's approval), protection pages refuse instead of running.
 - Ownership of private data is tied to a non-extractable signing key in this browser. Clearing browser data loses access. There is no recovery or multi-device flow yet.
 - The old plaintext endpoints under /api/protections/ are blocked by the web proxy, but data stored there by earlier versions is not migrated or deleted. That cleanup needs an explicit scope.
 - Private PDFs are refused in the private path. Public documents can still be extracted by the backend only after an explicit opt-in, as agreed in rancangan 65.1. Connectors inside the private runner are labelled mocks with no free network access.
