@@ -1,0 +1,37 @@
+{
+  "holdings": [
+    7,
+    1,
+    1
+  ],
+  "prices": [
+    2,
+    3,
+    1
+  ],
+  "cash": 5,
+  "reserve": 3,
+  "fee_rates": [
+    0.01,
+    0.015,
+    0.02
+  ],
+  "fixed_fees": [
+    0.05,
+    0.08,
+    0.03
+  ],
+  "lower": [
+    0.1,
+    0.1,
+    0.1
+  ],
+  "upper": [
+    0.4,
+    0.4,
+    0.4
+  ],
+  "sector_cap": 0.65,
+  "buy_limit": 5,
+  "allow_sell": true
+}

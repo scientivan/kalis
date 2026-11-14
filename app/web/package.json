@@ -1,0 +1,32 @@
+{
+  "name": "kalis-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build --webpack",
+    "start": "next start --hostname 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js && node --test tests/backend-crypto.test.mjs"
+  },
+  "dependencies": {
+    "@near-wallet-selector/core": "10.1.4",
+    "@near-wallet-selector/meteor-wallet": "10.1.4",
+    "@near-wallet-selector/modal-ui": "10.1.4",
+    "@near-wallet-selector/my-near-wallet": "10.1.4",
+    "@noble/ciphers": "1.2.1",
+    "@noble/curves": "1.8.1",
+    "@noble/hashes": "1.7.1",
+    "buffer": "6.0.3",
+    "next": "16.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "prettier": "^3.3.3",
+    "typescript": "5.9.3"
+  }
+}
