@@ -1,0 +1,79 @@
+{
+  "count": 12,
+  "valid": 12,
+  "optimal": 12,
+  "rows": [
+    {
+      "id": "C01",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": 0.0
+    },
+    {
+      "id": "C02",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": 0.0
+    },
+    {
+      "id": "C03",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": 0.0
+    },
+    {
+      "id": "C04",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": 0.0
+    },
+    {
+      "id": "C05",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": 0.0
+    },
+    {
+      "id": "C06",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": 0.0
+    },
+    {
+      "id": "C07",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": 0.0
+    },
+    {
+      "id": "C08",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": 0.0
+    },
+    {
+      "id": "C09",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": null
+    },
+    {
+      "id": "C10",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": null
+    },
+    {
+      "id": "C11",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": null
+    },
+    {
+      "id": "C12",
+      "feasible_or_correct_status": true,
+      "minimum_cost_or_correct_status": true,
+      "cost_gap_if_feasible": 0.0
+    }
+  ]
+}

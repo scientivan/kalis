@@ -1,0 +1,1867 @@
+{
+  "scope": "Toy financial logic only. Not investment advice, trading performance, privacy proof or AI benchmark.",
+  "scipy_version": "1.17.1",
+  "case_count": 42,
+  "passed": 42,
+  "paired_portfolio_outputs": [
+    {
+      "case_id": "P01_base",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          0,
+          1
+        ],
+        "scores": [
+          1.8,
+          1.2,
+          0.6
+        ],
+        "objective": 0.5499999999999999
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          2,
+          2
+        ],
+        "cash_after": 2.99,
+        "fees": 0.01,
+        "nav_after": 9.99
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          0,
+          1
+        ],
+        "objective": 0.5499999999999999
+      },
+      "pass": true,
+      "solver_seconds": 0.00903741600268404
+    },
+    {
+      "case_id": "P02_concentrated",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          -5,
+          2,
+          1
+        ],
+        "scores": [
+          0.20000000000000018,
+          1.6,
+          0.6
+        ],
+        "objective": 2.399999999999999
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          2,
+          3,
+          2
+        ],
+        "cash_after": 2.92,
+        "fees": 0.08,
+        "nav_after": 9.92
+      },
+      "enumeration_oracle": {
+        "delta": [
+          -5,
+          2,
+          1
+        ],
+        "objective": 2.3999999999999995
+      },
+      "pass": true,
+      "solver_seconds": 0.0068927909997000825
+    },
+    {
+      "case_id": "P03_low_cash",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          -1,
+          -3
+        ],
+        "scores": [
+          1.8,
+          0.8,
+          -0.19999999999999996
+        ],
+        "objective": -0.4000000000000002
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          2,
+          0
+        ],
+        "cash_after": 4.96,
+        "fees": 0.04,
+        "nav_after": 9.96
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          -1,
+          -3
+        ],
+        "objective": -0.4000000000000002
+      },
+      "pass": true,
+      "solver_seconds": 0.008408166999288369
+    },
+    {
+      "case_id": "P04_cash_only",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          3,
+          2,
+          2
+        ],
+        "scores": [
+          3.0,
+          2.0,
+          1.0
+        ],
+        "objective": 14.650000000000002
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          2,
+          2
+        ],
+        "cash_after": 2.93,
+        "fees": 0.07,
+        "nav_after": 9.93
+      },
+      "enumeration_oracle": {
+        "delta": [
+          3,
+          2,
+          2
+        ],
+        "objective": 14.65
+      },
+      "pass": true,
+      "solver_seconds": 0.0006900000007590279
+    }
+  ],
+  "static_control": {
+    "delta": [
+      2,
+      0,
+      0
+    ],
+    "audit": {
+      "pass": false,
+      "checks": {
+        "integer_units": true,
+        "no_short": true,
+        "cash_reserve": false,
+        "buy_limit": true,
+        "sell_permission": true,
+        "turnover": true,
+        "asset_caps": false,
+        "shared_sector": false
+      },
+      "holdings_after": [
+        5,
+        2,
+        1
+      ],
+      "cash_after": 1.98,
+      "fees": 0.02,
+      "nav_after": 9.98
+    },
+    "not_ai_baseline": true
+  },
+  "cases": [
+    {
+      "case_id": "P01_base",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          0,
+          1
+        ],
+        "scores": [
+          1.8,
+          1.2,
+          0.6
+        ],
+        "objective": 0.5499999999999999
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          2,
+          2
+        ],
+        "cash_after": 2.99,
+        "fees": 0.01,
+        "nav_after": 9.99
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          0,
+          1
+        ],
+        "objective": 0.5499999999999999
+      },
+      "pass": true,
+      "solver_seconds": 0.00903741600268404
+    },
+    {
+      "case_id": "P02_concentrated",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          -5,
+          2,
+          1
+        ],
+        "scores": [
+          0.20000000000000018,
+          1.6,
+          0.6
+        ],
+        "objective": 2.399999999999999
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          2,
+          3,
+          2
+        ],
+        "cash_after": 2.92,
+        "fees": 0.08,
+        "nav_after": 9.92
+      },
+      "enumeration_oracle": {
+        "delta": [
+          -5,
+          2,
+          1
+        ],
+        "objective": 2.3999999999999995
+      },
+      "pass": true,
+      "solver_seconds": 0.0068927909997000825
+    },
+    {
+      "case_id": "P03_low_cash",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          -1,
+          -3
+        ],
+        "scores": [
+          1.8,
+          0.8,
+          -0.19999999999999996
+        ],
+        "objective": -0.4000000000000002
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          2,
+          0
+        ],
+        "cash_after": 4.96,
+        "fees": 0.04,
+        "nav_after": 9.96
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          -1,
+          -3
+        ],
+        "objective": -0.4000000000000002
+      },
+      "pass": true,
+      "solver_seconds": 0.008408166999288369
+    },
+    {
+      "case_id": "P04_cash_only",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          3,
+          2,
+          2
+        ],
+        "scores": [
+          3.0,
+          2.0,
+          1.0
+        ],
+        "objective": 14.650000000000002
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          2,
+          2
+        ],
+        "cash_after": 2.93,
+        "fees": 0.07,
+        "nav_after": 9.93
+      },
+      "enumeration_oracle": {
+        "delta": [
+          3,
+          2,
+          2
+        ],
+        "objective": 14.65
+      },
+      "pass": true,
+      "solver_seconds": 0.0006900000007590279
+    },
+    {
+      "case_id": "P05_high_fees",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          0,
+          1
+        ],
+        "scores": [
+          1.8,
+          1.2,
+          0.6
+        ],
+        "objective": 0.5499999999999999
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          2,
+          2
+        ],
+        "cash_after": 2.8,
+        "fees": 0.2,
+        "nav_after": 9.8
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          0,
+          1
+        ],
+        "objective": 0.5499999999999999
+      },
+      "pass": true,
+      "solver_seconds": 0.006670917002338683
+    },
+    {
+      "case_id": "P06_sector_overlap",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          -1,
+          -2,
+          2
+        ],
+        "scores": [
+          1.8,
+          1.2,
+          0.6
+        ],
+        "objective": -3.25
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          2,
+          0,
+          3
+        ],
+        "cash_after": 4.95,
+        "fees": 0.05,
+        "nav_after": 9.95
+      },
+      "enumeration_oracle": {
+        "delta": [
+          -1,
+          -2,
+          2
+        ],
+        "objective": -3.25
+      },
+      "pass": true,
+      "solver_seconds": 0.007851333000871819
+    },
+    {
+      "case_id": "P07_no_sell_infeasible",
+      "strategy_output": {
+        "status": "infeasible"
+      },
+      "ledger_audit": null,
+      "enumeration_oracle": null,
+      "pass": true,
+      "solver_seconds": 0.00048550000065006316
+    },
+    {
+      "case_id": "P08_reserve_infeasible",
+      "strategy_output": {
+        "status": "infeasible"
+      },
+      "ledger_audit": null,
+      "enumeration_oracle": null,
+      "pass": true,
+      "solver_seconds": 0.00047237499893526547
+    },
+    {
+      "case_id": "P09_stress",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          -3,
+          -2,
+          -1
+        ],
+        "scores": [
+          -2.2,
+          -2.8,
+          -3.4
+        ],
+        "objective": 15.3
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          0,
+          0,
+          0
+        ],
+        "cash_after": 9.94,
+        "fees": 0.06,
+        "nav_after": 9.94
+      },
+      "enumeration_oracle": {
+        "delta": [
+          -3,
+          -2,
+          -1
+        ],
+        "objective": 15.299999999999999
+      },
+      "pass": true,
+      "solver_seconds": 0.0005198750004637986
+    },
+    {
+      "case_id": "P10_no_turnover",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "scores": [
+          1.8,
+          1.2,
+          0.6
+        ],
+        "objective": -0.0
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          2,
+          1
+        ],
+        "cash_after": 4.0,
+        "fees": 0.0,
+        "nav_after": 10.0
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "objective": 0.0
+      },
+      "pass": true,
+      "solver_seconds": 0.0004704159982793499
+    },
+    {
+      "case_id": "P11_zero_fees",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          1,
+          0,
+          1
+        ],
+        "scores": [
+          1.8,
+          1.2,
+          0.6
+        ],
+        "objective": 2.3
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          4,
+          2,
+          2
+        ],
+        "cash_after": 2,
+        "fees": 0,
+        "nav_after": 10
+      },
+      "enumeration_oracle": {
+        "delta": [
+          1,
+          0,
+          1
+        ],
+        "objective": 2.3
+      },
+      "pass": true,
+      "solver_seconds": 0.004960791000485187
+    },
+    {
+      "case_id": "P12_negative_cash",
+      "strategy_output": {
+        "status": "invalid_input"
+      },
+      "ledger_audit": null,
+      "enumeration_oracle": null,
+      "pass": true,
+      "solver_seconds": 3.1659983505960554e-06
+    },
+    {
+      "case_id": "R00",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          1,
+          1,
+          0
+        ],
+        "scores": [
+          2.2,
+          1.6,
+          1.0
+        ],
+        "objective": 3.7
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          2,
+          0
+        ],
+        "cash_after": 4.98,
+        "fees": 0.02,
+        "nav_after": 9.98
+      },
+      "enumeration_oracle": {
+        "delta": [
+          1,
+          1,
+          0
+        ],
+        "objective": 3.7
+      },
+      "pass": true,
+      "solver_seconds": 0.0076393339986680076
+    },
+    {
+      "case_id": "R01",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          2,
+          0,
+          0
+        ],
+        "scores": [
+          3.0,
+          1.0,
+          -0.25
+        ],
+        "objective": 5.9
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          2,
+          4,
+          5
+        ],
+        "cash_after": 4.98,
+        "fees": 0.02,
+        "nav_after": 15.98
+      },
+      "enumeration_oracle": {
+        "delta": [
+          2,
+          0,
+          0
+        ],
+        "objective": 5.9
+      },
+      "pass": true,
+      "solver_seconds": 0.000518458997248672
+    },
+    {
+      "case_id": "R02",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "scores": [
+          -1.9411764705882353,
+          -3.1764705882352944,
+          -3.7058823529411766
+        ],
+        "objective": -0.0
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          4,
+          5,
+          3
+        ],
+        "cash_after": 5,
+        "fees": 0,
+        "nav_after": 17
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "objective": 0.0
+      },
+      "pass": true,
+      "solver_seconds": 0.0004735830007120967
+    },
+    {
+      "case_id": "R03",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          2,
+          0,
+          0
+        ],
+        "scores": [
+          3.0,
+          1.0,
+          0.0
+        ],
+        "objective": 5.9
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          2,
+          3,
+          3
+        ],
+        "cash_after": 4,
+        "fees": 0,
+        "nav_after": 12
+      },
+      "enumeration_oracle": {
+        "delta": [
+          2,
+          0,
+          0
+        ],
+        "objective": 5.9
+      },
+      "pass": true,
+      "solver_seconds": 0.0005245829997875262
+    },
+    {
+      "case_id": "R04",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          -4,
+          -4,
+          0
+        ],
+        "scores": [
+          -2.4545454545454546,
+          -3.4545454545454546,
+          -3.0
+        ],
+        "objective": 23.236363636363638
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          0,
+          0,
+          0
+        ],
+        "cash_after": 10.2,
+        "fees": 0.8,
+        "nav_after": 10.2
+      },
+      "enumeration_oracle": {
+        "delta": [
+          -4,
+          -4,
+          0
+        ],
+        "objective": 23.236363636363638
+      },
+      "pass": true,
+      "solver_seconds": 0.00045808399954694323
+    },
+    {
+      "case_id": "R05",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          -1,
+          -2,
+          -5
+        ],
+        "scores": [
+          -2.333333333333333,
+          -2.533333333333333,
+          -4.333333333333333
+        ],
+        "objective": 28.666666666666664
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          4,
+          0,
+          0
+        ],
+        "cash_after": 11,
+        "fees": 0,
+        "nav_after": 15
+      },
+      "enumeration_oracle": {
+        "delta": [
+          -1,
+          -2,
+          -5
+        ],
+        "objective": 28.666666666666664
+      },
+      "pass": true,
+      "solver_seconds": 0.0005049999999755528
+    },
+    {
+      "case_id": "R06",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          -4,
+          0
+        ],
+        "scores": [
+          -1.0,
+          -3.4545454545454546,
+          -3.0
+        ],
+        "objective": 13.618181818181819
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          0,
+          0,
+          0
+        ],
+        "cash_after": 10.96,
+        "fees": 0.04,
+        "nav_after": 10.96
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          -4,
+          0
+        ],
+        "objective": 13.618181818181819
+      },
+      "pass": true,
+      "solver_seconds": 0.0004912499971396755
+    },
+    {
+      "case_id": "R07",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          2,
+          1,
+          1
+        ],
+        "scores": [
+          3.0,
+          1.3333333333333335,
+          0.33333333333333337
+        ],
+        "objective": 7.466666666666667
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          2,
+          2,
+          2
+        ],
+        "cash_after": 0,
+        "fees": 0,
+        "nav_after": 6
+      },
+      "enumeration_oracle": {
+        "delta": [
+          2,
+          1,
+          1
+        ],
+        "objective": 7.466666666666667
+      },
+      "pass": true,
+      "solver_seconds": 0.00046729099994990975
+    },
+    {
+      "case_id": "R08",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "scores": [
+          1.6666666666666667,
+          1.3333333333333335,
+          1.0
+        ],
+        "objective": -0.0
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          2,
+          1,
+          0
+        ],
+        "cash_after": 3.0,
+        "fees": 0.0,
+        "nav_after": 6.0
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "objective": 0.0
+      },
+      "pass": true,
+      "solver_seconds": 0.00044604100185097195
+    },
+    {
+      "case_id": "R09",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          1,
+          0,
+          0
+        ],
+        "scores": [
+          2.428571428571429,
+          1.7142857142857144,
+          -0.4285714285714286
+        ],
+        "objective": 2.378571428571429
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          1,
+          5
+        ],
+        "cash_after": 4.99,
+        "fees": 0.01,
+        "nav_after": 13.99
+      },
+      "enumeration_oracle": {
+        "delta": [
+          1,
+          0,
+          0
+        ],
+        "objective": 2.378571428571429
+      },
+      "pass": true,
+      "solver_seconds": 0.00043191700024181046
+    },
+    {
+      "case_id": "R10",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "scores": [
+          -1.8888888888888888,
+          -2.888888888888889,
+          -4.111111111111111
+        ],
+        "objective": -0.0
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          4,
+          4,
+          5
+        ],
+        "cash_after": 5.0,
+        "fees": 0.0,
+        "nav_after": 18.0
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "objective": 0.0
+      },
+      "pass": true,
+      "solver_seconds": 0.000420458000007784
+    },
+    {
+      "case_id": "R11",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          -3,
+          -1,
+          -2
+        ],
+        "scores": [
+          -1.9230769230769231,
+          -2.3076923076923075,
+          -3.6153846153846154
+        ],
+        "objective": 15.00769230769231
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          0,
+          0,
+          0
+        ],
+        "cash_after": 13,
+        "fees": 0,
+        "nav_after": 13
+      },
+      "enumeration_oracle": {
+        "delta": [
+          -3,
+          -1,
+          -2
+        ],
+        "objective": 15.007692307692306
+      },
+      "pass": true,
+      "solver_seconds": 0.00042183299956377596
+    },
+    {
+      "case_id": "R12",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "scores": [
+          2.0769230769230766,
+          0.7692307692307692,
+          0.6923076923076923
+        ],
+        "objective": -0.0
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          4,
+          1
+        ],
+        "cash_after": 5.0,
+        "fees": 0.0,
+        "nav_after": 13.0
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "objective": 0.0
+      },
+      "pass": true,
+      "solver_seconds": 0.0004181669974059332
+    },
+    {
+      "case_id": "R13",
+      "strategy_output": {
+        "status": "infeasible"
+      },
+      "ledger_audit": null,
+      "enumeration_oracle": null,
+      "pass": true,
+      "solver_seconds": 0.0004012080025859177
+    },
+    {
+      "case_id": "R14",
+      "strategy_output": {
+        "status": "infeasible"
+      },
+      "ledger_audit": null,
+      "enumeration_oracle": null,
+      "pass": true,
+      "solver_seconds": 0.0004177920018264558
+    },
+    {
+      "case_id": "R15",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          2,
+          -1,
+          2
+        ],
+        "scores": [
+          2.0769230769230766,
+          1.0769230769230769,
+          0.6923076923076923
+        ],
+        "objective": 4.211538461538461
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          5,
+          2,
+          3
+        ],
+        "cash_after": 2.5,
+        "fees": 0.5,
+        "nav_after": 12.5
+      },
+      "enumeration_oracle": {
+        "delta": [
+          2,
+          -1,
+          2
+        ],
+        "objective": 4.211538461538461
+      },
+      "pass": true,
+      "solver_seconds": 0.004378999998152722
+    },
+    {
+      "case_id": "R16",
+      "strategy_output": {
+        "status": "infeasible"
+      },
+      "ledger_audit": null,
+      "enumeration_oracle": null,
+      "pass": true,
+      "solver_seconds": 0.0004967089989804663
+    },
+    {
+      "case_id": "R17",
+      "strategy_output": {
+        "status": "infeasible"
+      },
+      "ledger_audit": null,
+      "enumeration_oracle": null,
+      "pass": true,
+      "solver_seconds": 0.00045324999882723205
+    },
+    {
+      "case_id": "R18",
+      "strategy_output": {
+        "status": "infeasible"
+      },
+      "ledger_audit": null,
+      "enumeration_oracle": null,
+      "pass": true,
+      "solver_seconds": 0.000442000000475673
+    },
+    {
+      "case_id": "R19",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          -2,
+          -3,
+          -2
+        ],
+        "scores": [
+          -1.8,
+          -3.2,
+          -3.8
+        ],
+        "objective": 20.450000000000003
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          0,
+          0,
+          0
+        ],
+        "cash_after": 10,
+        "fees": 0,
+        "nav_after": 10
+      },
+      "enumeration_oracle": {
+        "delta": [
+          -2,
+          -3,
+          -2
+        ],
+        "objective": 20.45
+      },
+      "pass": true,
+      "solver_seconds": 0.0004617910017259419
+    },
+    {
+      "case_id": "R20",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          -2,
+          -5,
+          -1
+        ],
+        "scores": [
+          -2.2,
+          -4.0,
+          -3.4
+        ],
+        "objective": 27.400000000000002
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          1,
+          0,
+          0
+        ],
+        "cash_after": 9,
+        "fees": 0,
+        "nav_after": 10
+      },
+      "enumeration_oracle": {
+        "delta": [
+          -2,
+          -5,
+          -1
+        ],
+        "objective": 27.400000000000002
+      },
+      "pass": true,
+      "solver_seconds": 0.00046837500121910125
+    },
+    {
+      "case_id": "R21",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          1,
+          -1,
+          -2
+        ],
+        "scores": [
+          3.0,
+          1.2,
+          -0.6000000000000001
+        ],
+        "objective": 2.8000000000000003
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          1,
+          0,
+          0
+        ],
+        "cash_after": 4,
+        "fees": 0,
+        "nav_after": 5
+      },
+      "enumeration_oracle": {
+        "delta": [
+          1,
+          -1,
+          -2
+        ],
+        "objective": 2.8
+      },
+      "pass": true,
+      "solver_seconds": 0.00045966699690325186
+    },
+    {
+      "case_id": "R22",
+      "strategy_output": {
+        "status": "infeasible"
+      },
+      "ledger_audit": null,
+      "enumeration_oracle": null,
+      "pass": true,
+      "solver_seconds": 0.00041304199839942157
+    },
+    {
+      "case_id": "R23",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          1,
+          0,
+          -1
+        ],
+        "scores": [
+          1.9333333333333333,
+          1.2,
+          0.4666666666666667
+        ],
+        "objective": 1.3666666666666667
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          5,
+          3,
+          1
+        ],
+        "cash_after": 5.8,
+        "fees": 0.2,
+        "nav_after": 14.8
+      },
+      "enumeration_oracle": {
+        "delta": [
+          1,
+          0,
+          -1
+        ],
+        "objective": 1.3666666666666667
+      },
+      "pass": true,
+      "solver_seconds": 0.0046992919997137506
+    },
+    {
+      "case_id": "R24",
+      "strategy_output": {
+        "status": "infeasible"
+      },
+      "ledger_audit": null,
+      "enumeration_oracle": null,
+      "pass": true,
+      "solver_seconds": 0.00048799999785842374
+    },
+    {
+      "case_id": "R25",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          2,
+          0
+        ],
+        "scores": [
+          1.4615384615384615,
+          2.0,
+          -0.5384615384615385
+        ],
+        "objective": 3.9
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          5,
+          2,
+          5
+        ],
+        "cash_after": 0.98,
+        "fees": 0.02,
+        "nav_after": 12.98
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          2,
+          0
+        ],
+        "objective": 3.9
+      },
+      "pass": true,
+      "solver_seconds": 0.0004867079987889156
+    },
+    {
+      "case_id": "R26",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          2,
+          0,
+          0
+        ],
+        "scores": [
+          2.428571428571429,
+          0.8571428571428572,
+          -0.1428571428571428
+        ],
+        "objective": 4.757142857142858
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          4,
+          4,
+          4
+        ],
+        "cash_after": 1.8,
+        "fees": 0.2,
+        "nav_after": 13.8
+      },
+      "enumeration_oracle": {
+        "delta": [
+          2,
+          0,
+          0
+        ],
+        "objective": 4.757142857142858
+      },
+      "pass": true,
+      "solver_seconds": 0.00046770799963269383
+    },
+    {
+      "case_id": "R27",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          -1,
+          -1,
+          -3
+        ],
+        "scores": [
+          1.6666666666666667,
+          1.5555555555555556,
+          -0.33333333333333326
+        ],
+        "objective": -2.4722222222222223
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          2,
+          0,
+          0
+        ],
+        "cash_after": 6.95,
+        "fees": 0.05,
+        "nav_after": 8.95
+      },
+      "enumeration_oracle": {
+        "delta": [
+          -1,
+          -1,
+          -3
+        ],
+        "objective": -2.4722222222222223
+      },
+      "pass": true,
+      "solver_seconds": 0.00725129100101185
+    },
+    {
+      "case_id": "R28",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "scores": [
+          -2.428571428571429,
+          -2.571428571428571,
+          -4.428571428571429
+        ],
+        "objective": -0.0
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          5,
+          2,
+          5
+        ],
+        "cash_after": 2.0,
+        "fees": 0.0,
+        "nav_after": 14.0
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "objective": 0.0
+      },
+      "pass": true,
+      "solver_seconds": 0.0004917500009469222
+    },
+    {
+      "case_id": "R29",
+      "strategy_output": {
+        "status": "feasible",
+        "delta": [
+          0,
+          0,
+          3
+        ],
+        "scores": [
+          1.9090909090909092,
+          2.0,
+          0.6363636363636364
+        ],
+        "objective": 1.7590909090909088
+      },
+      "ledger_audit": {
+        "pass": true,
+        "checks": {
+          "integer_units": true,
+          "no_short": true,
+          "cash_reserve": true,
+          "buy_limit": true,
+          "sell_permission": true,
+          "turnover": true,
+          "asset_caps": true,
+          "shared_sector": true
+        },
+        "holdings_after": [
+          3,
+          0,
+          4
+        ],
+        "cash_after": 3.7,
+        "fees": 0.30000000000000004,
+        "nav_after": 10.7
+      },
+      "enumeration_oracle": {
+        "delta": [
+          0,
+          0,
+          3
+        ],
+        "objective": 1.7590909090909093
+      },
+      "pass": true,
+      "solver_seconds": 0.0063398329984920565
+    }
+  ]
+}

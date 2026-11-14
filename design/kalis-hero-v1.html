@@ -1,0 +1,300 @@
+<title>Kalis Landing Hero</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: nila-dyed ground with wax-crack texture; left thesis column, right a mori cloth panel
+   where a soga dye bath floods everything except the waxed portfolio card; a three-step proof strip below. */
+:root {
+  --ink: #0d1440;        /* deepest nila, page ground */
+  --ink-2: #16205a;      /* crack lines on ground */
+  --mori: #f1ece1;       /* undyed cotton, the cloth */
+  --mori-ink: #2a1a10;   /* text on mori */
+  --soga: #93491c;       /* soga brown dye, the bold color */
+  --soga-deep: #6e3412;
+  --malam: #e6ad45;      /* wax amber, marks what is protected */
+  --tint: #cfd3ee;       /* secondary text on nila, tinted not grey */
+  --line: #2a3474;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, "Helvetica Neue", sans-serif;
+  --data: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--ink); }
+body {
+  background: var(--ink); color: var(--mori); font-family: var(--font); font-weight: 500;
+  font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px; overflow-x: hidden;
+}
+::selection { background: var(--malam); color: var(--ink); }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--malam); outline-offset: 3px; border-radius: 6px; }
+
+#cracks { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+.wrap { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; }
+
+/* nav */
+nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-block: 20px; position: relative;
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 24px; letter-spacing: -0.02em; text-decoration: none; }
+.brand svg { width: 30px; height: 30px; }
+.navlinks { display: flex; gap: 6px; padding: 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--ink); }
+.navlinks a { text-decoration: none; font-weight: 600; font-size: 15px; padding: 8px 14px; border-radius: 999px; color: var(--tint); }
+.navlinks a:hover { background: var(--ink-2); color: var(--mori); }
+
+/* buttons */
+.cta { display: inline-flex; align-items: center; gap: 6px; }
+.btn { font: inherit; font-weight: 700; font-size: 16px; height: 48px; padding: 0 22px; border-radius: 999px; border: 0;
+  background: var(--malam); color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; cursor: pointer;
+  box-shadow: 0 6px 16px -8px rgba(0,0,0,.6); transition: transform .2s ease, background .2s ease; }
+.btn:hover { background: #f0bd5c; transform: translateY(-1px); }
+.btn-round { width: 48px; padding: 0; justify-content: center; }
+.btn-round svg { width: 20px; height: 20px; }
+.btn-ghost { background: transparent; color: var(--mori); border: 1px solid var(--line); box-shadow: none; }
+.btn-ghost:hover { background: var(--ink-2); }
+.nav-cta .btn { height: 42px; font-size: 15px; }
+
+/* hero */
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 56px; align-items: center; padding-block: 48px 40px; }
+h1 { font-size: clamp(2.8rem, 6.2vw, 5.6rem); line-height: .98; letter-spacing: -0.04em; font-weight: 800; margin: 0 0 24px; text-wrap: balance; }
+h1 .wax { color: var(--malam); }
+.lede { font-size: 21px; line-height: 1.45; font-weight: 600; color: var(--tint); max-width: 34ch; margin: 0 0 32px; }
+.lede strong { color: var(--mori); font-weight: 700; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 36px; }
+
+.meaning { display: flex; gap: 14px; align-items: flex-start; max-width: 470px; padding: 16px 18px; border-radius: 16px;
+  background: var(--ink-2); border: 1px solid var(--line); }
+.meaning .pill { flex: none; font-weight: 700; font-size: 14px; color: var(--ink); background: var(--mori); border-radius: 999px; padding: 4px 12px; margin-top: 2px; }
+.meaning p { margin: 0; font-size: 15.5px; color: var(--tint); }
+.meaning p b { display: block; color: var(--mori); font-size: 17px; margin-bottom: 2px; }
+
+/* cloth */
+.frame { border-radius: 22px; padding: 8px; background: var(--ink-2); border: 1px solid var(--line);
+  box-shadow: 0 30px 60px -30px rgba(0,0,0,.7); }
+.cloth { position: relative; border-radius: 15px; overflow: hidden; background: var(--mori); color: var(--mori-ink);
+  min-height: 520px; padding: 22px; display: grid; grid-template-rows: auto 1fr auto; gap: 18px; isolation: isolate; }
+#dye { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.cloth > *:not(#dye) { position: relative; z-index: 1; }
+.cloth-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; padding: 5px 11px; border-radius: 999px;
+  background: var(--mori); color: var(--mori-ink); border: 1px solid #d8cfbd; }
+.chip.dyed { background: var(--soga-deep); color: var(--mori); border-color: var(--soga); }
+.chip svg { width: 14px; height: 14px; }
+
+/* the waxed card: dye never enters it */
+.waxed { align-self: center; justify-self: center; width: min(100%, 390px); background: var(--mori); border-radius: 16px;
+  padding: 20px 22px; box-shadow: 0 0 0 2px var(--malam), 0 0 0 7px rgba(230,173,69,.28), 0 18px 34px -18px rgba(42,26,16,.55); }
+.waxed h3 { margin: 0 0 4px; font-size: 22px; letter-spacing: -0.02em; font-weight: 800; }
+.waxed .sub { margin: 0 0 14px; font-size: 15px; color: #5b4636; }
+.rows { display: grid; grid-template-columns: 1fr auto; gap: 7px 18px; font-size: 16.5px; font-variant-numeric: tabular-nums; }
+.rows span:nth-child(even) { font-weight: 700; text-align: right; }
+.answer { margin-top: 16px; padding-top: 14px; border-top: 1px dashed #cdbfa5; transition: opacity .5s ease, transform .5s ease; }
+.answer b { display: block; font-size: 17px; font-weight: 800; }
+.answer p { margin: 2px 0 0; font-size: 15px; color: #5b4636; }
+.answer.pending { opacity: .35; }
+.answer.pending b::after { content: " (running)"; font-weight: 600; color: #8a7360; }
+
+.seen { border-radius: 14px; padding: 14px 16px; background: var(--soga-deep); color: var(--mori); transition: opacity .6s ease; }
+.seen b { display: block; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.seen code { display: block; font-family: var(--data); font-weight: 500; font-size: 12.5px; line-height: 1.45; word-break: break-all;
+  color: #f3d9b8; max-height: 3.1em; overflow: hidden; }
+.seen.waiting { opacity: 0; }
+.cloth-foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 13.5px; }
+.cloth-foot a { font-weight: 700; }
+.cloth.is-dyed .cloth-foot { color: var(--mori); }
+.replay { font: inherit; font-weight: 700; font-size: 13.5px; background: none; border: 0; color: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 4px 0; }
+
+/* proof strip: a real sequence, so numbered */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0; border-top: 1px solid var(--line); margin-top: 8px; }
+.step { padding: 22px 22px 6px 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: start; }
+.step + .step { padding-left: 22px; border-left: 1px solid var(--line); }
+.step .n { grid-row: span 2; font-weight: 800; font-size: 15px; color: var(--ink); background: var(--malam); width: 30px; height: 30px;
+  border-radius: 999px; display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.step h4 { margin: 2px 0 0; font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
+.step p { margin: 0; font-size: 15px; color: var(--tint); }
+.step p a { color: var(--mori); font-weight: 700; }
+
+@media (max-width: 960px) {
+  .hero { grid-template-columns: 1fr; gap: 36px; padding-top: 28px; }
+  .navlinks { display: none; }
+  .steps { grid-template-columns: 1fr; }
+  .step, .step + .step { padding: 18px 0 6px; border-left: 0; border-top: 1px solid var(--line); }
+  .step:first-child { border-top: 0; }
+  .cloth { min-height: 480px; }
+}
+@media (max-width: 420px) {
+  .lede { font-size: 19px; }
+  .nav-cta .btn { padding: 0 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .answer, .seen, .btn { transition: none; }
+}
+</style>
+
+<!--
+THESIS: A privacy marketplace explained as wax-resist batik. Refuses the dark-navy lock-icon privacy page and the cream editorial look.
+OWN-WORLD: nila-dyed ground with wax cracks, mori cotton cloth, soga dye bath, malam amber for everything protected. SF Pro at 600 to 800.
+STORY: The visitor watches dye flood a cloth and stop at a waxed card holding their portfolio, sees the ciphertext the world gets, and the answer only they get, each linked to a real testnet record.
+FIRST VIEWPORT: thesis headline left at about 5.6rem, lede and amber primary action under it; cloth panel right; numbered proof strip under both.
+FORM: batik tulis, my rank 1 (IMPECCABLE'S PICK chosen by Dien); seed daeeb142.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+-->
+
+<canvas id="cracks" aria-hidden="true"></canvas>
+<div class="wrap">
+  <nav aria-label="Main">
+    <a class="brand" href="#top" aria-label="Kalis home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3c5.5 7 9 12 9 16.5A9 9 0 0 1 7 19.5C7 15 10.5 10 16 3Z" fill="#f1ece1"/><path d="M12 20.5c.6 2.4 2.4 3.8 4.8 4" stroke="#e6ad45" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+      Kalis
+    </a>
+    <div class="navlinks">
+      <a href="#how">How it works</a>
+      <a href="#proof">Proof</a>
+      <a href="#methods">Methods</a>
+    </div>
+    <div class="nav-cta"><a class="btn" href="#demo">Run the demo</a></div>
+  </nav>
+
+  <section class="hero" id="top">
+    <div>
+      <h1>Secret methods. Secret data. <span class="wax">Nothing soaks through.</span></h1>
+      <p class="lede">Kalis runs an expert's private method on your own sensitive data inside a sealed enclave. <strong>The expert never sees your numbers, and you never see their method.</strong></p>
+      <div class="actions">
+        <span class="cta">
+          <a class="btn" href="#demo" id="cta-demo">Run the portfolio demo</a>
+          <a class="btn btn-round" href="#demo" aria-label="Run the portfolio demo"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h11M11 5l5 5-5 5"/></svg></a>
+        </span>
+        <a class="btn btn-ghost" href="#how">See how it stays sealed</a>
+      </div>
+      <div class="meaning">
+        <span class="pill">kalis</span>
+        <p><b>Indonesian for water that will not soak in.</b>Like rain on a taro leaf. Batik makers use wax the same way, so the dye colors the cloth and never the waxed part.</p>
+      </div>
+    </div>
+
+    <div class="frame" id="demo">
+      <div class="cloth" aria-label="Animated example of a private run">
+        <canvas id="dye" aria-hidden="true"></canvas>
+        <div class="cloth-top">
+          <span class="chip" id="state-chip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg><span id="state-text">Sealed on your device</span></span>
+          <span class="chip">Synthetic demo data</span>
+        </div>
+
+        <div class="waxed" role="group" aria-labelledby="card-title">
+          <h3 id="card-title">Your portfolio</h3>
+          <p class="sub">Stays on your side. Only this card can read it.</p>
+          <div class="rows">
+            <span>Asset A, 7 units at 2</span><span>14.00</span>
+            <span>Asset B, 1 unit at 3</span><span>3.00</span>
+            <span>Asset C, 1 unit at 1</span><span>1.00</span>
+            <span>Cash (keep at least 3)</span><span>5.00</span>
+            <span>Each asset between</span><span>10% and 40%</span>
+          </div>
+          <div class="answer pending" id="answer">
+            <b>Sell 3 of A and buy 2 of C</b>
+            <p>Transaction cost 0.18. Every limit is met. Only you can open this answer.</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="seen waiting" id="seen">
+            <b>What the operator and the public chain see</b>
+            <code id="cipher">uLfz4EJoqE8jSO/4qkaB5Ge/sCM1PoY4AV7XyRpUjFlBQsf/RZjKj2731XoYR6Ok/D4bMbYIiXqLPexhoTrL2owErVLddK4mNKWhtHb1q5anaBjoPmOwVPdshqfVAkChSKXLzJV4O7NHxBlGi/A/m7m1PAkwjZLbKmOYy9/4H8/cLIWmToI</code>
+          </div>
+        </div>
+
+        <div class="cloth-foot">
+          <a href="https://explorer.testnet.near.org/transactions/2m9XzLb8SD3MkChhZzfUpT5Ms2anVpYFPxDKfwjY8uHs" target="_blank" rel="noopener">This exact run on NEAR testnet</a>
+          <button class="replay" id="replay" type="button">Dye it again</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps" id="how" aria-label="How a private run works">
+    <div class="step">
+      <span class="n">1</span>
+      <h4>Encrypted on your device</h4>
+      <p>Your browser locks the data to a key that only exists inside the enclave.</p>
+    </div>
+    <div class="step">
+      <span class="n">2</span>
+      <h4>Opened only inside the enclave</h4>
+      <p>An OutLayer TEE runs the method and seals the answer back to you. <a href="https://testnet-api.outlayer.ai/attestations/by-request/38119" target="_blank" rel="noopener">See the attestation</a></p>
+    </div>
+    <div class="step" id="proof">
+      <span class="n">3</span>
+      <h4>Every version recorded on NEAR</h4>
+      <p>The method's code, manifest and runner hashes sit in a public registry, so a seller cannot swap them.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Ground texture: thin wax cracks on the nila field, drawn once.
+  const g = document.getElementById('cracks'), gc = g.getContext('2d');
+  function drawCracks() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    g.width = innerWidth * dpr; g.height = innerHeight * dpr; gc.setTransform(dpr, 0, 0, dpr, 0, 0);
+    gc.clearRect(0, 0, innerWidth, innerHeight);
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    gc.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--ink-2');
+    gc.lineCap = 'round';
+    const n = Math.round(innerWidth * innerHeight / 9000);
+    for (let i = 0; i < n; i++) {
+      let x = rnd() * innerWidth, y = rnd() * innerHeight, a = rnd() * Math.PI * 2;
+      gc.lineWidth = 0.6 + rnd() * 1.1; gc.beginPath(); gc.moveTo(x, y);
+      const steps = 3 + Math.floor(rnd() * 6);
+      for (let s = 0; s < steps; s++) { a += (rnd() - 0.5) * 1.4; x += Math.cos(a) * (8 + rnd() * 22); y += Math.sin(a) * (8 + rnd() * 22); gc.lineTo(x, y); }
+      gc.stroke();
+    }
+  }
+  drawCracks(); addEventListener('resize', drawCracks);
+
+  // The authored moment: a soga dye bath rises through the cloth, leaving the waxed card clean.
+  const cloth = document.querySelector('.cloth'), c = document.getElementById('dye'), ctx = c.getContext('2d');
+  const answer = document.getElementById('answer'), seen = document.getElementById('seen');
+  const stateText = document.getElementById('state-text'), chip = document.getElementById('state-chip');
+  let raf, t0;
+  function size() { const r = cloth.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2); c.width = r.width * d; c.height = r.height * d; ctx.setTransform(d, 0, 0, d, 0, 0); return r; }
+  function paint(level) {
+    const r = size(), w = r.width, h = r.height, top = h * (1 - level);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#93491c'; ctx.beginPath(); ctx.moveTo(0, h);
+    for (let x = 0; x <= w; x += 8) ctx.lineTo(x, top + Math.sin(x / 37 + level * 9) * 9 + Math.sin(x / 13 + level * 4) * 4);
+    ctx.lineTo(w, h); ctx.closePath(); ctx.fill();
+    // dye pools darker in the cloth's own cracks
+    let seed = 3; const rnd = () => (seed = (seed * 48271) % 2147483647) / 2147483647;
+    ctx.strokeStyle = '#6e3412'; ctx.lineWidth = 1;
+    for (let i = 0; i < 70; i++) { let x = rnd() * w, y = top + rnd() * (h - top), a = rnd() * 6.28; ctx.beginPath(); ctx.moveTo(x, y);
+      for (let s = 0; s < 4; s++) { a += (rnd() - .5) * 1.5; x += Math.cos(a) * 14; y += Math.sin(a) * 14; ctx.lineTo(x, y); } ctx.stroke(); }
+  }
+  function finish() {
+    answer.classList.remove('pending'); seen.classList.remove('waiting');
+    stateText.textContent = 'Answered inside the enclave'; chip.classList.add('dyed'); cloth.classList.add('is-dyed');
+  }
+  function run() {
+    cancelAnimationFrame(raf);
+    answer.classList.add('pending'); seen.classList.add('waiting'); chip.classList.remove('dyed'); cloth.classList.remove('is-dyed');
+    stateText.textContent = 'Sealed on your device';
+    if (reduce) { paint(1); finish(); return; }
+    t0 = performance.now();
+    const step = (now) => {
+      const p = Math.min((now - t0) / 2600, 1), e = 1 - Math.pow(1 - p, 3);
+      paint(e);
+      if (p > 0.12) cloth.classList.add('is-dyed');
+      if (p > 0.45) { seen.classList.remove('waiting'); stateText.textContent = 'Running inside the enclave'; }
+      if (p < 1) raf = requestAnimationFrame(step); else finish();
+    };
+    paint(0); setTimeout(() => (raf = requestAnimationFrame(step)), 500);
+  }
+  document.getElementById('replay').addEventListener('click', run);
+  addEventListener('resize', () => paint(answer.classList.contains('pending') ? 0 : 1));
+  run();
+})();
+</script>

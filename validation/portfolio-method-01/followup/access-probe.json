@@ -1,0 +1,13 @@
+{
+  "status": "timeout",
+  "seconds": 35.02467645800061,
+  "stdout": "",
+  "stderr": "",
+  "probe": "Readiness only, Return exactly READY, no portfolio benchmark answers obtained",
+  "diagnostics": [
+    "CLI debug reported EPERM creating OAuth refresh lock in Claude config directory",
+    "CLI debug reported repeated API Connection error"
+  ],
+  "interpretation": "Exact cause of connection error not established. No baseline accuracy score may be assigned.",
+  "credential_values_recorded": false
+}

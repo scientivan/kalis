@@ -1,0 +1,389 @@
+[
+  {
+    "id": "C01",
+    "output": {
+      "status": "feasible",
+      "delta": [
+        -1,
+        0,
+        0
+      ],
+      "audit": {
+        "valid": true,
+        "cost": 0.07,
+        "cash_after": 6.93,
+        "nav_after": 18.93,
+        "asset_values_after": [
+          6,
+          3,
+          3
+        ]
+      }
+    },
+    "oracle": {
+      "delta": [
+        -1,
+        0,
+        0
+      ],
+      "valid": true,
+      "cost": 0.07,
+      "cash_after": 6.93,
+      "nav_after": 18.93,
+      "asset_values_after": [
+        6,
+        3,
+        3
+      ]
+    },
+    "pass": true,
+    "solver_seconds": 0.008433999999397201
+  },
+  {
+    "id": "C02",
+    "output": {
+      "status": "feasible",
+      "delta": [
+        0,
+        0,
+        0
+      ],
+      "audit": {
+        "valid": true,
+        "cost": 0.0,
+        "cash_after": 5.0,
+        "nav_after": 15.0,
+        "asset_values_after": [
+          4,
+          3,
+          3
+        ]
+      }
+    },
+    "oracle": {
+      "delta": [
+        0,
+        0,
+        0
+      ],
+      "valid": true,
+      "cost": 0.0,
+      "cash_after": 5.0,
+      "nav_after": 15.0,
+      "asset_values_after": [
+        4,
+        3,
+        3
+      ]
+    },
+    "pass": true,
+    "solver_seconds": 0.0009235830002580769
+  },
+  {
+    "id": "C03",
+    "output": {
+      "status": "feasible",
+      "delta": [
+        -3,
+        0,
+        2
+      ],
+      "audit": {
+        "valid": true,
+        "cost": 0.18,
+        "cash_after": 8.82,
+        "nav_after": 22.82,
+        "asset_values_after": [
+          8,
+          3,
+          3
+        ]
+      }
+    },
+    "oracle": {
+      "delta": [
+        -3,
+        0,
+        2
+      ],
+      "valid": true,
+      "cost": 0.18,
+      "cash_after": 8.82,
+      "nav_after": 22.82,
+      "asset_values_after": [
+        8,
+        3,
+        3
+      ]
+    },
+    "pass": true,
+    "solver_seconds": 0.0006781250012863893
+  },
+  {
+    "id": "C04",
+    "output": {
+      "status": "feasible",
+      "delta": [
+        1,
+        1,
+        2
+      ],
+      "audit": {
+        "valid": true,
+        "cost": 0.265,
+        "cash_after": 12.735,
+        "nav_after": 19.735,
+        "asset_values_after": [
+          2,
+          3,
+          2
+        ]
+      }
+    },
+    "oracle": {
+      "delta": [
+        1,
+        1,
+        2
+      ],
+      "valid": true,
+      "cost": 0.265,
+      "cash_after": 12.735,
+      "nav_after": 19.735,
+      "asset_values_after": [
+        2,
+        3,
+        2
+      ]
+    },
+    "pass": true,
+    "solver_seconds": 0.0005879999989701901
+  },
+  {
+    "id": "C05",
+    "output": {
+      "status": "feasible",
+      "delta": [
+        -1,
+        0,
+        0
+      ],
+      "audit": {
+        "valid": true,
+        "cost": 0.52,
+        "cash_after": 6.48,
+        "nav_after": 18.48,
+        "asset_values_after": [
+          6,
+          3,
+          3
+        ]
+      }
+    },
+    "oracle": {
+      "delta": [
+        -1,
+        0,
+        0
+      ],
+      "valid": true,
+      "cost": 0.52,
+      "cash_after": 6.48,
+      "nav_after": 18.48,
+      "asset_values_after": [
+        6,
+        3,
+        3
+      ]
+    },
+    "pass": true,
+    "solver_seconds": 0.0007016670024313498
+  },
+  {
+    "id": "C06",
+    "output": {
+      "status": "feasible",
+      "delta": [
+        -1,
+        0,
+        0
+      ],
+      "audit": {
+        "valid": true,
+        "cost": 0.25,
+        "cash_after": 6.75,
+        "nav_after": 18.75,
+        "asset_values_after": [
+          6,
+          3,
+          3
+        ]
+      }
+    },
+    "oracle": {
+      "delta": [
+        -1,
+        0,
+        0
+      ],
+      "valid": true,
+      "cost": 0.25,
+      "cash_after": 6.75,
+      "nav_after": 18.75,
+      "asset_values_after": [
+        6,
+        3,
+        3
+      ]
+    },
+    "pass": true,
+    "solver_seconds": 0.0006694999974570237
+  },
+  {
+    "id": "C07",
+    "output": {
+      "status": "feasible",
+      "delta": [
+        -2,
+        0,
+        0
+      ],
+      "audit": {
+        "valid": true,
+        "cost": 0.09,
+        "cash_after": 8.91,
+        "nav_after": 18.91,
+        "asset_values_after": [
+          4,
+          3,
+          3
+        ]
+      }
+    },
+    "oracle": {
+      "delta": [
+        -2,
+        0,
+        0
+      ],
+      "valid": true,
+      "cost": 0.09,
+      "cash_after": 8.91,
+      "nav_after": 18.91,
+      "asset_values_after": [
+        4,
+        3,
+        3
+      ]
+    },
+    "pass": true,
+    "solver_seconds": 0.000646874999802094
+  },
+  {
+    "id": "C08",
+    "output": {
+      "status": "feasible",
+      "delta": [
+        -2,
+        0,
+        0
+      ],
+      "audit": {
+        "valid": true,
+        "cost": 0.09,
+        "cash_after": 8.91,
+        "nav_after": 18.91,
+        "asset_values_after": [
+          4,
+          3,
+          3
+        ]
+      }
+    },
+    "oracle": {
+      "delta": [
+        -2,
+        0,
+        0
+      ],
+      "valid": true,
+      "cost": 0.09,
+      "cash_after": 8.91,
+      "nav_after": 18.91,
+      "asset_values_after": [
+        4,
+        3,
+        3
+      ]
+    },
+    "pass": true,
+    "solver_seconds": 0.0006660830003966112
+  },
+  {
+    "id": "C09",
+    "output": {
+      "status": "infeasible"
+    },
+    "oracle": null,
+    "pass": true,
+    "solver_seconds": 0.0004889999981969595
+  },
+  {
+    "id": "C10",
+    "output": {
+      "status": "infeasible"
+    },
+    "oracle": null,
+    "pass": true,
+    "solver_seconds": 0.0004751249980472494
+  },
+  {
+    "id": "C11",
+    "output": {
+      "status": "infeasible"
+    },
+    "oracle": null,
+    "pass": true,
+    "solver_seconds": 0.0005042910015617963
+  },
+  {
+    "id": "C12",
+    "output": {
+      "status": "feasible",
+      "delta": [
+        -1,
+        0,
+        0
+      ],
+      "audit": {
+        "valid": true,
+        "cost": 0.08,
+        "cash_after": 7.92,
+        "nav_after": 19.92,
+        "asset_values_after": [
+          6,
+          4,
+          2
+        ]
+      }
+    },
+    "oracle": {
+      "delta": [
+        -1,
+        0,
+        0
+      ],
+      "valid": true,
+      "cost": 0.08,
+      "cash_after": 7.92,
+      "nav_after": 19.92,
+      "asset_values_after": [
+        6,
+        4,
+        2
+      ]
+    },
+    "pass": true,
+    "solver_seconds": 0.0006378329999279231
+  }
+]

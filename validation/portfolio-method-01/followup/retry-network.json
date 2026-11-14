@@ -1,0 +1,18 @@
+{
+  "timestamp_utc": "2026-11-13T05:59:10.371285+00:00",
+  "dns": {
+    "api.anthropic.com": {
+      "status": "failed",
+      "error": "[Errno 8] nodename nor servname provided, or not known"
+    },
+    "api.openai.com": {
+      "status": "failed",
+      "error": "[Errno 8] nodename nor servname provided, or not known"
+    }
+  },
+  "scope": "network access from this execution environment only",
+  "curl": {
+    "returncode": 6,
+    "headers_received": false
+  }
+}

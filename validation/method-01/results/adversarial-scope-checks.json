@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Empty export",
+    "expected_status": "insufficient",
+    "observed_status": "consistent",
+    "pass": false,
+    "reason": "No records cannot establish consistency."
+  },
+  {
+    "name": "Open partial pick",
+    "expected_status": "insufficient",
+    "observed_status": "mismatch",
+    "pass": false,
+    "reason": "An unfinished stage is not a completed shortage."
+  },
+  {
+    "name": "Complaint contradicts logs",
+    "expected_status": "insufficient",
+    "observed_status": "consistent",
+    "pass": false,
+    "reason": "Consistent system logs cannot resolve a conflicting report of physical delivery."
+  },
+  {
+    "name": "Closed snapshot shortage",
+    "expected_status": "mismatch",
+    "observed_status": "mismatch",
+    "pass": true,
+    "reason": "Every completed stage records one instead of target two."
+  },
+  {
+    "name": "Order only",
+    "expected_status": "insufficient",
+    "observed_status": "insufficient",
+    "pass": true,
+    "reason": "No fulfillment trace."
+  }
+]

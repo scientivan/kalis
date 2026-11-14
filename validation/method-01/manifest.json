@@ -1,0 +1,21 @@
+{
+  "PROTOCOL.md": "2e9d92f1d29d4560a92055a29a7a733714909dfaa18f6df5e448c28f76bcef0a",
+  "evaluator/answer-key.json": "6de4e9deaef6c28a0b75e3d81efd4e03f83f1ffe233158f1b6d78f93dc6ac574",
+  "inputs/development/C01.json": "7ba3da5622b4621efe3277802ffe54886b894deff0fee3ca8c4b4d8c4e852529",
+  "inputs/development/C02.json": "678cd12ab615fad7be5d8720f4491c9fb5217ae2caf7c7cd892f0bc9269419c8",
+  "inputs/development/C03.json": "05aadba6e486dfa20c8f79d334b8f26a44915d55ef55a24c98e3985d2275356a",
+  "inputs/development/C04.json": "bca6b45587fe5d45c8e7740a9b362f7c1d1c8651909391a1548494472069b9f7",
+  "inputs/evaluation/C05.json": "12e5e046b1d8f13e4dc8692b9f0acfea449eae5cde6dfcb02c4f25fefc4cfca6",
+  "inputs/evaluation/C06.json": "7590a6d40aaeb815be49e81f51a3c346c0d2ae4c59fc54b19f80669ad58f22ff",
+  "inputs/evaluation/C07.json": "1a28c7856000b36eac532b39e50baaafa05d735b85682b167b223ee67b018897",
+  "inputs/evaluation/C08.json": "a98d1fb90a7c97279b1e55828b772ddf222ab53310aa0ba85be7649a889a73ac",
+  "inputs/evaluation/C09.json": "e9f3f297a3ad1ad5bb8b3d3b007a9886cc1c5e9e27b3090b0c0c1b2b50dc3bdf",
+  "inputs/evaluation/C10.json": "a0ea7df84ed41a0ed3fb1ac0cdbb1340e958fa7181761a7a8db2bb4513d3725b",
+  "inputs/evaluation/C11.json": "1a5384c1ea7124a38abd6cb9a682479570c11850660d773dd56196c7af03ff85",
+  "inputs/evaluation/C12.json": "b6fade0289eaa5f389e6b6c76677161128adba20887f37fbb7c9b7a65fac2e5e",
+  "prompts/A-good-prompt.md": "0e749c8a48a5e3ded2c316647a9a4b4d52039ddd1ddac1451fbfc05cd1e86312",
+  "prompts/B-general-ai-tools.md": "413920e378d47c96efb1322c7772a453fd7a9790a79cd6032a47519ee4cb2bc1",
+  "prompts/C-method-candidate.md": "de52c6b9996e795e45bf8cf153e12804ebaada70207fbc30ad9a8e3e69ed7d38",
+  "prompts/shared-context.md": "1c30ab7a25cfcc2cbe5c29296d5bc9d2b7ecbc525dabcd080466608dd8b7d709",
+  "runs.csv": "e2214c3384d2268cd63cd62f2cc7b08fa469349d0d3a6a015b7a046f1ba0fe17"
+}

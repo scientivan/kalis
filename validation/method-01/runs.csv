@@ -1,0 +1,1 @@
+case_id,arm,repeat,model_snapshot,prompt_hash,output_path,status_correct,stage_correct,score_100,critical_errors,input_tokens,output_tokens,tool_cost_usd,model_cost_usd,latency_seconds,human_prep_seconds,human_review_seconds,human_correction_seconds,retry_count,reviewer_notes

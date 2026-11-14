@@ -1,0 +1,9 @@
+{
+  "prompt_sha256": "33e9db8b7548a54a2a1b27565eba4a16bb0b21882cbe50398fb6665658d4335d",
+  "cases": 12,
+  "primary": "satisfy user constraints or correctly report infeasible",
+  "secondary": "minimize actual stated transaction cost among feasible solutions, ties accepted",
+  "no_hidden_strategy_matching": true,
+  "repetitions": 1,
+  "synthetic": true
+}

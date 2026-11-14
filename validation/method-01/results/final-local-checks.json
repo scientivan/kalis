@@ -1,0 +1,14 @@
+{
+  "original_status_stage_passes": 12,
+  "original_total": 12,
+  "shuffle_stability": 120,
+  "shuffle_total": 120,
+  "development_regression_passes": 5,
+  "development_regression_total": 5,
+  "bulk_findings": 100,
+  "bulk_expected": 100,
+  "bulk_stages_correct": true,
+  "bulk_seconds": 0.01188700000056997,
+  "llm_benchmark_completed": false,
+  "human_efficiency_measured": false
+}

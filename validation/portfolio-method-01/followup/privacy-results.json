@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "test": "operator_reads_portfolio_file",
+      "attack_succeeded": true
+    },
+    {
+      "test": "operator_reads_strategy_source",
+      "attack_succeeded": true
+    },
+    {
+      "test": "operator_captures_portfolio_at_runtime",
+      "attack_succeeded": true
+    },
+    {
+      "test": "operator_captures_strategy_at_runtime",
+      "attack_succeeded": true
+    }
+  ],
+  "captured_synthetic": {
+    "portfolio": {
+      "holdings": [
+        3,
+        2,
+        1
+      ],
+      "cash": 4,
+      "reserve": 2,
+      "fee": 0.01,
+      "caps": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "sector_cap": 0.6,
+      "turnover": 8,
+      "buy_limit": 5,
+      "allow_sell": true,
+      "regime": "normal",
+      "case_id": "P01_base"
+    },
+    "strategy_base": [
+      3.0,
+      2.0,
+      1.0
+    ],
+    "scores": [
+      1.8,
+      1.2,
+      0.6
+    ]
+  },
+  "computation_status": "feasible",
+  "scope": "ordinary host controlled by operator, not a TEE attack",
+  "operator_privacy_passed": false
+}

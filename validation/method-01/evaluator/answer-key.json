@@ -1,0 +1,149 @@
+[
+  {
+    "case_id": "C01",
+    "split": "development",
+    "status": "mismatch",
+    "first_observed": "pick",
+    "evidence": [
+      "e1",
+      "e2"
+    ],
+    "limit": "Salah SKU teramati saat pick. Alasan manusia/sistem belum diketahui."
+  },
+  {
+    "case_id": "C02",
+    "split": "development",
+    "status": "mismatch",
+    "first_observed": "pack",
+    "evidence": [
+      "e1",
+      "e2",
+      "e3"
+    ],
+    "limit": "Perbedaan pertama pada pack, bukan bukti siapa pelakunya."
+  },
+  {
+    "case_id": "C03",
+    "split": "development",
+    "status": "insufficient",
+    "first_observed": null,
+    "evidence": [
+      "e1",
+      "e2"
+    ],
+    "limit": "Keluhan tanpa log internal tidak melokalisasi titik kesalahan."
+  },
+  {
+    "case_id": "C04",
+    "split": "development",
+    "status": "consistent",
+    "first_observed": null,
+    "evidence": [
+      "e1",
+      "e2",
+      "e3",
+      "e4"
+    ],
+    "limit": "Catatan konsisten, bukan jaminan barang fisik benar."
+  },
+  {
+    "case_id": "C05",
+    "split": "evaluation",
+    "status": "mismatch",
+    "first_observed": "pick",
+    "evidence": [
+      "e2",
+      "e3"
+    ],
+    "limit": "Pick v1 tidak sesuai pesanan v2 yang telah berlaku. Perlu cek penyebaran versi, bukan menyalahkan picker."
+  },
+  {
+    "case_id": "C06",
+    "split": "evaluation",
+    "status": "consistent",
+    "first_observed": null,
+    "evidence": [
+      "e1",
+      "e2",
+      "e3",
+      "a1"
+    ],
+    "limit": "Substitusi berizin. Tidak boleh dianggap salah varian."
+  },
+  {
+    "case_id": "C07",
+    "split": "evaluation",
+    "status": "consistent",
+    "first_observed": null,
+    "evidence": [
+      "e1",
+      "e2",
+      "e3",
+      "e4",
+      "e5"
+    ],
+    "limit": "Dua pick parsial total dua unit, bukan kekurangan atau empat unit."
+  },
+  {
+    "case_id": "C08",
+    "split": "evaluation",
+    "status": "consistent",
+    "first_observed": null,
+    "evidence": [
+      "e1",
+      "e2",
+      "e3",
+      "a1"
+    ],
+    "limit": "Alias resmi satu SKU, bukan dua varian."
+  },
+  {
+    "case_id": "C09",
+    "split": "evaluation",
+    "status": "mismatch",
+    "first_observed": "ship",
+    "evidence": [
+      "e1",
+      "e2",
+      "e3"
+    ],
+    "limit": "Perbedaan pertama yang TERAMATI di ship. Lokasi terjadinya antara pick dan ship belum diketahui, pack tidak tercatat."
+  },
+  {
+    "case_id": "C10",
+    "split": "evaluation",
+    "status": "consistent",
+    "first_observed": null,
+    "evidence": [
+      "e1",
+      "e2",
+      "e3"
+    ],
+    "limit": "Duplikat identik ID e2 adalah replay, dihitung sekali."
+  },
+  {
+    "case_id": "C11",
+    "split": "evaluation",
+    "status": "data_conflict",
+    "first_observed": null,
+    "evidence": [
+      "e1",
+      "e2",
+      "e3"
+    ],
+    "limit": "Dua payload berbeda ID sama. Pack berbeda dari order, tetapi jangan menentukan titik pertama sebelum konflik pick diselesaikan."
+  },
+  {
+    "case_id": "C12",
+    "split": "evaluation",
+    "status": "mismatch",
+    "first_observed": "pick",
+    "evidence": [
+      "e1",
+      "e2",
+      "e3",
+      "e4"
+    ],
+    "limit": "Kedua line tertukar. Total SKU order tampak benar, pencocokan harus per line."
+  }
+]

@@ -1,0 +1,166 @@
+<title>Kalis Directions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: page chrome is neutral; each direction is a self-contained tile with its own literal palette, shown as it would look in the app (light). */
+:root {
+  --bg: #f2f3f5; --fg: #16181d; --muted: #3d4350; --line: #d5d8de; --panel: #ffffff;
+  --sys: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, "Helvetica Neue", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #121418; --fg: #eef0f3; --muted: #b9bfca; --line: #2b2f37; --panel: #1a1d23; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #121418; --fg: #eef0f3; --muted: #b9bfca; --line: #2b2f37; --panel: #1a1d23; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font-family: var(--sys); font-weight: 500; font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px }
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 24px }
+h1 { font-size: 28px; font-weight: 700; margin: 0; text-wrap: balance }
+.intro { color: var(--muted); max-width: 70ch; margin: 6px 0 0; font-size: 16px }
+.note { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; color: var(--muted); font-size: 14px }
+.note b { color: var(--fg) }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px }
+@media (max-width: 1080px) { .grid { grid-template-columns: 1fr } }
+
+.tile { border-radius: 18px; padding: 8px; border: 1px solid var(--t-line); background: var(--t-bg); color: var(--t-ink); display: grid; gap: 8px; min-width: 0 }
+.inner { border-radius: 12px; padding: 18px; background: var(--t-surface); border: 1px solid var(--t-line); display: grid; gap: 16px; position: relative; overflow: hidden }
+.tex { position: absolute; inset: 0; pointer-events: none }
+.inner > *:not(.tex) { position: relative }
+.head h2 { font-size: 22px; font-weight: 700; margin: 0 }
+.head p { margin: 4px 0 0; font-size: 15px; color: var(--t-ink2) }
+.sw { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px }
+.sw div { border-radius: 8px; height: 56px; border: 1px solid rgba(0,0,0,.08); display: flex; align-items: flex-end; padding: 6px; font-size: 12.5px; font-weight: 600 }
+.swl { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; font-size: 12.5px; color: var(--t-ink2); font-weight: 600 }
+.type .t1 { font-size: 24px; font-weight: 700; line-height: 1.2 }
+.type .t2 { font-size: 16px; font-weight: 600; margin-top: 4px }
+.type .t3 { font-size: 14px; font-weight: 500; color: var(--t-ink2); margin-top: 2px }
+.num { font-variant-numeric: tabular-nums; font-weight: 800 }
+
+.card { border-radius: 14px; border: 1px solid var(--t-line); background: var(--t-card); padding: 14px; display: grid; gap: 10px }
+.card .ttl { font-size: 17px; font-weight: 700; line-height: 1.3 }
+.card .by { font-size: 13.5px; color: var(--t-ink2) }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+.pill { font-size: 12.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--t-line); background: var(--t-surface) }
+.price { margin-left: auto; font-size: 15px }
+.btn { justify-self: start; height: 38px; padding: 0 16px; border-radius: 10px; border: 0; font: 600 14px var(--sys); background: var(--t-primary); color: var(--t-on); cursor: pointer }
+.btn:focus-visible { outline: 3px solid var(--t-accent); outline-offset: 2px }
+.sig { border-radius: 12px; padding: 12px; background: var(--t-card); border: 1px solid var(--t-line); display: grid; gap: 8px }
+.sig b { font-size: 14px }
+.sig p { margin: 0; font-size: 13.5px; color: var(--t-ink2) }
+.meta { font-size: 13.5px; color: var(--t-ink2); padding: 4px 10px 8px; display: grid; gap: 4px }
+.meta b { color: var(--t-ink) }
+.pick { margin: 0 10px 10px; height: 40px; border-radius: 10px; border: 1px solid var(--t-ink); background: transparent; color: var(--t-ink); font: 700 14px var(--sys); cursor: pointer }
+.pick:focus-visible { outline: 3px solid var(--t-accent) }
+
+/* ryux-ignore RX-DS-03: style tiles show each direction's own palette as literal swatches on purpose; the chosen one becomes tokens */
+/* 1 Sealed packet */
+.d1 { --t-bg:#eef1f6; --t-surface:#f7f8fb; --t-card:#ffffff; --t-line:#d3d9e4; --t-ink:#121a2c; --t-ink2:#3c4660; --t-primary:#1f3fd1; --t-on:#ffffff; --t-accent:#e09a2c }
+.d1 .tex { background-image: linear-gradient(#e3e8f1 1px, transparent 1px), linear-gradient(90deg, #e3e8f1 1px, transparent 1px); background-size: 32px 32px }
+.seal { display: flex; align-items: center; gap: 10px; border-radius: 10px; padding: 8px 10px; background: #121a2c; color: #ffffff; font-size: 13px; font-weight: 600 }
+.seal .ct { font-family: ui-monospace, Menlo, monospace; letter-spacing: .04em; color: #c9d3ff; overflow: hidden; white-space: nowrap }
+.seal .open { color: #121a2c; background: #e09a2c; border-radius: 6px; padding: 2px 7px; margin-left: auto; white-space: nowrap }
+
+/* 2 Hash mosaic */
+.d2 { --t-bg:#eef3f2; --t-surface:#f7faf9; --t-card:#ffffff; --t-line:#cfdedb; --t-ink:#10201e; --t-ink2:#36504c; --t-primary:#0f6e6a; --t-on:#ffffff; --t-accent:#ef5b3f }
+.mosaic { display: grid; grid-template-columns: repeat(16, 1fr); gap: 2px }
+.mosaic i { aspect-ratio: 1; border-radius: 2px; display: block }
+.d2 .tex { opacity: .9 }
+.d2 .cover { border-radius: 10px; overflow: hidden }
+
+/* 3 Enclave chamber */
+.d3 { --t-bg:#eef0f3; --t-surface:#f8f9fa; --t-card:#ffffff; --t-line:#d4d8df; --t-ink:#171a21; --t-ink2:#424955; --t-primary:#c2410c; --t-on:#ffffff; --t-accent:#2563eb }
+.d3 .tex { background-image: radial-gradient(#cfd4dc 1.2px, transparent 1.3px); background-size: 18px 18px }
+.chamber { border: 2px solid #171a21; border-radius: 14px; padding: 10px 12px; display: grid; gap: 8px }
+.lights { display: flex; gap: 5px }
+.lights span { flex: 1; height: 6px; border-radius: 3px; background: #d4d8df }
+.lights span.on { background: #c2410c }
+.stagenames { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: #424955 }
+@media (prefers-reduced-motion: no-preference) {
+  .lights span.on { animation: glow 2.4s ease-in-out 3 }
+  .lights span:nth-child(2) { animation-delay: .3s } .lights span:nth-child(3) { animation-delay: .6s } .lights span:nth-child(4) { animation-delay: .9s }
+  @keyframes glow { 50% { background: #f97316 } }
+}
+</style>
+
+<div class="wrap">
+  <div>
+    <h1>Three directions for the Kalis app</h1>
+    <p class="intro">Each tile shows the palette, the type scale at app size, one real marketplace card, the primary button and the signature element. All three use the SF Pro system stack at weight 500 and above, solid colours and a textured background, as your design rules ask. Pick one, or combine parts.</p>
+  </div>
+  <div class="note"><b>The card content is real.</b> The tender method, the demo seller name, the price of 0.1 NEAR testnet and "No ratings yet" come from the backend as it is now. Every seller in the demo is fictional and labelled as a demo.</div>
+
+  <div class="grid">
+    <!-- 1 -->
+    <section class="tile d1" aria-labelledby="h1">
+      <div class="inner">
+        <div class="tex"></div>
+        <div class="head"><h2 id="h1">1. Sealed packet</h2><p>Calm and exact, like a bank statement you trust. Data is always shown as a sealed packet until it opens on your device.</p></div>
+        <div>
+          <div class="sw"><div style="background:#1f3fd1;color:#fff">Primary</div><div style="background:#e09a2c;color:#121a2c">Held</div><div style="background:#121a2c;color:#fff">Ink</div><div style="background:#eef1f6;color:#121a2c">Page</div><div style="background:#ffffff;color:#121a2c">Card</div></div>
+        </div>
+        <div class="swl"><span>#1F3FD1</span><span>#E09A2C</span><span>#121A2C</span><span>#EEF1F6</span><span>#FFFFFF</span></div>
+        <div class="type"><div class="t1">Price a tender bid</div><div class="t2">Card title 16, weight 600</div><div class="t3">Body 14, weight 500, dark secondary text</div></div>
+        <div class="card">
+          <div class="ttl">Price a tender bid above your minimum margin</div>
+          <div class="by">Rani Hartono (demo seller), procurement consultant</div>
+          <div class="row"><span class="pill">Program + private AI</span><span class="pill">No ratings yet</span><span class="price num">0.1 NEAR</span></div>
+          <div class="seal"><span aria-hidden="true">🔒</span><span class="ct">c7Q2…x9Lr fe08 1aB3 77dk</span><span class="open">Opens on your device</span></div>
+          <button class="btn" type="button">Run privately</button>
+        </div>
+        <div class="sig"><b>Signature: the sealed packet</b><p>Every private value appears as a locked chip with cipher text. When the answer opens on your device, the chip decrypts letter by letter into the real number. Amber marks anything held for your approval.</p></div>
+      </div>
+      <div class="meta"><span><b>Background</b> 32px fine grid on cool grey</span><span><b>Motion</b> decrypt on open, quiet elsewhere</span><span><b>Risk</b> closest to a conventional fintech look</span></div>
+      <button class="pick" type="button" data-ryux-pick="1">Choose 1, Sealed packet</button>
+    </section>
+
+    <!-- 2 -->
+    <section class="tile d2" aria-labelledby="h2">
+      <div class="inner">
+        <svg class="tex" aria-hidden="true" width="100%" height="100%"><defs><pattern id="px" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#f7faf9"/><rect x="0" y="0" width="11" height="11" fill="#e6efed"/><rect x="12" y="12" width="11" height="11" fill="#eef4f2"/></pattern></defs><rect width="100%" height="100%" fill="url(#px)"/></svg>
+        <div class="head"><h2 id="h2">2. Hash mosaic</h2><p>Each method version gets a mosaic drawn from its code hash. A new version visibly changes the pattern, so "which version ran" becomes something you can see.</p></div>
+        <div><div class="sw"><div style="background:#0f6e6a;color:#fff">Primary</div><div style="background:#ef5b3f;color:#fff">Private</div><div style="background:#10201e;color:#fff">Ink</div><div style="background:#eef3f2;color:#10201e">Page</div><div style="background:#ffffff;color:#10201e">Card</div></div></div>
+        <div class="swl"><span>#0F6E6A</span><span>#EF5B3F</span><span>#10201E</span><span>#EEF3F2</span><span>#FFFFFF</span></div>
+        <div class="type"><div class="t1">Price a tender bid</div><div class="t2">Card title 16, weight 600</div><div class="t3">Body 14, weight 500, dark secondary text</div></div>
+        <div class="card">
+          <div class="cover"><div class="mosaic" id="mos"></div></div>
+          <div class="ttl">Price a tender bid above your minimum margin</div>
+          <div class="by">Rani Hartono (demo seller), procurement consultant</div>
+          <div class="row"><span class="pill">Program + private AI</span><span class="pill">No ratings yet</span><span class="price num">0.1 NEAR</span></div>
+          <button class="btn" type="button">Run privately</button>
+        </div>
+        <div class="sig"><b>Signature: the version mosaic</b><p>The cover is the first 64 bytes of the method's code hash on chain, one solid cell per byte. The run screen shows the same mosaic next to "this exact version ran in the TEE". Coral marks a private value.</p></div>
+      </div>
+      <div class="meta"><span><b>Background</b> solid pixel blocks, the kind you liked</span><span><b>Motion</b> cells settle into the version pattern on load</span><span><b>Risk</b> the mosaic needs one line of explanation the first time</span></div>
+      <button class="pick" type="button" data-ryux-pick="2">Choose 2, Hash mosaic</button>
+    </section>
+
+    <!-- 3 -->
+    <section class="tile d3" aria-labelledby="h3">
+      <div class="inner">
+        <div class="tex"></div>
+        <div class="head"><h2 id="h3">3. Enclave chamber</h2><p>The TEE is drawn as a closed chamber with stage lights on its edge. You watch your run move through the seven stages without ever seeing inside.</p></div>
+        <div><div class="sw"><div style="background:#c2410c;color:#fff">Primary</div><div style="background:#2563eb;color:#fff">Proof</div><div style="background:#171a21;color:#fff">Ink</div><div style="background:#eef0f3;color:#171a21">Page</div><div style="background:#ffffff;color:#171a21">Card</div></div></div>
+        <div class="swl"><span>#C2410C</span><span>#2563EB</span><span>#171A21</span><span>#EEF0F3</span><span>#FFFFFF</span></div>
+        <div class="type"><div class="t1">Price a tender bid</div><div class="t2">Card title 16, weight 600</div><div class="t3">Body 14, weight 500, dark secondary text</div></div>
+        <div class="card">
+          <div class="ttl">Price a tender bid above your minimum margin</div>
+          <div class="by">Rani Hartono (demo seller), procurement consultant</div>
+          <div class="row"><span class="pill">Program + private AI</span><span class="pill">No ratings yet</span><span class="price num">0.1 NEAR</span></div>
+          <div class="chamber"><div class="lights"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span></div><div class="stagenames"><span>Open method</span><span>Run</span><span>Seal answer</span></div></div>
+          <button class="btn" type="button">Run privately</button>
+        </div>
+        <div class="sig"><b>Signature: the chamber</b><p>Anything that happens inside the TEE sits in a heavy dark outline. Stage lights fill in as the runner reports each stage. Blue marks a proof you can check yourself, such as the attestation or the signed completion.</p></div>
+      </div>
+      <div class="meta"><span><b>Background</b> fine dot grid</span><span><b>Motion</b> stage lights progress during a run</span><span><b>Risk</b> orange primary is bold; it must stay off error states</span></div>
+      <button class="pick" type="button" data-ryux-pick="3">Choose 3, Enclave chamber</button>
+    </section>
+  </div>
+
+  <div class="note"><b>Applies to all three.</b> App pages use the small scale you set (page title about 24px, card titles 15–17px, body 13–14px, controls 38px high). No labels above headings, no ":" or em dash in interface copy, no gradients or glass. The landing page can use a larger scale and more motion later.</div>
+  <button class="pick" type="button" data-ryux-pick="regenerate" style="--t-ink: var(--fg); --t-accent: var(--fg); justify-self:start; padding: 0 16px">None of these, make three new</button>
+</div>
+
+<script>
+// Version mosaic from the tender method's code hash on chain (v2): 5c37749434fbacce0f415abb1c0b7a185de2502dbb49d1066e26997eebe9cdcf
+const hash = "5c37749434fbacce0f415abb1c0b7a185de2502dbb49d1066e26997eebe9cdcf";
+const pal = ["#0f6e6a", "#14857f", "#9fd4cc", "#d9ebe7", "#10201e", "#ef5b3f", "#f6c6b9", "#ffffff"];
+const m = document.getElementById("mos");
+for (let i = 0; i < 64; i++) { const v = parseInt(hash[i % 64], 16); const c = document.createElement("i"); c.style.background = pal[v % 8]; m.appendChild(c); }
+</script>

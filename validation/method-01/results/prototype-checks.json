@@ -1,0 +1,290 @@
+{
+  "scope": "Deterministic status/stage checks only, not 100-point semantic rubric",
+  "cases": [
+    {
+      "case_id": "C01",
+      "split": "development",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "mismatch",
+        "first_observed": "pick",
+        "evidence_ids": [
+          "e1",
+          "e2"
+        ],
+        "findings": [
+          {
+            "order": "O1",
+            "line": "L1",
+            "stage": "pick",
+            "time": "10:00",
+            "expected": {
+              "RED": 1
+            },
+            "observed": {
+              "BLUE": 1
+            },
+            "evidence_ids": [
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    },
+    {
+      "case_id": "C02",
+      "split": "development",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "mismatch",
+        "first_observed": "pack",
+        "evidence_ids": [
+          "e1",
+          "e3"
+        ],
+        "findings": [
+          {
+            "order": "O1",
+            "line": "L1",
+            "stage": "pack",
+            "time": "10:20",
+            "expected": {
+              "RED": 1
+            },
+            "observed": {
+              "BLUE": 1
+            },
+            "evidence_ids": [
+              "e1",
+              "e3"
+            ]
+          }
+        ],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    },
+    {
+      "case_id": "C03",
+      "split": "development",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "insufficient",
+        "first_observed": null,
+        "evidence_ids": [],
+        "findings": [],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    },
+    {
+      "case_id": "C04",
+      "split": "development",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "consistent",
+        "first_observed": null,
+        "evidence_ids": [],
+        "findings": [],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    },
+    {
+      "case_id": "C05",
+      "split": "evaluation",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "mismatch",
+        "first_observed": "pick",
+        "evidence_ids": [
+          "e2",
+          "e3"
+        ],
+        "findings": [
+          {
+            "order": "O1",
+            "line": "L1",
+            "stage": "pick",
+            "time": "10:00",
+            "expected": {
+              "BLUE": 1
+            },
+            "observed": {
+              "RED": 1
+            },
+            "evidence_ids": [
+              "e2",
+              "e3"
+            ]
+          }
+        ],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    },
+    {
+      "case_id": "C06",
+      "split": "evaluation",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "consistent",
+        "first_observed": null,
+        "evidence_ids": [],
+        "findings": [],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    },
+    {
+      "case_id": "C07",
+      "split": "evaluation",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "consistent",
+        "first_observed": null,
+        "evidence_ids": [],
+        "findings": [],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    },
+    {
+      "case_id": "C08",
+      "split": "evaluation",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "consistent",
+        "first_observed": null,
+        "evidence_ids": [],
+        "findings": [],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    },
+    {
+      "case_id": "C09",
+      "split": "evaluation",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "mismatch",
+        "first_observed": "ship",
+        "evidence_ids": [
+          "e1",
+          "e3"
+        ],
+        "findings": [
+          {
+            "order": "O1",
+            "line": "L1",
+            "stage": "ship",
+            "time": "10:30",
+            "expected": {
+              "RED": 1
+            },
+            "observed": {
+              "BLUE": 1
+            },
+            "evidence_ids": [
+              "e1",
+              "e3"
+            ]
+          }
+        ],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    },
+    {
+      "case_id": "C10",
+      "split": "evaluation",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "consistent",
+        "first_observed": null,
+        "evidence_ids": [],
+        "findings": [],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    },
+    {
+      "case_id": "C11",
+      "split": "evaluation",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "data_conflict",
+        "first_observed": null,
+        "evidence_ids": [
+          "e2"
+        ],
+        "findings": [],
+        "uncertainty": "Conflicting event payloads require reconciliation before localization."
+      }
+    },
+    {
+      "case_id": "C12",
+      "split": "evaluation",
+      "status_and_stage_pass": true,
+      "shuffle_passes": 10,
+      "output": {
+        "status": "mismatch",
+        "first_observed": "pick",
+        "evidence_ids": [
+          "e1",
+          "e2",
+          "e3",
+          "e4"
+        ],
+        "findings": [
+          {
+            "order": "O1",
+            "line": "L1",
+            "stage": "pick",
+            "time": "10:00",
+            "expected": {
+              "RED": 1
+            },
+            "observed": {
+              "BLUE": 1
+            },
+            "evidence_ids": [
+              "e1",
+              "e3"
+            ]
+          },
+          {
+            "order": "O1",
+            "line": "L2",
+            "stage": "pick",
+            "time": "10:00",
+            "expected": {
+              "BLUE": 1
+            },
+            "observed": {
+              "RED": 1
+            },
+            "evidence_ids": [
+              "e2",
+              "e4"
+            ]
+          }
+        ],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      }
+    }
+  ],
+  "bulk": {
+    "orders": 1000,
+    "events": 4000,
+    "expected_affected_orders": 100,
+    "observed_affected_orders": 100,
+    "all_first_pack": true,
+    "elapsed_seconds": 0.010970834000545437,
+    "scope": "One local synthetic run, not LLM or human speed comparison"
+  }
+}

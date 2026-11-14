@@ -1,0 +1,251 @@
+{
+  "original_passes": 12,
+  "original_count": 12,
+  "adversarial_development_regressions": [
+    {
+      "name": "Empty export",
+      "input": {
+        "case_id": "C04",
+        "context": [],
+        "events": [],
+        "schema_version": "1.0"
+      },
+      "expected_status": "insufficient",
+      "output": {
+        "status": "insufficient",
+        "first_observed": null,
+        "evidence_ids": [],
+        "findings": [],
+        "uncertainty": "Empty export contains no evidence."
+      },
+      "pass": true
+    },
+    {
+      "name": "Open partial pick",
+      "input": {
+        "case_id": "C04",
+        "context": [
+          {
+            "type": "stage_state",
+            "stage": "pick",
+            "state": "open",
+            "order": "O1",
+            "line": "L1"
+          }
+        ],
+        "events": [
+          {
+            "id": "e1",
+            "order": "O1",
+            "line": "L1",
+            "stage": "order",
+            "sku": "RED",
+            "qty": 2,
+            "version": 1,
+            "time": "09:00"
+          },
+          {
+            "id": "e2",
+            "order": "O1",
+            "line": "L1",
+            "stage": "pick",
+            "sku": "RED",
+            "qty": 1,
+            "version": 1,
+            "time": "10:00"
+          }
+        ],
+        "schema_version": "1.0"
+      },
+      "expected_status": "insufficient",
+      "output": {
+        "status": "insufficient",
+        "first_observed": null,
+        "evidence_ids": [],
+        "findings": [],
+        "uncertainty": "Open stages require a completed snapshot before shortage classification. Other lines not certified by this limited prototype."
+      },
+      "pass": true
+    },
+    {
+      "name": "Complaint contradicts logs",
+      "input": {
+        "case_id": "C04",
+        "context": [],
+        "events": [
+          {
+            "id": "e1",
+            "order": "O1",
+            "line": "L1",
+            "stage": "order",
+            "sku": "RED",
+            "qty": 1,
+            "version": 1,
+            "time": "09:00"
+          },
+          {
+            "id": "e2",
+            "order": "O1",
+            "line": "L1",
+            "stage": "pick",
+            "sku": "RED",
+            "qty": 1,
+            "version": 1,
+            "time": "10:00"
+          },
+          {
+            "id": "e3",
+            "order": "O1",
+            "line": "L1",
+            "stage": "pack",
+            "sku": "RED",
+            "qty": 1,
+            "version": 1,
+            "time": "10:20"
+          },
+          {
+            "id": "e4",
+            "order": "O1",
+            "line": "L1",
+            "stage": "ship",
+            "sku": "RED",
+            "qty": 1,
+            "version": 1,
+            "time": "10:30"
+          },
+          {
+            "id": "complaint1",
+            "order": "O1",
+            "line": "L1",
+            "stage": "complaint",
+            "sku": "BLUE",
+            "qty": 1,
+            "version": 1,
+            "time": "12:00"
+          }
+        ],
+        "schema_version": "1.0"
+      },
+      "expected_status": "insufficient",
+      "output": {
+        "status": "insufficient",
+        "first_observed": null,
+        "evidence_ids": [
+          "complaint1"
+        ],
+        "findings": [],
+        "uncertainty": "System logs are consistent but a customer report remains unresolved. Request physical verification."
+      },
+      "pass": true
+    },
+    {
+      "name": "Closed snapshot shortage",
+      "input": {
+        "case_id": "C04",
+        "context": [],
+        "events": [
+          {
+            "id": "e1",
+            "order": "O1",
+            "line": "L1",
+            "stage": "order",
+            "sku": "RED",
+            "qty": 2,
+            "version": 1,
+            "time": "09:00"
+          },
+          {
+            "id": "e2",
+            "order": "O1",
+            "line": "L1",
+            "stage": "pick",
+            "sku": "RED",
+            "qty": 1,
+            "version": 1,
+            "time": "10:00"
+          },
+          {
+            "id": "e3",
+            "order": "O1",
+            "line": "L1",
+            "stage": "pack",
+            "sku": "RED",
+            "qty": 1,
+            "version": 1,
+            "time": "10:20"
+          },
+          {
+            "id": "e4",
+            "order": "O1",
+            "line": "L1",
+            "stage": "ship",
+            "sku": "RED",
+            "qty": 1,
+            "version": 1,
+            "time": "10:30"
+          }
+        ],
+        "schema_version": "1.0"
+      },
+      "expected_status": "mismatch",
+      "output": {
+        "status": "mismatch",
+        "first_observed": "pick",
+        "evidence_ids": [
+          "e1",
+          "e2"
+        ],
+        "findings": [
+          {
+            "order": "O1",
+            "line": "L1",
+            "stage": "pick",
+            "time": "10:00",
+            "expected": {
+              "RED": 2
+            },
+            "observed": {
+              "RED": 1
+            },
+            "evidence_ids": [
+              "e1",
+              "e2"
+            ]
+          }
+        ],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      },
+      "pass": true
+    },
+    {
+      "name": "Order only",
+      "input": {
+        "case_id": "C04",
+        "context": [],
+        "events": [
+          {
+            "id": "e1",
+            "order": "O1",
+            "line": "L1",
+            "stage": "order",
+            "sku": "RED",
+            "qty": 1,
+            "version": 1,
+            "time": "09:00"
+          }
+        ],
+        "schema_version": "1.0"
+      },
+      "expected_status": "insufficient",
+      "output": {
+        "status": "insufficient",
+        "first_observed": null,
+        "evidence_ids": [],
+        "findings": [],
+        "uncertainty": "Only supplied log consistency was checked. First observed stage is not proof of origin or cause. Missing stages and physical contents remain unverified."
+      },
+      "pass": true
+    }
+  ],
+  "note": "Previously failing cases used to develop guards. Not held-out validation."
+}

@@ -1,0 +1,150 @@
+<title>Kalis Design References</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one column of reference cards grouped by what Kalis borrows; every text sits inside a card or row, no loose paragraphs, no bullet lists. */
+:root {
+  --bg: #eef1f4; --fg: #141821; --muted: #3a4252; --line: #d3d8e0; --panel: #ffffff; --soft: #f6f8fa;
+  --accent: #1f4fd1; --accent-ink: #ffffff; --warn: #8a4b00; --warn-bg: #fff3df; --ok: #0d6b4f; --ok-bg: #e3f5ee;
+  --sys: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, "Helvetica Neue", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #12151b; --fg: #eef1f5; --muted: #bcc3cf; --line: #2c323d; --panel: #1a1e26; --soft: #20252e; --accent: #8fb0ff; --accent-ink: #0b1430; --warn: #ffd08a; --warn-bg: #3a2a10; --ok: #8fe3c3; --ok-bg: #11342a; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #12151b; --fg: #eef1f5; --muted: #bcc3cf; --line: #2c323d; --panel: #1a1e26; --soft: #20252e; --accent: #8fb0ff; --accent-ink: #0b1430; --warn: #ffd08a; --warn-bg: #3a2a10; --ok: #8fe3c3; --ok-bg: #11342a; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font-family: var(--sys); font-weight: 500; font-size: 15px; line-height: 1.55;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 32px 32px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px }
+.wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px }
+.frame { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 8px }
+.panel { background: var(--soft); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 12px }
+h1 { margin: 0; font-size: 26px; font-weight: 700; text-wrap: balance }
+h2 { margin: 0; font-size: 21px; font-weight: 700 }
+h3 { margin: 0; font-size: 17px; font-weight: 700 }
+.lead { margin: 0; font-size: 16px; color: var(--muted) }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+@media (max-width: 860px) { .grid2, .grid3 { grid-template-columns: 1fr } }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 6px; min-width: 0 }
+.box b { font-size: 15px }
+.box p { margin: 0; color: var(--muted); font-size: 14.5px }
+.ref { display: grid; gap: 10px }
+.refhead { display: flex; gap: 10px; align-items: center; flex-wrap: wrap }
+.chip { font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--muted) }
+.chip.ok { background: var(--ok-bg); color: var(--ok); border-color: transparent }
+.chip.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent }
+.url { margin-left: auto; font-size: 13.5px; font-weight: 600; color: var(--accent); text-decoration: none; overflow-wrap: anywhere }
+.url:hover { text-decoration: underline }
+.url:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px }
+.rows { display: grid; gap: 8px }
+.row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px }
+@media (max-width: 600px) { .row { grid-template-columns: 1fr; gap: 2px } }
+.row .k { font-size: 13.5px; font-weight: 700; color: var(--fg) }
+.row .v { font-size: 14.5px; color: var(--muted) }
+.row.take { border-color: var(--ok); }
+.row.take .k { color: var(--ok) }
+.row.skip .k { color: var(--warn) }
+</style>
+
+<div class="wrap">
+  <div class="frame"><div class="panel">
+    <h1>Referensi desain untuk Kalis</h1>
+    <p class="lead">Delapan produk dengan use case yang mirip, dikelompokkan menurut hal yang bisa dipinjam Kalis. Buka tautannya untuk melihat sendiri, lalu tandai mana yang kamu suka atau tolak.</p>
+    <div class="grid3">
+      <div class="box"><b>Marketplace yang bisa dijalankan</b><p>Apify, Replicate, dan Hugging Face Spaces menjual atau memajang alat yang dijalankan pembeli dengan input sendiri. Strukturnya paling dekat dengan Kalis.</p></div>
+      <div class="box"><b>Privasi dan TEE untuk orang awam</b><p>Phala, Venice, Nillion, dan Ocean menjelaskan komputasi privat. Bagian yang bisa dipinjam adalah cara mereka menjelaskan bukti dan tingkat privasi.</p></div>
+      <div class="box"><b>Dana bersama dan bounty</b><p>Gitcoin mengemas kampanye pendanaan sebagai kartu dengan status dan satu tombol. Ini acuan untuk halaman komunitas.</p></div>
+    </div>
+    <div class="box"><b>Yang tidak bisa dibuka</b><p>PromptBase (marketplace prompt) dan Fiverr (listing jasa) menolak pembacaan otomatis dengan HTTP 403. Kamu bisa membukanya langsung di browser kalau ingin membandingkan.</p></div>
+  </div></div>
+
+  <div class="frame"><div class="panel">
+    <h2>Pola yang muncul di banyak produk</h2>
+    <div class="rows">
+      <div class="row"><span class="k">Navbar</span><span class="v">Bagian produk di kiri (misalnya Models, Datasets, Spaces), lalu Docs dan Pricing, lalu masuk dan daftar di kanan. Tidak ada satu pun yang memisahkan saldo sebagai menu utama.</span></div>
+      <div class="row"><span class="k">Kartu katalog</span><span class="v">Judul berupa hasil, satu kalimat deskripsi, nama pembuat, dan satu sinyal pemakaian (jumlah run, pengguna, atau suka). Apify juga menaruh rating dan model harga di kartu.</span></div>
+      <div class="row"><span class="k">Kategori</span><span class="v">Replicate dan Hugging Face mengelompokkan per tugas dengan kata kerja, misalnya "Generate images" atau "Transcribe speech". Ini cocok dengan aturanmu soal label yang mudah dibayangkan.</span></div>
+      <div class="row"><span class="k">Halaman detail</span><span class="v">Statistik dan harga di atas, lalu cara kerja, contoh hasil, batasan, riwayat versi, lalu form input. Replicate memakai tab Playground, API, Examples, README.</span></div>
+      <div class="row"><span class="k">Menjalankan</span><span class="v">Apify membuat form otomatis dari skema input, dikelompokkan per tahap. Hasil bisa diekspor. Ini sama dengan rencana form dari manifest v5 di Kalis.</span></div>
+      <div class="row"><span class="k">Celah yang bisa diisi Kalis</span><span class="v">Tidak satu pun marketplace yang dibaca menjelaskan apa yang terjadi pada data input pembeli, di mana run berjalan, atau berapa lama hasil disimpan. Bagian ini harus dirancang Kalis sendiri dan bisa menjadi pembeda.</span></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="panel ref">
+    <div class="refhead"><h3>Apify Store</h3><span class="chip ok">Paling mirip</span><a class="url" href="https://apify.com/store" target="_blank" rel="noopener">apify.com/store</a></div>
+    <div class="rows">
+      <div class="row"><span class="k">Kenapa mirip</span><span class="v">Marketplace alat siap jalan buatan pembuat pihak ketiga, dibayar per pemakaian.</span></div>
+      <div class="row take"><span class="k">Pinjam</span><span class="v">Kartu yang menampilkan rating, jumlah pengguna, dan model harga sekaligus. Daftar per kategori pekerjaan. Biaya selalu terlihat sebelum menjalankan.</span></div>
+      <div class="row skip"><span class="k">Hindari</span><span class="v">Deskripsi promosi dengan emoji dan istilah internal seperti "Actors" yang harus dijelaskan dulu.</span></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="panel ref">
+    <div class="refhead"><h3>Apify, halaman detail alat</h3><span class="chip ok">Paling mirip</span><a class="url" href="https://apify.com/apify/website-content-crawler" target="_blank" rel="noopener">apify.com/apify/website-content-crawler</a></div>
+    <div class="rows">
+      <div class="row"><span class="k">Kenapa mirip</span><span class="v">Satu alat dengan statistik, harga, cara kerja, form input yang dibuat dari skema, dan riwayat perubahan.</span></div>
+      <div class="row take"><span class="k">Pinjam</span><span class="v">Urutan bagian (statistik, harga, cara kerja, contoh hasil, batasan, riwayat versi, form). Form dikelompokkan per tahap. Bagian tanya jawab tentang legalitas dan biaya.</span></div>
+      <div class="row skip"><span class="k">Hindari</span><span class="v">Halaman yang sangat panjang dengan label campuran bahasa biasa dan nama teknis.</span></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="panel ref">
+    <div class="refhead"><h3>Replicate</h3><span class="chip ok">Mirip</span><a class="url" href="https://replicate.com/explore" target="_blank" rel="noopener">replicate.com/explore</a><a class="url" style="margin-left:0" href="https://replicate.com/black-forest-labs/flux-schnell" target="_blank" rel="noopener">contoh halaman model</a></div>
+    <div class="rows">
+      <div class="row"><span class="k">Kenapa mirip</span><span class="v">Model buatan banyak pembuat yang dijalankan pengguna, dengan jumlah run di setiap kartu.</span></div>
+      <div class="row take"><span class="k">Pinjam</span><span class="v">Koleksi "I want to…" berdasarkan tugas, tanda "Official" untuk pembuat terverifikasi, tab Playground dan Examples, serta bagian Limitations yang jujur di halaman model.</span></div>
+      <div class="row skip"><span class="k">Hindari</span><span class="v">Nama model berbentuk slug teknis seperti owner/model-name sebagai judul utama.</span></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="panel ref">
+    <div class="refhead"><h3>Hugging Face Spaces</h3><span class="chip ok">Mirip</span><a class="url" href="https://huggingface.co/spaces" target="_blank" rel="noopener">huggingface.co/spaces</a></div>
+    <div class="rows">
+      <div class="row"><span class="k">Kenapa mirip</span><span class="v">Direktori aplikasi AI yang bisa langsung dicoba, dengan chip kategori dan status berjalan di setiap kartu.</span></div>
+      <div class="row take"><span class="k">Pinjam</span><span class="v">Navbar paling lengkap dengan menu yang dikelompokkan (Website, Community, Solutions). Chip kategori di atas katalog. Badge status di kartu, misalnya "Running".</span></div>
+      <div class="row skip"><span class="k">Hindari</span><span class="v">Badge berisi istilah perangkat keras seperti "Running on Zero" yang tidak dipahami orang awam.</span></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="panel ref">
+    <div class="refhead"><h3>Phala</h3><span class="chip">Privasi dan TEE</span><a class="url" href="https://phala.com/" target="_blank" rel="noopener">phala.com</a></div>
+    <div class="rows">
+      <div class="row"><span class="k">Kenapa mirip</span><span class="v">Komputasi AI di TEE dengan hasil yang bisa diverifikasi.</span></div>
+      <div class="row take"><span class="k">Pinjam</span><span class="v">Contoh bukti attestation yang ditampilkan sebagai potongan UI nyata, halaman verifikasi tersendiri, dan status kepatuhan yang diberi label jujur (misalnya "in progress").</span></div>
+      <div class="row skip"><span class="k">Hindari</span><span class="v">Hero berupa terminal CLI, karena terlalu teknis untuk pembeli Web2 Kalis.</span></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="panel ref">
+    <div class="refhead"><h3>Venice</h3><span class="chip">Privasi dan TEE</span><a class="url" href="https://venice.ai/" target="_blank" rel="noopener">venice.ai</a></div>
+    <div class="rows">
+      <div class="row"><span class="k">Kenapa mirip</span><span class="v">AI dengan privasi sebagai janji utama, menawarkan model di TEE.</span></div>
+      <div class="row take"><span class="k">Pinjam</span><span class="v">Tangga privasi empat tingkat yang masing-masing dijelaskan satu kalimat. Kalis bisa memakai pola ini untuk menjelaskan metode biasa, metode dengan AI privat, dan metode prompt.</span></div>
+      <div class="row skip"><span class="k">Hindari</span><span class="v">Hero berupa kotak chat, karena Kalis bukan aplikasi chat.</span></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="panel ref">
+    <div class="refhead"><h3>Nillion dan Ocean Protocol</h3><span class="chip">Privasi data</span><a class="url" href="https://www.nillion.com/" target="_blank" rel="noopener">nillion.com</a><a class="url" style="margin-left:0" href="https://oceanprotocol.com/" target="_blank" rel="noopener">oceanprotocol.com</a></div>
+    <div class="rows">
+      <div class="row"><span class="k">Kenapa mirip</span><span class="v">Pasar dan komputasi atas data yang tetap tertutup.</span></div>
+      <div class="row take"><span class="k">Pinjam</span><span class="v">Analogi Nillion tentang instruksi yang disegel lalu terbuka sendiri, cocok untuk menjelaskan segel di perangkat pembeli. Kartu tumpukan produk Ocean dengan chip label.</span></div>
+      <div class="row skip"><span class="k">Hindari</span><span class="v">Halaman Nillion yang hampir kosong saat dibaca dan positioning token di Ocean yang tidak relevan untuk pembeli Web2.</span></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="panel ref">
+    <div class="refhead"><h3>Gitcoin</h3><span class="chip">Dana bersama</span><a class="url" href="https://www.gitcoin.co/" target="_blank" rel="noopener">gitcoin.co</a></div>
+    <div class="rows">
+      <div class="row"><span class="k">Kenapa mirip</span><span class="v">Pendanaan komunitas dan bounty untuk kontributor.</span></div>
+      <div class="row take"><span class="k">Pinjam</span><span class="v">Kartu kampanye berisi badge status, nama, deskripsi, jumlah dana, jumlah proyek, periode, dan satu tombol. Cocok untuk kartu bounty Kalis.</span></div>
+      <div class="row skip"><span class="k">Hindari</span><span class="v">Istilah mekanisme pendanaan yang tidak dijelaskan, misalnya nama mekanisme tanpa arti.</span></div>
+    </div>
+  </div></div>
+
+  <div class="frame"><div class="panel">
+    <h2>Yang perlu kamu tandai</h2>
+    <div class="grid2">
+      <div class="box"><b>Struktur yang disukai</b><p>Sebutkan produk yang struktur halamannya ingin kamu tiru, misalnya Apify untuk detail metode atau Gitcoin untuk komunitas.</p></div>
+      <div class="box"><b>Yang ditolak</b><p>Sebutkan bagian yang tidak kamu suka, supaya tidak ikut masuk ke rancangan layout dan wording Kalis.</p></div>
+    </div>
+  </div></div>
+</div>

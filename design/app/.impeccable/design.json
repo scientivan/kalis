@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-13T16:51:28.926027+00:00",
+  "title": "Kalis app design contract",
+  "extensions": {
+    "shadows": [
+      {
+        "name": "overlay",
+        "value": "0 16px 42px -12px #20332624",
+        "purpose": "Dropdown, modal and toast"
+      },
+      {
+        "name": "selected-tab",
+        "value": "0 2px 6px #23362608",
+        "purpose": "Selected local navigation"
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150ms",
+        "purpose": "Background and text color transitions, disabled with reduced motion"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide-min",
+        "value": "1600px"
+      },
+      {
+        "name": "compact-max",
+        "value": "1200px"
+      },
+      {
+        "name": "wrapped-header-max",
+        "value": "1000px"
+      },
+      {
+        "name": "mobile-max",
+        "value": "760px"
+      },
+      {
+        "name": "narrow-max",
+        "value": "380px"
+      }
+    ]
+  },
+  "components": [],
+  "narrative": {
+    "overview": "Reference-led Corbel dashboard world in Operate mode. Light sage canvas, white panels, dark selected navigation and compact utility rail.",
+    "keyCharacteristics": [
+      "Five main areas without role switch",
+      "Synthetic session-only preview",
+      "Native rendering unverified"
+    ],
+    "dos": [
+      "Keep sample state labels explicit",
+      "Preserve keyboard focus and reduced motion"
+    ],
+    "donts": [
+      "Do not claim live execution or payments",
+      "Do not claim a completed visual pass"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light"><title>Kalis — Workspace</title>
+<link rel="stylesheet" href="app.css"><script src="data.js" defer></script><script src="flows.js" defer></script><script src="app.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="app-header">
+<a class="brand" href="#workspace" aria-label="Kalis workspace"><span class="brand-mark"><svg viewBox="0 0 32 36" aria-hidden="true"><path d="M16 2C12 9 4 17 4 23a12 12 0 0 0 24 0C28 17 20 9 16 2Z"/><path d="m11 23 4 4 7-8"/></svg></span><span>Kalis</span></a>
+<nav class="primary-nav" aria-label="Main navigation">
+<a href="#workspace" data-nav="workspace">Workspace</a><a href="#marketplace" data-nav="marketplace">Marketplace</a><a href="#community" data-nav="community">Community</a><a href="#activity" data-nav="activity">Activity<span id="activity-count" class="nav-count">2</span></a><a href="#balance" data-nav="balance">Balance</a>
+</nav>
+<div class="header-tools"><button class="icon-button mobile-search" data-action="search" aria-label="Search Kalis"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg></button><div class="account-wrap"><button id="account-trigger" class="account-trigger" aria-expanded="false" aria-controls="account-menu"><span class="avatar">D</span><span>Dien</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg></button>
+<div id="account-menu" class="account-menu" hidden><p>Personal account</p><a href="#account" data-account-link>Account</a><a href="#connections" data-account-link>Connections</a><a href="#preferences" data-account-link>Permissions &amp; preferences</a></div></div></div>
+</header>
+<aside class="utility-rail" aria-label="Quick actions"><button data-action="search" aria-label="Search Kalis" data-tooltip="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg></button><span class="rail-divider"></span><a href="#workspace/new" aria-label="New work" data-tooltip="New work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a><a href="#workspace/files" aria-label="Private files" data-tooltip="Files"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3h7v2"/></svg></a><span class="rail-divider"></span><button data-action="help" aria-label="About this preview" data-tooltip="Preview guide"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4M12 17h.01"/></svg></button></aside>
+<main id="main" tabindex="-1"></main>
+<footer class="app-footer"><span>Interactive preview</span><span>Sample data. Changes stay in this session.</span><button data-action="help">About this draft <span aria-hidden="true">↗</span></button></footer>
+<dialog id="overlay" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
+<div id="toast" class="toast" role="status" hidden></div>
+<noscript><p class="no-script">Enable JavaScript to explore this interactive design preview.</p></noscript>
+</body></html>

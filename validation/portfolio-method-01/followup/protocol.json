@@ -1,0 +1,15 @@
+{
+  "cases": 42,
+  "repetitions": 1,
+  "prompt_sha256": "edaa11f189991209b0455e7a8a588320aae8060eb0f465733689c291314052bc",
+  "primary_metric": "correct status and feasible global optimum, tolerance 1e-6",
+  "secondary_metric": "correct status and feasible solution, without optimum requirement",
+  "conditions": "same complete rules and cases as solver, model has no tools or answer key",
+  "limits": [
+    "synthetic same-author cases, not independent holdout",
+    "single tool-free model run is not all AI",
+    "no human time measurement",
+    "AI with code tools not evaluated",
+    "no financial returns"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "case_id": "C03",
+  "context": [],
+  "events": [
+    {
+      "id": "e1",
+      "order": "O1",
+      "line": "L1",
+      "stage": "order",
+      "sku": "RED",
+      "qty": 1,
+      "version": 1,
+      "time": "09:00"
+    },
+    {
+      "id": "e2",
+      "order": "O1",
+      "line": "L1",
+      "stage": "complaint",
+      "sku": "BLUE",
+      "qty": 1,
+      "version": 1,
+      "time": "12:00"
+    }
+  ],
+  "schema_version": "1.0"
+}

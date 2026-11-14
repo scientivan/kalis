@@ -1,0 +1,285 @@
+<title>Kalis Marketplace Mock</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: Luno shell. Sidebar and page share one pale background; white cards with 1px dashed warm borders and 12px radius carry everything. Teal marks where you are, blue marks the create action, slate marks secondary controls. */
+:root {
+  --page: #f4f7f6; --card: #ffffff; --line: #e9e6e1; --line-strong: #d9d5ce;
+  --ink: #2f2e2e; --ink2: #4b5058; --muted: #5f6670;
+  --teal: #00857a; --teal-soft: #e3f4f1; --blue: #1971c2; --blue-soft: #e7f0fb; --slate: #2c3e50;
+  --amber-soft: #fff6db; --amber-ink: #7a5600; --coral-ink: #a8321d; --coral-soft: #fdeae5;
+  --font: "Nunito", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --page: #15191c; --card: #1d2226; --line: #343b41; --line-strong: #46505a;
+  --ink: #eef1f2; --ink2: #c9cfd4; --muted: #a9b1b8;
+  --teal: #4fd1c1; --teal-soft: #173632; --blue: #7ab4f5; --blue-soft: #18283b; --slate: #cfd8e1;
+  --amber-soft: #3a3014; --amber-ink: #ffd877; --coral-ink: #ffab98; --coral-soft: #3b211b; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --page: #15191c; --card: #1d2226; --line: #343b41; --line-strong: #46505a;
+  --ink: #eef1f2; --ink2: #c9cfd4; --muted: #a9b1b8;
+  --teal: #4fd1c1; --teal-soft: #173632; --blue: #7ab4f5; --blue-soft: #18283b; --slate: #cfd8e1;
+  --amber-soft: #3a3014; --amber-ink: #ffd877; --coral-ink: #ffab98; --coral-soft: #3b211b; color-scheme: dark }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--font); font-weight: 500; font-size: 15px; line-height: 1.5 }
+.shell { display: grid; grid-template-columns: 280px minmax(0, 1fr); min-height: 100vh;
+  padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px) }
+
+/* Sidebar */
+.side { padding: 20px 20px 28px; display: grid; gap: 18px; align-content: start }
+.ws { display: flex; align-items: center; justify-content: space-between }
+.ws b { font-size: 26px; font-weight: 700; letter-spacing: -.01em }
+.dots { width: 28px; height: 28px; border-radius: 50%; background: var(--blue-soft); color: var(--blue); border: 0; font: 800 14px var(--font); cursor: pointer }
+.pickrow { display: flex; gap: 8px }
+.pill-select { flex: 1; height: 38px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: 600 14px var(--font); padding: 0 14px }
+.circle-btn { width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--blue); color: #ffffff; font: 700 20px var(--font); cursor: pointer; flex: none }
+.group { border: 1px dashed var(--line-strong); border-radius: 12px; padding: 0 16px 6px; display: grid }
+.ghead { padding: 12px 0 10px; border-bottom: 1px dashed var(--line); display: grid; gap: 1px }
+.ghead b { font-size: 12.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ink2) }
+.ghead span { font-size: 13px; color: var(--muted) }
+.nav { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); color: var(--ink); text-decoration: none; font-size: 15.5px; font-weight: 600 }
+.nav:last-child { border-bottom: 0 }
+.nav svg { width: 20px; height: 20px; flex: none }
+.nav .chev { margin-left: auto; width: 14px; height: 14px; color: var(--muted) }
+.nav.active { color: var(--teal) }
+.nav:focus-visible, .sub a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 8px }
+.sub { margin: 0 0 8px 9px; padding-left: 18px; border-left: 2px solid var(--teal); display: grid; gap: 2px }
+.sub a { position: relative; padding: 5px 0; font-size: 14.5px; color: var(--ink2); text-decoration: none; display: flex; justify-content: space-between }
+.sub a .n { font-size: 12.5px; color: var(--muted); font-weight: 700 }
+.sub a.on { color: var(--teal); font-weight: 700 }
+.sub a.on::before { content: ""; position: absolute; left: -24px; top: 50%; width: 10px; height: 10px; margin-top: -5px; border-radius: 50%; background: var(--teal) }
+.ver { margin-left: auto; font-size: 12px; font-weight: 800; background: var(--blue); color: #fff; border-radius: 6px; padding: 1px 7px }
+
+/* Header */
+.main { min-width: 0; display: grid; align-content: start }
+.top { height: 74px; display: flex; align-items: center; gap: 16px; padding: 0 24px; border-bottom: 4px solid var(--card) }
+.burger { width: 26px; display: grid; gap: 5px } .burger i { display: block; height: 2px; background: var(--teal); border-radius: 2px }
+.word { font-size: 26px; letter-spacing: .12em; font-weight: 600; color: var(--muted) } .word em { font-style: normal; color: var(--teal) }
+.search { flex: 1; max-width: 560px; height: 38px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: 500 15px var(--font); padding: 0 12px }
+.search::placeholder { color: var(--muted) }
+.topr { margin-left: auto; display: flex; align-items: center; gap: 14px }
+.net { font-size: 13px; font-weight: 800; color: var(--amber-ink); background: var(--amber-soft); border-radius: 999px; padding: 4px 10px }
+.wallet { height: 38px; border-radius: 6px; border: 1px solid var(--slate); background: var(--slate); color: var(--card); font: 700 14px var(--font); padding: 0 14px; cursor: pointer }
+.iconbtn { width: 38px; height: 38px; border-radius: 50%; border: 0; background: transparent; color: var(--ink2); cursor: pointer; display: grid; place-items: center }
+.iconbtn svg { width: 20px; height: 20px }
+
+/* Content */
+.content { padding: 18px 24px 40px; display: grid; gap: 22px }
+.crumb { display: flex; gap: 8px; font-size: 15px; color: var(--ink2) } .crumb a { color: var(--teal); text-decoration: none; font-weight: 600 }
+.card { background: var(--card); border: 1px dashed var(--line-strong); border-radius: 12px }
+.pagehead { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 24px; flex-wrap: wrap }
+.pagehead h1 { margin: 0; font-size: 22px; font-weight: 700 }
+.pagehead p { margin: 2px 0 0; font-size: 14px; color: var(--muted) }
+.kpis { display: flex; gap: 28px }
+.kpi { display: grid; gap: 1px } .kpi b { font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums } .kpi b small { font-size: 12.5px; font-weight: 700; color: var(--teal); margin-left: 4px }
+.kpi span { font-size: 12.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--muted) }
+
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px }
+.tile { display: flex; align-items: center; gap: 14px; padding: 20px; cursor: pointer; text-align: left; font: inherit; color: inherit }
+.tile.on { border-style: solid; border-color: var(--teal) }
+.ic { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--blue-soft); color: var(--blue) }
+.ic svg { width: 20px; height: 20px }
+.tile .lbl { font-size: 13px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--ink2) }
+.tile .val { font-size: 17px; font-weight: 800 } .tile .val small { font-size: 13px; font-weight: 700; color: var(--muted); margin-left: 4px }
+
+.split { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; align-items: start }
+.chead { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px 0 }
+.chead h2 { margin: 0; font-size: 16px; font-weight: 700 }
+.tools { display: flex; gap: 8px; align-items: center }
+.seg { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid var(--slate) }
+.seg button { border: 0; background: var(--card); color: var(--slate); font: 700 13px var(--font); padding: 7px 12px; cursor: pointer }
+.seg button.on { background: var(--slate); color: var(--card) }
+.cbody { padding: 18px 24px 24px }
+
+.methods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px }
+.m { border: 1px dashed var(--line-strong); border-radius: 12px; padding: 18px; display: grid; gap: 12px; background: var(--card) }
+.mtop { display: flex; align-items: center; gap: 10px }
+.kind { font-size: 12.5px; font-weight: 800; border-radius: 999px; padding: 3px 10px; background: var(--teal-soft); color: var(--teal) }
+.kind.prompt { background: var(--amber-soft); color: var(--amber-ink) }
+.more { margin-left: auto; width: 28px; height: 28px; border-radius: 50%; border: 0; background: var(--blue-soft); color: var(--blue); font: 800 13px var(--font); cursor: pointer }
+.m h3 { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.35 }
+.m .out { margin: 0; font-size: 14px; color: var(--ink2) }
+.urg { display: flex; gap: 10px; align-items: flex-start; background: var(--coral-soft); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; color: var(--coral-ink); font-weight: 600 }
+.urg svg { width: 16px; height: 16px; flex: none; margin-top: 2px }
+.seller { display: flex; align-items: center; gap: 10px; border-top: 1px dashed var(--line); padding-top: 12px }
+.av { width: 34px; height: 34px; border-radius: 50%; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; font-weight: 800; font-size: 13px; flex: none }
+.seller .who { display: grid; line-height: 1.3 } .seller .who b { font-size: 14px } .seller .who span { font-size: 12.5px; color: var(--muted) }
+.price { margin-left: auto; text-align: right; display: grid; line-height: 1.25 } .price b { font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums } .price span { font-size: 12.5px; color: var(--muted) }
+.mfoot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap }
+.chip { font-size: 12.5px; font-weight: 700; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--line); color: var(--ink2); background: var(--page) }
+.run { margin-left: auto; height: 38px; padding: 0 16px; border-radius: 6px; border: 0; background: var(--teal); color: #ffffff; font: 700 14px var(--font); cursor: pointer }
+
+.inner { border: 1px dashed var(--line-strong); border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px }
+.inner b { font-size: 15px } .inner p { margin: 0; font-size: 13.5px; color: var(--ink2) }
+.stack { display: grid; gap: 12px }
+.step { display: flex; gap: 12px; align-items: flex-start }
+.step .no { width: 26px; height: 26px; border-radius: 50%; background: var(--teal-soft); color: var(--teal); font-weight: 800; font-size: 13px; display: grid; place-items: center; flex: none }
+.fund { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.fund .inner b { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums }
+.fund .inner span { font-size: 13px; color: var(--muted) }
+.note { display: flex; gap: 10px; background: var(--amber-soft); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; color: var(--amber-ink); font-weight: 600 }
+
+@media (max-width: 1180px) { .split { grid-template-columns: 1fr } .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+@media (max-width: 900px) { .shell { grid-template-columns: 1fr } .side { display: none } .methods { grid-template-columns: 1fr } .kpis { gap: 18px } .word { display: none } }
+@media (max-width: 560px) { .tiles { grid-template-columns: 1fr } .top { gap: 10px; padding: 0 16px } .content { padding: 14px 16px 32px } .wallet { display: none } .pagehead, .cbody, .chead { padding-left: 16px; padding-right: 16px } .fund { grid-template-columns: 1fr } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-store" viewBox="0 0 24 24"><path fill="currentColor" opacity=".35" d="M4 10h16v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path fill="currentColor" d="M3 5l2-2h14l2 2 1 4a3 3 0 0 1-5 2 3 3 0 0 1-5 0 3 3 0 0 1-5 0 3 3 0 0 1-5-2z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".35"/><path fill="currentColor" d="M10 8l6 4-6 4z"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><rect x="2" y="8" width="11" height="8" rx="4" fill="currentColor" opacity=".35"/><rect x="11" y="8" width="11" height="8" rx="4" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path fill="currentColor" opacity=".35" d="M5 2h9l5 5v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path fill="currentColor" d="M14 2l5 5h-5zM7 12h10v2H7zm0 4h7v2H7z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="currentColor" opacity=".35"/><path fill="none" stroke="currentColor" stroke-width="2.4" d="M7.5 12.5l3 3 6-6.5"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path fill="currentColor" opacity=".35" d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="2" fill="currentColor"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4" fill="currentColor"/><path fill="currentColor" opacity=".35" d="M1 21a8 8 0 0 1 16 0zM16 4a4 4 0 1 1 0 8zM18 14a7 7 0 0 1 5 7h-4a9 9 0 0 0-3-7z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="currentColor"/><path fill="currentColor" opacity=".35" d="M4 21a8 8 0 0 1 16 0z"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.6" d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1" fill="currentColor" opacity=".35"/><rect x="10" y="7" width="4" height="14" rx="1" fill="currentColor"/><rect x="17" y="3" width="4" height="18" rx="1" fill="currentColor" opacity=".35"/></symbol>
+  <symbol id="i-brief" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="3" fill="currentColor" opacity=".35"/><path fill="currentColor" d="M9 3h6a2 2 0 0 1 2 2v2h-2V5H9v2H7V5a2 2 0 0 1 2-2zM2 12h20v2H2z"/></symbol>
+  <symbol id="i-build" viewBox="0 0 24 24"><path fill="currentColor" opacity=".35" d="M3 21V9l9-6 9 6v12z"/><path fill="currentColor" d="M9 21v-6h6v6z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.4"/><path fill="none" stroke="currentColor" stroke-width="2.4" d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path fill="currentColor" opacity=".35" d="M5 17V11a7 7 0 0 1 14 0v6l2 2H3z"/><path fill="currentColor" d="M9 20h6a3 3 0 0 1-6 0z"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path fill="currentColor" d="M20 15A8 8 0 0 1 9 4a8 8 0 1 0 11 11z"/></symbol>
+</svg>
+
+<div class="shell">
+  <aside class="side" aria-label="Main navigation">
+    <div class="ws"><b>Kalis</b><button class="dots" type="button" aria-label="Workspace options">···</button></div>
+    <div class="pickrow">
+      <label for="role" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">I am using Kalis as</label>
+      <select id="role" class="pill-select"><option>I want to use a method</option><option>I want to sell a method</option></select>
+      <button class="circle-btn" type="button" aria-label="Sell a new method">+</button>
+    </div>
+
+    <nav class="group" aria-label="Use methods">
+      <div class="ghead"><b>Use methods</b><span>Find one and run it on your data</span></div>
+      <a class="nav active" href="#" aria-current="page"><svg><use href="#i-store"/></svg>Marketplace<svg class="chev"><use href="#i-chev"/></svg></a>
+      <div class="sub">
+        <a class="on" href="#">All methods <span class="n">8</span></a>
+        <a href="#">Invest and Web3 <span class="n">3</span></a>
+        <a href="#">Win business <span class="n">2</span></a>
+        <a href="#">Run the company <span class="n">2</span></a>
+        <a href="#">Career <span class="n">1</span></a>
+      </div>
+      <a class="nav" href="#"><svg><use href="#i-play"/></svg>My runs</a>
+      <a class="nav" href="#"><svg><use href="#i-check"/></svg>Waiting for my approval</a>
+    </nav>
+
+    <nav class="group" aria-label="Your private data">
+      <div class="ghead"><b>Your private data</b><span>What methods may read, under your control</span></div>
+      <a class="nav" href="#"><svg><use href="#i-link"/></svg>Connected apps</a>
+      <a class="nav" href="#"><svg><use href="#i-file"/></svg>Documents</a>
+      <a class="nav" href="#"><svg><use href="#i-brief"/></svg>Saved notes</a>
+    </nav>
+
+    <nav class="group" aria-label="Sell and improve">
+      <div class="ghead"><b>Sell and improve</b><span>For experts and contributors</span></div>
+      <a class="nav" href="#"><svg><use href="#i-tag"/></svg>My methods</a>
+      <a class="nav" href="#"><svg><use href="#i-people"/></svg>Community fund</a>
+      <a class="nav" href="#"><svg><use href="#i-build"/></svg>Paid improvements</a>
+    </nav>
+
+    <nav class="group" aria-label="Account">
+      <div class="ghead"><b>Account</b><span>Profile, payments and history</span></div>
+      <a class="nav" href="#"><svg><use href="#i-user"/></svg>Account and balance</a>
+      <a class="nav" href="#"><svg><use href="#i-chart"/></svg>Activity <span class="ver">Testnet</span></a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div class="burger" aria-hidden="true"><i></i><i></i><i></i></div>
+      <span class="word">KAL<em>I</em>S</span>
+      <label for="q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search methods</label>
+      <input id="q" class="search" type="search" placeholder="Search methods, for example tender or payroll">
+      <div class="topr">
+        <span class="net">NEAR testnet</span>
+        <button class="wallet" type="button">Connect NEAR wallet</button>
+        <button class="iconbtn" type="button" aria-label="Notifications"><svg><use href="#i-bell"/></svg></button>
+        <button class="iconbtn" type="button" aria-label="Switch dark mode"><svg><use href="#i-moon"/></svg></button>
+      </div>
+    </header>
+
+    <main class="content">
+      <nav class="crumb" aria-label="Breadcrumb"><a href="#">Home</a><span aria-hidden="true">/</span><span>Marketplace</span></nav>
+
+      <section class="card pagehead">
+        <div><h1>Marketplace</h1><p>Run an expert's method on your own data. The expert never sees your data, and you never see their method.</p></div>
+        <div class="kpis">
+          <div class="kpi"><b>8</b><span>Methods</span></div>
+          <div class="kpi"><b>8</b><span>Experts</span></div>
+          <div class="kpi"><b>10%<small>of each run</small></b><span>To community fund</span></div>
+        </div>
+      </section>
+
+      <section class="tiles" aria-label="Browse by goal">
+        <button class="card tile on" type="button"><span class="ic"><svg><use href="#i-chart"/></svg></span><span><span class="lbl">Invest and Web3</span><br><span class="val">3<small>methods</small></span></span></button>
+        <button class="card tile" type="button"><span class="ic"><svg><use href="#i-brief"/></svg></span><span><span class="lbl">Win business</span><br><span class="val">2<small>methods</small></span></span></button>
+        <button class="card tile" type="button"><span class="ic"><svg><use href="#i-build"/></svg></span><span><span class="lbl">Run the company</span><br><span class="val">2<small>methods</small></span></span></button>
+        <button class="card tile" type="button"><span class="ic"><svg><use href="#i-user"/></svg></span><span><span class="lbl">Career</span><br><span class="val">1<small>method</small></span></span></button>
+      </section>
+
+      <div class="split">
+        <section class="card" aria-labelledby="mh">
+          <div class="chead"><h2 id="mh">Methods for investing and Web3</h2>
+            <div class="tools"><div class="seg" role="group" aria-label="Sort"><button class="on" type="button">Newest</button><button type="button">Lowest price</button></div></div>
+          </div>
+          <div class="cbody methods">
+            <article class="m">
+              <div class="mtop"><span class="kind">Program</span><span class="chip">Personal investing</span><button class="more" type="button" aria-label="More about this method">···</button></div>
+              <h3>Rebalance a portfolio at the lowest trading cost</h3>
+              <p class="out">It checks every allowed trade combination and returns the lowest cost one that keeps each asset inside your target range and your cash above your minimum.</p>
+              <div class="urg"><svg><use href="#i-clock"/></svg><span>Rebalance before the market opens. If your positions leak, others can trade against you.</span></div>
+              <div class="seller"><span class="av" aria-hidden="true">AS</span><span class="who"><b>Arif Santoso</b><span>Investment planner, demo seller</span></span><span class="price"><b>0.1 NEAR</b><span>per run</span></span></div>
+              <div class="mfoot"><span class="chip">9 checks you can verify</span><span class="chip">No ratings yet</span><button class="run" type="button">Run privately</button></div>
+            </article>
+            <article class="m">
+              <div class="mtop"><span class="kind">Program</span><span class="chip">DeFi</span><button class="more" type="button" aria-label="More about this method">···</button></div>
+              <h3>Protect a DeFi loan before it gets liquidated</h3>
+              <p class="out">How much to repay or top up so your loan stays above a safe health level.</p>
+              <div class="urg"><svg><use href="#i-clock"/></svg><span>Prices can fall within hours. If your position leaks, liquidation hunters see it first.</span></div>
+              <div class="seller"><span class="av" aria-hidden="true">BP</span><span class="who"><b>Bima Pratama</b><span>DeFi risk analyst, demo seller</span></span><span class="price"><b>0.08 NEAR</b><span>per run</span></span></div>
+              <div class="mfoot"><span class="chip">5 checks you can verify</span><span class="chip">No ratings yet</span><button class="run" type="button">Run privately</button></div>
+            </article>
+            <article class="m">
+              <div class="mtop"><span class="kind prompt">Prompt</span><span class="chip">Token sales</span><button class="more" type="button" aria-label="More about this method">···</button></div>
+              <h3>Sell unlocked tokens without crashing the price</h3>
+              <p class="out">A day by day selling plan that stays under your share of daily trading volume.</p>
+              <div class="urg"><svg><use href="#i-clock"/></svg><span>The unlock date is fixed. If your plan leaks, the market sells before you do.</span></div>
+              <div class="seller"><span class="av" aria-hidden="true">KA</span><span class="who"><b>Kenji Arakawa</b><span>Treasury advisor, demo seller</span></span><span class="price"><b>0.07 NEAR</b><span>per run</span></span></div>
+              <div class="mfoot"><span class="chip">4 checks you can verify</span><span class="chip">No ratings yet</span><button class="run" type="button">Run privately</button></div>
+            </article>
+            <article class="m" style="align-content:start">
+              <div class="note"><span>All sellers on this page are demo accounts and their rules were written for the demo. This is not financial advice.</span></div>
+              <div class="inner"><b>Want to sell a method here?</b><p>Package your know-how as a program or a prompt. Buyers run it without ever seeing it, and you are paid when every step succeeds.</p></div>
+              <button class="run" type="button" style="margin-left:0;justify-self:start;background:var(--blue)">Sell a method</button>
+            </article>
+          </div>
+        </section>
+
+        <aside class="stack" aria-label="How Kalis protects you">
+          <section class="card">
+            <div class="chead"><h2>How a run stays private</h2></div>
+            <div class="cbody stack">
+              <div class="inner step"><span class="no">1</span><span><b>Sealed on your device</b><p>Your data is locked in your browser before it leaves. Kalis only ever holds the locked copy.</p></span></div>
+              <div class="inner step"><span class="no">2</span><span><b>Opened only inside a locked chip</b><p>The method runs in a secure enclave on NEAR's compute network, which neither the expert nor Kalis can look into.</p></span></div>
+              <div class="inner step"><span class="no">3</span><span><b>Paid only if every step works</b><p>Your payment waits in escrow. If any step fails, it comes back to you.</p></span></div>
+            </div>
+          </section>
+          <section class="card">
+            <div class="chead"><h2>Community fund</h2></div>
+            <div class="cbody stack">
+              <div class="fund">
+                <div class="inner"><b>10%</b><span>of every run price</span></div>
+                <div class="inner"><b>Council</b><span>approves each payout</span></div>
+              </div>
+              <div class="inner"><b>Make a method better and get paid</b><p>The fund pays contributors whose improvement passes a private test and is approved by the fund council.</p></div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>

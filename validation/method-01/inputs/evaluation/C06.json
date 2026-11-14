@@ -1,0 +1,49 @@
+{
+  "case_id": "C06",
+  "context": [
+    {
+      "id": "a1",
+      "type": "approved_substitution",
+      "order": "O1",
+      "line": "L1",
+      "from_sku": "RED",
+      "to_sku": "BLUE",
+      "qty": 1,
+      "time": "09:30",
+      "approved_by": "customer"
+    }
+  ],
+  "events": [
+    {
+      "id": "e1",
+      "order": "O1",
+      "line": "L1",
+      "stage": "order",
+      "sku": "RED",
+      "qty": 1,
+      "version": 1,
+      "time": "09:00"
+    },
+    {
+      "id": "e2",
+      "order": "O1",
+      "line": "L1",
+      "stage": "pick",
+      "sku": "BLUE",
+      "qty": 1,
+      "version": 1,
+      "time": "10:00"
+    },
+    {
+      "id": "e3",
+      "order": "O1",
+      "line": "L1",
+      "stage": "pack",
+      "sku": "BLUE",
+      "qty": 1,
+      "version": 1,
+      "time": "10:20"
+    }
+  ],
+  "schema_version": "1.0"
+}

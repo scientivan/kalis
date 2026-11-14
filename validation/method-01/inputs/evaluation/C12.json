@@ -1,0 +1,67 @@
+{
+  "case_id": "C12",
+  "context": [],
+  "events": [
+    {
+      "id": "e1",
+      "order": "O1",
+      "line": "L1",
+      "stage": "order",
+      "sku": "RED",
+      "qty": 1,
+      "version": 1,
+      "time": "09:00"
+    },
+    {
+      "id": "e2",
+      "order": "O1",
+      "line": "L2",
+      "stage": "order",
+      "sku": "BLUE",
+      "qty": 1,
+      "version": 1,
+      "time": "09:00"
+    },
+    {
+      "id": "e3",
+      "order": "O1",
+      "line": "L1",
+      "stage": "pick",
+      "sku": "BLUE",
+      "qty": 1,
+      "version": 1,
+      "time": "10:00"
+    },
+    {
+      "id": "e4",
+      "order": "O1",
+      "line": "L2",
+      "stage": "pick",
+      "sku": "RED",
+      "qty": 1,
+      "version": 1,
+      "time": "10:00"
+    },
+    {
+      "id": "e5",
+      "order": "O1",
+      "line": "L1",
+      "stage": "pack",
+      "sku": "BLUE",
+      "qty": 1,
+      "version": 1,
+      "time": "10:20"
+    },
+    {
+      "id": "e6",
+      "order": "O1",
+      "line": "L2",
+      "stage": "pack",
+      "sku": "RED",
+      "qty": 1,
+      "version": 1,
+      "time": "10:20"
+    }
+  ],
+  "schema_version": "1.0"
+}

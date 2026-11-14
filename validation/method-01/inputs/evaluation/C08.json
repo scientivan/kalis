@@ -1,0 +1,44 @@
+{
+  "case_id": "C08",
+  "context": [
+    {
+      "id": "a1",
+      "type": "sku_alias",
+      "canonical": "R-01",
+      "alias": "RED"
+    }
+  ],
+  "events": [
+    {
+      "id": "e1",
+      "order": "O1",
+      "line": "L1",
+      "stage": "order",
+      "sku": "R-01",
+      "qty": 1,
+      "version": 1,
+      "time": "09:00"
+    },
+    {
+      "id": "e2",
+      "order": "O1",
+      "line": "L1",
+      "stage": "pick",
+      "sku": "RED",
+      "qty": 1,
+      "version": 1,
+      "time": "10:00"
+    },
+    {
+      "id": "e3",
+      "order": "O1",
+      "line": "L1",
+      "stage": "pack",
+      "sku": "RED",
+      "qty": 1,
+      "version": 1,
+      "time": "10:20"
+    }
+  ],
+  "schema_version": "1.0"
+}

@@ -1,0 +1,458 @@
+[
+  {
+    "id": "C01",
+    "holdings": [
+      4,
+      1,
+      3
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 5,
+    "reserve": 3,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": true
+  },
+  {
+    "id": "C02",
+    "holdings": [
+      2,
+      1,
+      3
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 5,
+    "reserve": 3,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": true
+  },
+  {
+    "id": "C03",
+    "holdings": [
+      7,
+      1,
+      1
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 5,
+    "reserve": 3,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": true
+  },
+  {
+    "id": "C04",
+    "holdings": [
+      0,
+      0,
+      0
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 20,
+    "reserve": 3,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": true
+  },
+  {
+    "id": "C05",
+    "holdings": [
+      4,
+      1,
+      3
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 5,
+    "reserve": 3,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.5,
+      0.8,
+      0.3
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": true
+  },
+  {
+    "id": "C06",
+    "holdings": [
+      4,
+      1,
+      3
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 5,
+    "reserve": 3,
+    "fee_rates": [
+      0.1,
+      0.15,
+      0.2
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": true
+  },
+  {
+    "id": "C07",
+    "holdings": [
+      4,
+      1,
+      3
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 5,
+    "reserve": 3,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.4,
+    "buy_limit": 5,
+    "allow_sell": true
+  },
+  {
+    "id": "C08",
+    "holdings": [
+      4,
+      1,
+      3
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 5,
+    "reserve": 8,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": true
+  },
+  {
+    "id": "C09",
+    "holdings": [
+      7,
+      1,
+      1
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 5,
+    "reserve": 3,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": false
+  },
+  {
+    "id": "C10",
+    "holdings": [
+      4,
+      1,
+      3
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 5,
+    "reserve": 30,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": true
+  },
+  {
+    "id": "C11",
+    "holdings": [
+      4,
+      1,
+      3
+    ],
+    "prices": [
+      2,
+      3,
+      1
+    ],
+    "cash": 5,
+    "reserve": 3,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.2,
+      0.2,
+      0.2
+    ],
+    "upper": [
+      0.3,
+      0.3,
+      0.3
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": true
+  },
+  {
+    "id": "C12",
+    "holdings": [
+      3,
+      2,
+      1
+    ],
+    "prices": [
+      3,
+      2,
+      2
+    ],
+    "cash": 5,
+    "reserve": 3,
+    "fee_rates": [
+      0.01,
+      0.015,
+      0.02
+    ],
+    "fixed_fees": [
+      0.05,
+      0.08,
+      0.03
+    ],
+    "lower": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "upper": [
+      0.4,
+      0.4,
+      0.4
+    ],
+    "sector_cap": 0.65,
+    "buy_limit": 5,
+    "allow_sell": true
+  }
+]

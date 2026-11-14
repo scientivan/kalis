@@ -1,0 +1,55 @@
+/* Animated product objects share the landscape, without a dashboard frame. */
+.hero{grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:38px;min-height:720px}
+.product-story{min-width:0;align-self:center;scroll-margin-top:30px}
+.story-scene[hidden]{display:none}
+.story-scene svg{width:100%;height:auto;display:block;overflow:visible;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.story-scene svg text{fill:#263f56;stroke:none;font:500 15px -apple-system,BlinkMacSystemFont,sans-serif}
+.route{fill:none;stroke:#8096a8;stroke-dasharray:4 7}
+.kalis-caption{text-align:center;min-height:96px;padding:10px 18px 0}
+.kalis-caption h2{font-size:22px;line-height:1.3;letter-spacing:-.025em;margin:0 0 10px}
+.kalis-caption p{font-size:14px;line-height:1.6;max-width:43ch;margin:0 auto;color:#263f56;text-wrap:balance}
+.story-player{display:flex;align-items:center;justify-content:center;gap:6px;margin:16px auto 0;width:fit-content;background:#f7fafc;border-radius:30px;padding:4px 10px}
+.story-player>span{font-size:11px;font-variant-numeric:tabular-nums;margin:0 8px;color:#425e75}
+.story-player button{width:36px;height:36px;border:0;background:transparent;color:#182b3d;border-radius:50%;font-size:18px;cursor:pointer;display:grid;place-items:center}
+.story-player button:hover{background:#dce7ef}
+.story-player button:focus-visible{outline:2px solid #2945b8;outline-offset:2px}
+.story-dots{display:flex;margin-right:10px}
+.story-dots button{width:22px;height:32px;font-size:0}
+.story-dots button:after{content:'';width:5px;height:5px;border-radius:50%;background:#9cb0c0}
+.story-dots button[aria-pressed=true]:after{background:#2945b8;width:7px;height:7px}
+.story-disclosure{text-align:center;font-size:10px;line-height:1.6;color:#263f56;margin:12px 0 0}
+.story-disclosure a{color:inherit;text-underline-offset:3px;margin-left:9px}
+.product-story.is-playing .moving-right{animation:travel-right 3s ease-in-out infinite}
+.product-story.is-playing .moving-left{animation:travel-left 3s ease-in-out infinite}
+.product-story.is-playing .arrives{animation:arrive 2.8s ease-out infinite}
+.product-story.is-playing .drops{animation:drop 2.8s ease-in-out infinite}
+.product-story.is-playing .selects{animation:select 2.8s ease-in-out infinite}
+.product-story.is-playing .route{animation:route 3s linear infinite}
+@keyframes travel-right{0%,100%{transform:translateX(0)}50%{transform:translateX(20px)}}
+@keyframes travel-left{0%,100%{transform:translateX(0)}50%{transform:translateX(-20px)}}
+@keyframes arrive{0%{clip-path:inset(0 0 100% 0)}35%,100%{clip-path:inset(0)}}
+@keyframes drop{0%,100%{transform:translateY(-15px)}65%{transform:translateY(12px)}}
+@keyframes select{0%,100%{transform:translate(10px,10px)}40%,65%{transform:translate(-7px,-5px)}}
+@keyframes route{to{stroke-dashoffset:-44}}
+@media(max-width:1100px){.hero{gap:24px}.hero h1{font-size:45px}}
+@media(max-width:760px){.hero{grid-template-columns:1fr;gap:28px;min-height:0;padding:0 0 34px}.hero h1{font-size:clamp(39px,8.2vw,59px)}.product-story{width:100%;max-width:550px;margin:auto}.kalis-caption h2{font-size:21px}.kalis-caption p{font-size:13px}.story-player{gap:2px;padding:4px 6px}.story-dots{margin-right:4px}.story-dots button{width:20px}}
+@media(prefers-reduced-motion:reduce){.product-story *{animation:none!important}}
+
+.story-player>button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Scoped normal-flow layout prevents legacy absolute caption positioning. */
+.product-story{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:0;padding-bottom:20px}
+#kalis-canvas{display:none;width:100%;aspect-ratio:1.35;min-width:0}
+#kalis-canvas canvas{display:block;width:100%;height:100%}
+.product-story.has-cycle-webgl #kalis-canvas{display:block}
+.product-story.has-cycle-webgl .story-scene{display:none}
+.kalis-caption{position:static;display:block;transform:none;inset:auto;min-height:110px;padding:18px 22px 14px;background:#edf3f8;border-radius:14px 14px 0 0}
+.kalis-caption h2{color:#182b3d}
+.kalis-caption p{color:#263f56;font-size:15px}
+.story-player{margin:0;padding:4px 12px 16px;gap:8px;width:100%;border-radius:0 0 14px 14px;background:#edf3f8;flex-wrap:wrap}
+.story-player>button{width:44px;height:44px;flex:none;border:1px solid #6b8396}
+.story-dots button{width:28px;height:44px}
+.story-dots button:after{background:#587185}
+.story-dots button[aria-pressed=true]:after{width:12px;height:6px;border-radius:3px;background:#2945b8}
+.story-disclosure{background:#edf3f8;align-self:center;padding:6px 12px;border-radius:8px;font-size:12px}
+@media(max-width:420px){.story-player{gap:4px;padding-inline:6px}.story-dots{order:2;width:100%;justify-content:center;margin:0}.kalis-caption{min-height:125px}.story-player>span{margin-right:auto}}

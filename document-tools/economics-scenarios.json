@@ -1,0 +1,39 @@
+{
+  "status": "Illustrative assumptions, not approved pricing or measured costs",
+  "currency": "USD",
+  "creator_share": 0.3,
+  "community_fund_share": 0.1,
+  "payment_percent": 0.029,
+  "payment_fixed": 0.3,
+  "refund_allowance": 0.02,
+  "support_per_user": 2,
+  "scenarios": [
+    {
+      "scenario": "Ringan",
+      "price": 29,
+      "runs": 50,
+      "cost_per_run": 0.05,
+      "total_variable": 17.821,
+      "contribution": 11.179,
+      "contribution_pct": 38.5
+    },
+    {
+      "scenario": "Dasar",
+      "price": 29,
+      "runs": 50,
+      "cost_per_run": 0.15,
+      "total_variable": 22.821,
+      "contribution": 6.179,
+      "contribution_pct": 21.3
+    },
+    {
+      "scenario": "Berat",
+      "price": 29,
+      "runs": 50,
+      "cost_per_run": 0.4,
+      "total_variable": 35.321,
+      "contribution": -6.321,
+      "contribution_pct": -21.8
+    }
+  ]
+}
