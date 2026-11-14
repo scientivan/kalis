@@ -6,6 +6,7 @@ import { statusLabel, useMethodTitles } from "../lib/labels";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { backend, plainError } from "../lib/backend/client";
+import { cachedPrivate } from "../lib/backend/private-client";
 import { useNearAuth } from "../lib/near/auth";
 import { AppShell, icon } from "./shell";
 import { PageInfo, Segmented } from "./controls";
@@ -20,13 +21,29 @@ type Money = { display?: string };
 function useApi<T>(path: string | null, rev: number) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState("");
+  const [stale, setStale] = useState(false);
+  const [slow, setSlow] = useState(false);
+  const isPrivate = !!path && path.startsWith("protections/");
   useEffect(() => {
     if (!path) return;
-    let on = true; setError("");
-    backend<T>(path).then(x => { if (on) setData(x); }).catch(e => { if (on) setError(e.message); });
-    return () => { on = false; };
-  }, [path, rev]);
-  return { data, error, loading: !data && !error };
+    let on = true, done = false; setError(""); setSlow(false);
+    // Private pages wait for the TEE queue. Show what this device decrypted earlier, then refresh.
+    if (isPrivate) cachedPrivate<T>(path).then(c => { if (on && c && !done) { setData(c.value); setStale(true); } });
+    const timer = setTimeout(() => { if (on && !done) setSlow(true); }, 5000);
+    backend<T>(path).then(x => { done = true; if (on) { setData(x); setStale(false); setSlow(false); } }).catch(e => { done = true; if (on) { setError(e.message); setSlow(false); } });
+    return () => { on = false; clearTimeout(timer); };
+  }, [path, rev, isPrivate]);
+  return { data, error, loading: !data && !error, stale, slow, isPrivate };
+}
+/** Status for pages whose data is decrypted only inside the TEE. Replaces a silent skeleton. */
+function PrivateWait({ r, count }: { r: { loading: boolean; stale: boolean; slow: boolean; error: string }; count: number }) {
+  if (r.error) return null;
+  if (r.stale) return <StatePanel title="Showing what this device saved earlier" text="Refreshing from the secure runner. On NEAR testnet this can take a few minutes."/>;
+  if (!r.loading) return null;
+  return <>
+    <StatePanel title="Opening your private data in the secure runner" text={r.slow ? "Your data is decrypted only inside the TEE. The NEAR testnet queue is slow right now and this can take a few minutes. You can leave this page open." : "Your data is decrypted only inside the TEE, never on our server."}/>
+    <SkeletonTiles count={count}/>
+  </>;
 }
 /** Split chain text like "Title | Accept if: rule [kalis:prop-x]" into a clean title and detail. */
 const clean = (t: string) => { const x = t.replace(/\s*\[kalis:[^\]]*\]/g, "").replace(/^Bounty:\s*/i, "").trim(); const [a, ...b] = x.split(/\s*\|\s*/); return { title: a, detail: b.join(". ") }; };
@@ -138,7 +155,7 @@ function ApprovalPanel() {
   return <Main title="Needs your approval" tools={<Segmented label="Status" options={["Waiting", "Done", "All"]} value={tab} onChange={setTab} />}>
     {(err || message) && <div className="tgrid-note">{err ? <ErrorPanel message={err} onRetry={() => setRev(n => n + 1)} title="That action did not go through"/> : <StatePanel title={message}/>}</div>}
     <TileGrid label="Actions waiting for your approval">
-      {r.loading && <SkeletonTiles count={2}/>}
+      <PrivateWait r={r} count={2}/>
       {r.error && <ErrorPanel message={r.error} onRetry={() => setRev(n => n + 1)} title="We could not load your approvals"/>}
       {!r.loading && !r.error && !shown.length && <StatePanel title={tab === "Waiting" ? "Nothing is waiting for your approval" : "No approvals yet"} text="When a method wants to send something outside Kalis, it waits here until you read and approve the exact text."/>}
       {shown.map(o => { const open = ["pending","held","held_for_approval"].includes(o.status); return <Tile key={o.id} className={open || o.status === "approved" ? "is-wide" : ""} iconNode={<TileIcon name="pulse" color="#FF5F04"/>} chip={<Chip tone={o.status === "approved" || o.status === "sent" ? "blue" : "warn"}>{statusLabel(o.status)}</Chip>}
@@ -231,7 +248,7 @@ export function ConnectionsPage() {
       {err && <ErrorPanel message={err} onRetry={() => { setErr(""); setRev(n => n + 1); }} title="That change did not go through"/>}
       <TileGrid label="Your connections">
         <AddTile title={adding ? "Close the form" : "Add a connection"} desc="Lets a labelled mock app share read-only data with a method, for a limited time." onClick={toggle}/>
-        {r.loading && <SkeletonTiles count={3}/>}
+        <PrivateWait r={r} count={3}/>
         {r.error && <ErrorPanel message={r.error} onRetry={() => setRev(n => n + 1)} title="We could not load your connections"/>}
         {items.map(c => { const state = c.effective_state || (c.revoked || c.status === "revoked" ? "revoked" : c.expires_at && Date.parse(c.expires_at) <= Date.now() ? "expired" : "active"); const off = state !== "active"; const [name, ic] = CONNECTOR[c.connector] || [c.connector, "link"];
           return <Tile key={c.id} iconNode={<TileIcon name={ic} color={off ? "#5c5c5c" : "#0038FF"}/>} chip={<Chip tone={off ? "grey" : "pink"}>{off ? statusLabel(state) : "Mock app"}</Chip>} title={name}
@@ -256,7 +273,7 @@ export function DocumentsPage() {
     <Main title="Read documents">
       <TileGrid label="Read documents">
         <AddTile title={adding ? "Close the form" : "Read a document"} desc="Reads the text of a file so a method can use it. The server keeps only a fingerprint." onClick={toggle}/>
-        {r.loading && <SkeletonTiles count={3}/>}
+        <PrivateWait r={r} count={3}/>
         {r.error && <ErrorPanel message={r.error} onRetry={() => setRev(n => n + 1)} title="We could not load your documents"/>}
         {!r.loading && !r.error && !items.length && <StatePanel title="No documents yet" text="You add one while preparing a run that reads files." action={<Link className="view" href="/marketplace">Find a method</Link>}/>}
         {items.map(x => { const warn = !!x.pii_spans?.length || x.instruction_like; return <Tile key={x.id} iconNode={<TileIcon name="file" color={warn ? "#FF5F04" : "#0038FF"}/>} chip={<Chip tone={warn ? "warn" : "blue"}>{x.instruction_like ? "Hidden instructions found" : x.pii_spans?.length ? "Personal data found" : "No issues found"}</Chip>} title={x.filename}
@@ -280,7 +297,7 @@ export function NotesPage() {
       {err && <ErrorPanel message={err} onRetry={() => { setErr(""); setRev(n => n + 1); }} title="That change did not go through"/>}
       <TileGrid label={tab === "Saved" ? "Saved notes" : "Suggested notes"}>
         {tab === "Saved" && <AddTile title={adding ? "Close the form" : "Add a note"} desc="Save a fact a method may remember, such as your risk limit." onClick={toggle}/>}
-        {r.loading && <SkeletonTiles count={3}/>}
+        <PrivateWait r={r} count={3}/>
         {r.error && <ErrorPanel message={r.error} onRetry={() => setRev(n => n + 1)} title="We could not load your notes"/>}
         {!r.loading && !r.error && !items.length && <StatePanel title={tab === "Saved" ? "No saved notes" : "No suggestions waiting"} text={tab === "Saved" ? "Notes you save, or suggestions you accept, appear here." : "A method can suggest a note after a run. It waits here until you decide."}/>}
         {items.map(n => <Tile key={n.id} iconNode={<TileIcon name="note" color={n.status === "pending" ? "#FF77CD" : "#0038FF"} ink={n.status === "pending" ? "#101010" : "#fff"}/>} chip={<Chip tone={n.status === "pending" ? "pink" : "blue"}>{n.status === "pending" ? "Suggested" : "Saved"}</Chip>}

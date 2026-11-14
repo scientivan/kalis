@@ -1,9 +1,9 @@
-import { PRIVATE_RUNNER_HASH } from "./private-release";
+import { PRIVATE_RUNNER_HASH, PRIVATE_TEE_KEY, PRIVATE_RECEIPT_KEY } from "./private-release";
 import { preparePrivateRequest, openPrivateResponse } from "./privacy-crypto";
 import { sha256Hex, toHex } from "./crypto";
 type Obj = Record<string, any>;
-const TEE_KEY = process.env.NEXT_PUBLIC_KALIS_PRIVATE_TEE_KEY || "";
-const RECEIPT_KEY = process.env.NEXT_PUBLIC_KALIS_PRIVATE_RECEIPT_KEY || "";
+const TEE_KEY = process.env.NEXT_PUBLIC_KALIS_PRIVATE_TEE_KEY || PRIVATE_TEE_KEY;
+const RECEIPT_KEY = process.env.NEXT_PUBLIC_KALIS_PRIVATE_RECEIPT_KEY || PRIVATE_RECEIPT_KEY;
 const database = () =>
   new Promise<IDBDatabase>((resolve, reject) => {
     const r = indexedDB.open("kalis-private-device-v1", 1);
@@ -263,7 +263,7 @@ const pending = new Map<
   string,
   { packet: any; path: string; bodyHash: string }
 >();
-async function invoke(name: string, path: string, method: string, body: Obj) {
+async function invoke(name: string, path: string, method: string, body: Obj, fresh = false): Promise<any> {
   const c = await raw("privacy/config");
   if (!c.enabled)
     throw new Error(
@@ -295,24 +295,29 @@ async function invoke(name: string, path: string, method: string, body: Obj) {
       "A previous private operation is unresolved. Retry that same operation first.",
     );
   if (!waiting) {
-    const snap = await preparePrivateRequest(
-      c.tee_pubkey,
-      ident.owner,
-      sign,
-      "snapshot",
-      {},
-      0,
-    );
-    const state = openPrivateResponse(
-      snap,
-      await relay(snap, c, dev),
-      c.receipt_pubkey,
-    );
+    // Use the revision this device last saw, which saves one TEE round trip per operation.
+    // If another device changed the state, the runner refuses and we retry once with a snapshot.
     const highest = (await local<number>(name + ":revision")) || 0;
-    if (state.revision < highest)
-      throw new Error(
-        "Private storage returned an older revision. No operation was sent.",
+    let state: Obj = { revision: highest };
+    if (fresh) {
+      const snap = await preparePrivateRequest(
+        c.tee_pubkey,
+        ident.owner,
+        sign,
+        "snapshot",
+        {},
+        0,
       );
+      state = openPrivateResponse(
+        snap,
+        await relay(snap, c, dev),
+        c.receipt_pubkey,
+      );
+      if (state.revision < highest)
+        throw new Error(
+          "Private storage returned an older revision. No operation was sent.",
+        );
+    }
     const op = operation(path, method, body);
     op.payload = await policy(op.payload);
     if (op.action === "outbound.propose" || op.action === "browser.act") {
@@ -360,15 +365,27 @@ async function invoke(name: string, path: string, method: string, body: Obj) {
       output,
       c.receipt_pubkey,
     );
-    await local(
-      name + ":revision",
-      Math.max((await local<number>(name + ":revision")) || 0, opened.revision),
-    );
+    const seen = (await local<number>(name + ":revision")) || 0;
+    if (opened.revision < seen)
+      throw new Error("Private storage returned an older revision.");
+    await local(name + ":revision", Math.max(seen, opened.revision));
     pending.delete(name);
-    return normalize(opened.value);
+    const value = normalize(opened.value);
+    // Decrypted results stay on this device only, so pages can show them while the TEE refreshes.
+    if (method === "GET") await local(name + ":cache:" + path, { at: Date.now(), value });
+    return value;
   } catch (e) {
     pending.delete(name);
+    if (!fresh && e instanceof Error && /private state changed/.test(e.message))
+      return invoke(name, path, method, body, true);
     throw e;
+  }
+}
+export async function cachedPrivate<T>(path: string): Promise<{ at: number; value: T } | undefined> {
+  try {
+    return await local<{ at: number; value: T }>(slot() + ":cache:" + path);
+  } catch {
+    return undefined;
   }
 }
 export function privateRequest<T>(
