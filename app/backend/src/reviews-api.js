@@ -41,7 +41,10 @@ function summary(methodId, version) {
   const dist = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
   for (const r of rows) dist[r.rating]++;
   const count = rows.length;
+  // Paid runs of this method (a payment transaction exists), shown as "uses" on the Marketplace.
+  const runs = Object.values(db.all("runs")).filter((r) => r.method_id === methodId && r.pay_tx && (version == null || r.version === Number(version))).length;
   return {
+    runs,
     method_id: methodId, scope: version == null ? "all_versions" : `version_${Number(version)}`,
     count, average: count ? Math.round((rows.reduce((a, r) => a + r.rating, 0) / count) * 100) / 100 : null,
     distribution: dist, label: count ? null : "No ratings yet",
