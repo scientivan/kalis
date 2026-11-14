@@ -43,7 +43,7 @@ Build `57abddb0f9069d02ab5cc3b7bf0d5a802daf342e0d53a9d82d9c28ceed2aa896`. Secret
 - Guard runner completions cannot settle on the market (different completion key `4f9a8829…`, market expects the `kalis-runner` key). Needs a market change.
 - Recent spends of the sandbox are typed, not read (no history on RPC).
 - `token-scam-screen` v2 has no paid run yet. Taxes, liquidity lock and holder shares are still typed.
-- Three v3 runs paid at about 22:12 UTC lost their sealing secret when the buyer script hit a rate limit (`Too many requests`), so they can never execute. They are refundable with `refund_expired` after the 30-minute timeout.
+- Three v3 runs paid at about 22:12 UTC lost their sealing secret when the buyer script hit a rate limit (`Too many requests`), so they can never execute. They were refunded to the buyer with `refund_expired` after the 30-minute timeout: `run-mwgyoj18-20b6b0b7` tx `HZLZJrwQoonbeNNpr7N2JjCJYeB2Po25Rqb3bHKpKoii`, `run-mwgyoklf-f686b3c7` tx `4MacnSujpjgzY1MPWbioVDdW8ySqgrWemGzJvPPPceyr`, `run-mwgyom4h-bf470442` tx `DBMpAmbpzX4uVR79SRnyJrcbGDuyzSyAceHbY5JeSxwz`.
 
 ## 5. Testnet evidence (15 Nov 2026)
 
