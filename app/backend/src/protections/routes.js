@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 // HTTP routes for the five protections and the labelled mock services they use.
 // Every protections route needs an X-Kalis-Workspace header (demo identity; no real login yet).
 import fs from "node:fs";
@@ -60,7 +61,13 @@ const tenderHtml = `<!doctype html><html><body><h1>Kota Harapan Procurement Port
 <form method="post" action="/mock/portal/submit"><button>Submit bid</button></form></body></html>`;
 
 export function registerProtectionRoutes(route) {
-  const ws = (req) => checkWorkspace(req.headers["x-kalis-workspace"]);
+  // A signed-in NEAR account keeps one workspace across tabs and devices; anonymous visitors keep the
+  // per-tab demo workspace from the X-Kalis-Workspace header.
+  const ws = (req) => {
+    const p = principal(req);
+    if (p.kind === "near_account") return "acct-" + crypto.createHash("sha256").update(p.account_id).digest("hex").slice(0, 40);
+    return checkWorkspace(req.headers["x-kalis-workspace"]);
+  };
 
   // ----- mock services (labelled) -----
   route("GET", /^\/mock\/broker\/positions$/, async (_q, _m, _b, req) => {

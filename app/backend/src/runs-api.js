@@ -222,7 +222,13 @@ async function execute(runId, data) {
     const allowed = JSON.parse(manifestText).ai?.allowed || [];
     if (draft?.models?.uses_ai && draft.models.models.length < allowed.length) input.ai_restrict = draft.models.models;
     let res;
-    try { res = await callRunner(input); } catch (e) { addEvent(runId, "execution_failed", { error: e.message, retryable: true }); throw e; }
+    const pending = db.get("runs", runId)?.pending_call_id || null;
+    try { res = await callRunner(input, { resumeCallId: pending }); } catch (e) {
+      // OutLayer can queue for minutes on testnet. Keep the call id so a retry resumes the same call.
+      if (e.code === "outlayer_timeout" && e.callId) db.update("runs", runId, (r) => ({ ...r, pending_call_id: e.callId, updated_at: db.nowIso() }));
+      addEvent(runId, "execution_failed", { error: e.message, call_id: e.callId, retryable: true }); throw e;
+    }
+    if (pending) db.update("runs", runId, (r) => ({ ...r, pending_call_id: null, updated_at: db.nowIso() }));
     if (res.status !== "completed" || !res.output?.ok) {
       const failed = { status: res.status, error: res.error || res.output?.error || "runner did not complete", call_id: res.call_id };
       writeExecution(runId, { failed, at: new Date().toISOString() });
@@ -273,6 +279,11 @@ async function settle(runId, body) {
 
 // ---------- routes ----------
 export function registerRunRoutes(route) {
+  // A job cannot still be running after a restart: nothing in this process is polling it. Mark it stopped
+  // so the buyer sees "retry or reclaim" instead of "Running" forever. Paying again is never needed.
+  for (const r of Object.values(db.all("runs"))) {
+    if (r.phase === "executing") addEvent(r.id, "execution_failed", { error: "The server restarted while this job was running. Run it again to continue, or reclaim the payment after the escrow timeout.", retryable: true });
+  }
   route("GET", /^\/api\/runs$/, async (q, _m, _b, req) => {
     const p = principal(req);
     let rows = Object.values(db.all("runs")).filter((r) => r.principal === p.id);

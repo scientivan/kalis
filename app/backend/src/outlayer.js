@@ -9,7 +9,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const sortKeys = (v) => Array.isArray(v) ? v.map(sortKeys) : v && typeof v === "object"
   ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sortKeys(v[k])])) : v;
 
-export async function callRunner(input, { timeoutMs = 300000 } = {}) {
+export async function callRunner(input, { timeoutMs = 300000, resumeCallId = null } = {}) {
   const key = config.secrets.outlayerPaymentKey;
   if (!key) throw Object.assign(new Error("OutLayer payment key is not configured"), { code: "not_configured", status: 503 });
   // Prompt methods can spend most of a minute in model reasoning, so ask for the 180 s hard cap
@@ -18,7 +18,8 @@ export async function callRunner(input, { timeoutMs = 300000 } = {}) {
   const inputText = JSON.stringify(input);
   const limits = { max_execution_seconds: 180, max_instructions: 20_000_000_000 };
   const body = `{"input":${inputText},"secrets_ref":${JSON.stringify(config.runner.secretsRef)},"resource_limits":${JSON.stringify(limits)},"async":true}`;
-  const start = await (await fetch(`${config.outlayerApi}/call/${config.runner.project}`, { method: "POST", headers, body })).json();
+  // Resume a call that outlived an earlier poll instead of paying for a second one.
+  const start = resumeCallId ? { call_id: resumeCallId } : await (await fetch(`${config.outlayerApi}/call/${config.runner.project}`, { method: "POST", headers, body })).json();
   if (!start.call_id) throw Object.assign(new Error(`OutLayer refused the call: ${JSON.stringify(start).slice(0, 300)}`), { code: "outlayer_refused", status: 502 });
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
