@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { backend, request } from "../lib/backend/client";
 import { useNearAuth } from "../lib/near/auth";
 import { ActionFeedback } from "./data-tools";
+import { DayCards, ErrorPanel, SkeletonTiles, StatePanel, Summary, TileGrid } from "./tiles";
 type Profile = { display_name?: string; bio?: string };
 type Preferences = {
   default_models: string[] | null;
@@ -49,63 +50,29 @@ export function PaymentHistory() {
     void load();
   }, []);
   const title = useMethodTitles();
-  const labels: Record<string, string> = {
-    escrow_hold: "Payment held in escrow",
-    release: "Payment released",
-    stage_refund: "Payment refunded",
-    timeout_reclaim: "Payment reclaimed",
+  const labels: Record<string, [string, string]> = {
+    escrow_hold: ["Paid into escrow", "lock"],
+    release: ["Released to the expert", "check"],
+    stage_refund: ["Refunded to you", "coins"],
+    timeout_reclaim: ["Taken back after timeout", "coins"],
+  };
+  const sum = (types: string[]) => {
+    let total = 0;
+    for (const i of items) if (types.includes(i.type)) total += Number((i.amount?.display || "").replace(/[^0-9.]/g, "")) || 0;
+    return `${Number(total.toFixed(4))} NEAR`;
   };
   return (
     <>
-      <ActionFeedback error={error} />
-      {!loaded && busy && <div className="note-row">Loading payments</div>}
-      {loaded && !items.length && (
-        <div className="note-row">No payments yet.</div>
-      )}
-      <div className="rows">
-        {items.map((item, index) => (
-          <div className="row" key={index}>
-            <span className="two">
-              <b>{labels[item.type] || item.type}</b>
-              <span>
-                {title(item.method_id)}
-                {item.occurred_at
-                  ? ", " + new Date(item.occurred_at).toLocaleString()
-                  : ""}
-              </span>
-            </span>
-            <span className="num">{item.amount?.display}</span>
-            {item.tx_url && (
-              <a
-                className="view"
-                href={item.tx_url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                On NEAR
-              </a>
-            )}
-          </div>
-        ))}
-      </div>
-      {cursor && (
-        <button
-          className="view"
-          disabled={busy}
-          onClick={() => void load(cursor)}
-        >
-          {busy ? "Loading" : "Load more payments"}
-        </button>
-      )}
-      {error && (
-        <button
-          className="view"
-          disabled={busy}
-          onClick={() => void load(cursor || undefined)}
-        >
-          Retry
-        </button>
-      )}
+      {error && <ErrorPanel message={error} onRetry={() => void load(cursor || undefined)} title="We could not load your payments" />}
+      {!loaded && busy && <TileGrid label="Loading payments"><SkeletonTiles count={3} /></TileGrid>}
+      {loaded && !items.length && <TileGrid label="Payments"><StatePanel title="No payments yet" text="Each payment into escrow, release and refund appears here, grouped by day." /></TileGrid>}
+      {!!items.length && <Summary cells={[["Paid into escrow", sum(["escrow_hold"])], ["Released to experts", sum(["release"])], ["Came back to you", sum(["stage_refund", "timeout_reclaim"])], ["Records shown", items.length]]} />}
+      {!!items.length && <DayCards label="Payments by day" unit={["payment", "payments"]} lines={items.map((item, index) => ({
+        id: `${item.run_id}-${item.type}-${index}`, at: item.occurred_at, icon: (labels[item.type] || ["", "coins"])[1],
+        text: item.tx_url ? <a href={item.tx_url} target="_blank" rel="noreferrer">{(labels[item.type] || [item.type])[0]}, {title(item.method_id)}</a> : <>{(labels[item.type] || [item.type])[0]}, {title(item.method_id)}</>,
+        aside: item.amount?.display,
+      }))} />}
+      {cursor && <div className="pager"><span>Showing {items.length} payment records</span><button className="view" disabled={busy} onClick={() => void load(cursor)}>{busy ? "Loading" : "Show older payments"}</button></div>}
     </>
   );
 }

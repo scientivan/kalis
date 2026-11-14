@@ -58,10 +58,23 @@ export async function request<T>(path: string, method: "GET" | "POST" | "PATCH" 
     body: body === undefined ? undefined : JSON.stringify(body),
     cache: "no-store",
   });
-  const json = await r.json();
-  if (!r.ok)
-    throw new Error(json.error?.message || "Backend operation failed.");
+  let json: { error?: { message?: string } } | null = null;
+  try { json = await r.json(); } catch { json = null; }
+  if (!r.ok || json === null)
+    throw new Error(plainError(json?.error?.message, r.status));
   return json as T;
+}
+
+/**
+ * Turns raw third-party or transport errors (RPC rate limits, provider hostnames, stack text)
+ * into one plain sentence. Messages the Kalis backend wrote for people pass through unchanged.
+ */
+export function plainError(message?: string | null, status?: number): string {
+  const m = (message || "").trim();
+  if (!m) return status && status >= 500 ? "The Kalis service did not answer. Wait a moment, then try again." : "Something went wrong. Try again.";
+  if (/rate.?limit|too many requests|429/i.test(m) || status === 429) return "The NEAR network service is busy right now. Wait a moment, then try again.";
+  if (/fastnear|rpc\b|https?:\/\/|ECONN|ETIMEDOUT|fetch failed|socket|timeout/i.test(m)) return "We could not reach the NEAR network. Wait a moment, then try again.";
+  return m;
 }
 
 /** Bearer header for a signed-in NEAR account (see lib/near/auth.tsx), or nothing. */

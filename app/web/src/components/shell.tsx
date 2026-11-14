@@ -18,7 +18,7 @@ const navigation: Record<string, NavParent[]> = {
     { label: "Data", icon: "link", items: [{ label: "Connections", href: "/connections", active: "Connections" }, { label: "Documents", href: "/workspace/files", active: "Documents" }, { label: "Notes", href: "/workspace/memory", active: "Notes" }] }, ...shared,
   ],
   Author: [
-    { label: "Methods", icon: "tag", items: [{ label: "Drafts", href: "/marketplace/publish", active: "Drafts" }, { label: "Published", href: "/marketplace/mine", active: "Published" }] }, ...shared,
+    { label: "Methods", icon: "tag", items: [{ label: "Create", href: "/marketplace/publish", active: "Drafts" }, { label: "Published", href: "/marketplace/mine", active: "Published" }] }, ...shared,
   ],
 };
 export const icon = (name: string, cls = "i") => <svg className={cls} aria-hidden="true"><use href={`/marketplace-icons.svg#${name}`}/></svg>;

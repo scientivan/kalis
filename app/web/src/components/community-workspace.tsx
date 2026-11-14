@@ -1,5 +1,8 @@
 "use client";
-import { statusLabel } from "../lib/labels";
+import { statusLabel, useMethodTitles } from "../lib/labels";
+import { Chip, ErrorPanel, SkeletonTiles, StatePanel, Tile, TileGrid, TileIcon, methodIdentity } from "./tiles";
+import { WalletReview, walletError, actionLabel } from "./wallet-review";
+import { plainError } from "../lib/backend/client";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { backend } from "../lib/backend/client";
@@ -13,7 +16,8 @@ type Section = "Fund" | "Proposals" | "Bounties" | "Issues";
 const id = (x: unknown) => encodeURIComponent(String(x));
 const pretty = (x: unknown) => JSON.stringify(x, null, 2);
 const list = (x: any): Obj[] => Array.isArray(x) ? x : x?.items || [];
-const title = (x: Obj) => String(x.problem || x.description || x.label || x.id || "Item").replace(/\s*\[kalis:[^\]]*\]/g, "").split(" | ")[0];
+/** Human title for an issue, proposal or bounty. Strips chain tags and the "Bounty for x v2 (module):" prefix. */
+const title = (x: Obj) => { const t = String(x.problem || x.description || x.label || "").replace(/\s*\[kalis:[^\]]*\]/g, "").split(" | ")[0].replace(/^Bounty(?: for [\w-]+ v\d+(?: \([^)]*\))?)?:\s*/i, "").trim(); return t ? t.charAt(0).toUpperCase() + t.slice(1) : (String(x.id || "").startsWith("prop-") ? "Funding proposal" : typeof x.id === "number" ? `Bounty ${x.id}` : "Community record"); };
 const allowed = (x: Obj, action: string) => Array.isArray(x.allowed_actions) && x.allowed_actions.includes(action);
 function Field({ label, value, onChange, required, type = "text", multiline = false }: { label: string; value: string; onChange: (s: string) => void; required?: boolean; type?: string; multiline?: boolean }) {
   return <label className={`fx ${multiline ? "tall full" : ""}`}><span className="fx-label">{label}</span>{multiline ? <textarea required={required} rows={3} value={value} onChange={e => onChange(e.target.value)} /> : <input required={required} type={type} value={value} onChange={e => onChange(e.target.value)} />}</label>;
@@ -37,7 +41,9 @@ export function CommunityWorkspace({ section }: { section: Section }) {
   const [data, setData] = useState<Obj | null>(null), [config, setConfig] = useState<Obj | null>(null), [capability, setCapability] = useState<Obj | null>(null);
   const [items, setItems] = useState<Obj[]>([]), [selected, setSelected] = useState<Obj | null>(null), [creating, setCreating] = useState(false);
   const [loading, setLoading] = useState(true), [busy, setBusy] = useState(""), [error, setError] = useState(""), [notice, setNotice] = useState("");
-  const [pendingCall, setPendingCall] = useState<Obj | null>(null);
+  const [pendingCall, setPendingCallRaw] = useState<Obj | null>(null); const [signError, setSignError] = useState("");
+  const setPendingCall = (c: Obj | null) => { setSignError(""); setPendingCallRaw(c); };
+  const methodTitle = useMethodTitles();
   const [principal, setPrincipal] = useState<string | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
   const [privateCapability, setPrivateCapability] = useState<Obj | null>(null);
@@ -71,28 +77,48 @@ export function CommunityWorkspace({ section }: { section: Section }) {
     try { setSelected(await backend<Obj>(`${endpoint}/${id(item.id)}`)); } catch (e) { setError(e instanceof Error ? e.message : "Details could not be loaded."); } finally { setBusy(""); }
   }
   async function sign() {
-    if (!pendingCall) return; setBusy("Waiting for wallet"); setError("");
+    if (!pendingCall) return; setBusy("Waiting for wallet"); setError(""); setSignError("");
     try {
       await auth.signCalls([pendingCall as any]);
-      setNotice("Wallet request returned. Refresh the record to read its actual chain status."); setPendingCall(null); await refresh();
+      setNotice("Your wallet sent the request. The status updates once NEAR confirms it."); setPendingCall(null); await refresh();
       if (selected?.id) setSelected(await backend<Obj>(`${endpoint}/${id(selected.id)}`));
-    } catch (e) { setError(e instanceof Error ? e.message : "Wallet signing failed."); } finally { setBusy(""); }
+    } catch (e) { setSignError(walletError(e)); } finally { setBusy(""); }
   }
   const canWrite = enabled && !busy;
   return <AppShell active={section}>
     <section className="card ph"><h1>{section}</h1><div className="ph-actions"><PageInfo title={section} points={[{icon:icon("people"),text:explanations[section]},{icon:icon("wallet"),text:"Money and authority actions require your own testnet wallet signature."}]} /><button className="ghost-ic" aria-label="Refresh" onClick={() => void refresh()}>{icon("pulse")}</button></div><div className="page-purpose">{icon("people")}<p>{explanations[section]}</p></div></section>
-    {error && <section className="card ph" role="alert"><p className="form-error">{error}</p><button className="view" onClick={() => void refresh()}>Retry</button></section>}
+    {error && <section className="card list-card"><div className="dpane"><ErrorPanel message={plainError(error)} onRetry={() => void refresh()} title="Something did not load"/></div></section>}
     {notice && <section className="card ph" role="status"><Note>{notice}</Note></section>}
-    {pendingCall && <section className="card list-card"><div className="dpane"><h2 className="h3">Review wallet request</h2><div className="rows"><div className="row"><span className="two"><span>Required signer</span><b>{pendingCall.signer_must_be || auth.session?.account_id}</b></span></div><div className="row"><span className="two"><span>Contract</span><b>{pendingCall.receiver_id}</b></span></div><div className="row"><span className="two"><span>Action</span><b>{pendingCall.method_name}</b></span></div><div className="row"><span className="two"><span>Deposit attached (bond)</span><b>{nearFromYocto(pendingCall.deposit_yocto)} NEAR, gas up to {pendingCall.gas_tgas} Tgas</b></span></div></div><Proof label="Contract arguments" value={pendingCall.args}/><div className="nf-foot"><button className="view" onClick={() => setPendingCall(null)}>Dismiss</button><button className="primary-btn" disabled={!!busy || !auth.session || (!!pendingCall.signer_must_be && pendingCall.signer_must_be !== auth.session.account_id)} onClick={() => void sign()}>Sign with wallet</button></div></div></section>}
+    {pendingCall && <section className="card list-card"><div className="dpane"><WalletReview call={pendingCall as any} signer={auth.session?.account_id} busy={busy === "Waiting for wallet"} error={signError}
+      title={`Check before you sign. ${actionLabel(pendingCall.method_name)}`} explanation={`This ${Number(pendingCall.deposit_yocto || 0) > 0 ? "attaches the deposit below" : "attaches no deposit"} and is sent to the community contract on NEAR testnet. ${section === "Proposals" ? "A proposal bond is returned when the council decides." : ""} Nothing happens until you approve it in your wallet.`}
+      confirmLabel="Sign with wallet" onConfirm={() => void sign()} onCancel={() => setPendingCall(null)}/><Proof label="Contract arguments" value={pendingCall.args}/></div></section>}
     {capability && !enabled && <section className="card ph"><Note>{capability.reason}</Note></section>}
     {loading && <section className="card ph" role="status">Loading community records</section>}
-    {section === "Fund" ? <section className="card list-card"><div className="dpane"><div className="rows"><div className="row"><span className="two"><span>Fund balance</span><b>{data ? `${data.balance_near} NEAR` : "Unavailable"}</b></span></div><div className="row"><span className="two"><span>Available for improvements</span><b>{data?.available_near ? `${data.available_near} NEAR` : "Unavailable"}</b></span></div></div><h2 className="h3">Council</h2><div className="rows">{(config?.council || []).map((a: string) => <div className="row" key={a}>{a}</div>)}</div><Proof label="Council voting policy and bonds" value={config}/>{config?.rules?.map((r: Obj) => <Note key={r.id}>{r.reason}</Note>)}</div></section> : <>
-      <section className="card list-card"><div className="toolbar"><h2 className="list-title">{section}</h2>{section === "Issues" && <button className="primary-btn" disabled={!canWrite} onClick={() => { setCreating(!creating); setSelected(null); }}>Report a problem</button>}{section === "Proposals" && <button className="primary-btn" disabled={!canWrite || !auth.session} onClick={() => { setCreating(!creating); setSelected(null); }}>Create proposal</button>}</div><div className="dpane">{!loading && !items.length && <Note>No {section.toLowerCase()} yet.</Note>}<div className="rows">{items.map(item => <button className="row link-row" style={{textAlign:"left",width:"100%",background:"white",color:"inherit"}} key={item.id} onClick={() => void open(item)}><span className="two"><b>{title(item)}</b><span>{item.method_id || ""}{item.base_version ? `, version ${item.base_version}` : ""}</span></span><span className="tag">{statusLabel(item.chain_status || item.state) || (item.open ? "Open" : "Closed")}</span><span className="num">{item.amount?.display || item.budget?.display || ""}</span></button>)}</div>{cursor && <button className="view" disabled={!!busy} onClick={async()=>{setBusy("Loading more");try{const page=await backend<Obj>(`${endpoint}?cursor=${id(cursor)}`);setItems(old=>[...old,...list(page)]);setCursor(page.next_cursor||null);}catch(e){setError(e instanceof Error?e.message:"Could not load more records.");}finally{setBusy("");}}}>Load more</button>}</div></section>
+    {section === "Fund" ? <section className="card list-card"><div className="toolbar"><h2 className="list-title">Community fund</h2></div>
+      <TileGrid label="Community fund">
+        <Tile iconNode={<TileIcon name="coins"/>} chip={<Chip tone="blue">NEAR testnet</Chip>} title="Fund balance" desc="Part of each paid run goes here. The council uses it to pay for accepted method improvements." foot={<span className="mcard-price">{data ? `${data.balance_near} NEAR` : "Unavailable"}</span>}/>
+        <Tile iconNode={<TileIcon name="spark" color="#FF5F04"/>} chip={<Chip tone="orange">For bounties</Chip>} title="Available for improvements" desc="What is left after bounties already promised to contributors." foot={<span className="mcard-price">{data?.available_near ? `${data.available_near} NEAR` : "Unavailable"}</span>}/>
+        {(config?.council || []).map((a: string) => <Tile key={a} iconNode={<span className="avatar" aria-hidden="true">{a.slice(0, 1).toUpperCase()}</span>} chip={<Chip tone={auth.session?.account_id === a ? "pink" : "grey"}>{auth.session?.account_id === a ? "You" : "Council"}</Chip>} title={a} desc="Votes on funding proposals and reviews contributed fixes." />)}
+      </TileGrid>
+      <div className="dpane"><Proof label="Council voting policy and bonds" value={config}/>{config?.rules?.map((r: Obj) => <Note key={r.id}>{r.reason}</Note>)}</div></section> : <>
+      <section className="card list-card"><div className="toolbar"><h2 className="list-title">{section}</h2>{section === "Issues" && <button className="primary-btn" disabled={!canWrite} onClick={() => { setCreating(!creating); setSelected(null); }}>Report a problem</button>}{section === "Proposals" && <button className="primary-btn" disabled={!canWrite || !auth.session} onClick={() => { setCreating(!creating); setSelected(null); }}>Create proposal</button>}</div>
+        <TileGrid label={section}>
+          {loading && !items.length && <SkeletonTiles count={3}/>}
+          {!loading && !items.length && <StatePanel title={`No ${section.toLowerCase()} yet`} text={section === "Issues" ? "Report a problem with a method to start one." : section === "Proposals" ? "A proposal funds a fix for a reported issue." : "Bounties appear when the council approves a proposal."}/>}
+          {items.map(item => { const mid = methodIdentity(item.method_id); const st = item.chain_status || item.state; const status = st === "awaiting_signature" ? "Not signed yet" : statusLabel(st) || (item.open ? "Open" : "Closed");
+            return <Tile key={item.id} iconNode={item.method_id ? <TileIcon name={mid.icon} color={mid.color} ink={mid.ink}/> : <TileIcon name={section === "Issues" ? "info" : section === "Proposals" ? "people" : "spark"} color="#5c5c5c"/>}
+              chip={<Chip tone={/open|progress|voting|waiting/i.test(status) ? "orange" : /approved|funded|resolved/i.test(status) ? "blue" : /reject|fail|closed|expired/i.test(status) ? "grey" : undefined}>{status}</Chip>}
+              title={title(item)} desc={item.method_id ? `For ${methodTitle(item.method_id)}` : item.expected || item.note || item.acceptance_criteria?.[0]}
+              meta={[item.base_version || item.version ? `Version ${item.base_version || item.version}` : "", item.module ? `${item.module} part` : ""].filter(Boolean).slice(0, 2)}
+              foot={<><span className="mcard-price">{item.amount?.display || item.budget?.display || ""}</span><button className="view" disabled={!!busy} onClick={() => { void open(item); setTimeout(() => document.getElementById("record-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }), 300); }}>Details</button></>}/>; })}
+        </TileGrid>
+        {cursor && <div className="pager"><span>Showing {items.length}</span><button className="view" disabled={!!busy} onClick={async()=>{setBusy("Loading more");try{const page=await backend<Obj>(`${endpoint}?cursor=${id(cursor)}`);setItems(old=>[...old,...list(page)]);setCursor(page.next_cursor||null);}catch(e){setError(e instanceof Error?e.message:"Could not load more records.");}finally{setBusy("");}}}>Load more</button></div>}
+      </section>
       {creating && section === "Issues" && <IssueForm disabled={!canWrite} save={b => act("Reporting problem", "issues", b).then(r => { if(r) setCreating(false); })}/>}
       {creating && section === "Proposals" && <ProposalForm council={config?.council || []} disabled={!canWrite || !auth.session} save={b => act("Preparing proposal", "proposals", b).then(r => { if(r) setCreating(false); })}/>}
       {!auth.session && section !== "Issues" && <section className="card ph"><Note>Sign in with a NEAR account to propose, claim or submit paid work.</Note><button className="primary-btn" disabled={auth.busy} onClick={auth.signIn}>Sign in with NEAR</button></section>}
-      {selected && <section className="card list-card"><div className="toolbar"><h2 className="list-title">{title(selected)}</h2><button className="view" onClick={() => setSelected(null)}>Close details</button></div><div className="dpane">
-        <RecordFields record={selected}/>
+      {selected && <section className="card list-card" id="record-detail"><div className="toolbar"><h2 className="list-title">{title(selected)}</h2><button className="view" onClick={() => setSelected(null)}>Close details</button></div><div className="dpane">
+        <RecordFields record={selected} methodTitle={methodTitle}/>
         {section === "Issues" && <><Note>{selected.expected || "No expected outcome provided."}</Note><Proof label="Synthetic reproduction" value={selected.synthetic_reproduction}/>{selected.owner === principal && allowed(selected,"close") && <ReasonAction label="Close issue" disabled={!canWrite} onSubmit={reason => act("Closing issue",`issues/${id(selected.id)}/close`,{reason})}/>}{allowed(selected,"create_proposal") && <Link className="view" href={`/community/proposals?issue=${id(selected.id)}`}>Propose funding</Link>}</>}
         {section === "Proposals" && <><Proof label="Acceptance criteria and fixed evaluator" value={{acceptance_criteria:selected.acceptance_criteria,evaluator:selected.evaluator,reviewer:selected.reviewer}}/>{allowed(selected,"sign_add_proposal") && <button className="primary-btn" disabled={!canWrite || !auth.session} onClick={() => setPendingCall(selected.contract_call)}>Review and sign proposal</button>}<div className="nf-foot"><button className="view" disabled={!canWrite || !council || !allowed(selected,"vote_reject")} onClick={() => void act("Preparing vote",`proposals/${id(selected.id)}/vote`,{vote:"reject"},false)}>Reject proposal</button><button className="primary-btn" disabled={!canWrite || !council || !allowed(selected,"vote_approve")} onClick={() => void act("Preparing vote",`proposals/${id(selected.id)}/vote`,{vote:"approve"},false)}>Approve proposal</button></div>{!council && <Note>Only members of the DAO council can vote.</Note>}</>}
         {section === "Bounties" && <BountyDetail bounty={selected} enabled={enabled} council={council} busy={!!busy} act={act} onCall={setPendingCall}/>}
@@ -101,7 +127,9 @@ export function CommunityWorkspace({ section }: { section: Section }) {
     {section === "Bounties" && (privateCapability?.status === "enabled" || privateCapability?.status === "demo" ? <PrivateCases enabled={true} onError={setError}/> : <section className="card ph"><Note>{privateCapability?.reason || "Checking private-test availability."}</Note></section>)}
   </AppShell>;
 }
-function RecordFields({record}: {record:Obj}) { return <div className="rows">{["id","method_id","base_version","state","chain_status","reviewer","note"].filter(k => record[k] != null).map(k => <div className="row" key={k}><span className="two"><span>{({id:"Record",method_id:"Method",base_version:"Base version",state:"Status",chain_status:"Chain status",reviewer:"Reviewer",note:"Note"} as Obj)[k]}</span><b>{String(record[k])}</b></span></div>)}</div>; }
+function RecordFields({record, methodTitle = (x?: string | null) => x || ""}: {record:Obj; methodTitle?:(id?:string|null)=>string}) {
+  const show = (k: string) => k === "method_id" ? methodTitle(record[k]) : k === "state" || k === "chain_status" ? statusLabel(record[k]) : k === "budget" || k === "amount" ? record[k]?.display : String(record[k]);
+  return <div className="rows">{["method_id","base_version","module","budget","amount","state","chain_status","reviewer","note"].filter(k => record[k] != null && record[k] !== "").map(k => <div className="row" key={k}><span className="two"><span>{({method_id:"Method",base_version:"Base version",module:"Part of the method",budget:"Budget",amount:"Reward",state:"Status",chain_status:"Status on NEAR",reviewer:"Reviewer",note:"Note"} as Obj)[k]}</span><b>{show(k)}</b></span></div>)}</div>; }
 function IssueForm({disabled, save}: {disabled:boolean;save:(b:Obj)=>Promise<void>}) {
   const [v,setV] = useState({method_id:"",version:"",module:"core",problem:"",expected:"",synthetic_reproduction:""}); const [error,setError]=useState("");
   return <section className="card list-card"><div className="toolbar"><h2 className="list-title">Report a problem</h2></div><form className="nform" onSubmit={e => {e.preventDefault();setError("");try {void save({...v,version:v.version ? Number(v.version):undefined,synthetic_reproduction:v.synthetic_reproduction ? JSON.parse(v.synthetic_reproduction):null});}catch{setError("Use valid JSON for the synthetic reproduction.");}}}>{Object.entries(v).map(([k,value])=><Field key={k} label={({method_id:"Method ID",version:"Version, optional",module:"Module",problem:"What went wrong",expected:"Expected outcome",synthetic_reproduction:"Synthetic reproduction JSON, optional"} as Obj)[k]} value={value} required={["method_id","problem","expected"].includes(k)} multiline={["problem","expected","synthetic_reproduction"].includes(k)} onChange={s=>setV({...v,[k]:s})}/>)}<Note>Use fictional data only. Do not include your private inputs or the seller’s secret method.</Note>{error&&<p className="form-error">{error}</p>}<button className="primary-btn" disabled={disabled}>Report problem</button></form></section>;

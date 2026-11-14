@@ -9,6 +9,7 @@ import * as kc from "../lib/backend/crypto";
 import { runChecks } from "../lib/backend/checks";
 import { AppShell, icon } from "./shell";
 import { useNearAuth, type ContractCall } from "../lib/near/auth";
+import { WalletReview, walletError } from "./wallet-review";
 import { PreparationSources } from "./data-tools";
 import { Capability } from "./capability";
 import { PageInfo, Segmented, Dropdown } from "./controls";
@@ -57,6 +58,7 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
   const [promptConsent,setPromptConsent]=useState(false);
   const [operation,setOperation]=useState("");
   const [pendingCall,setPendingCall]=useState<ContractCall|null>(null);
+  const [reviewing,setReviewing]=useState<"pay"|"reclaim"|null>(null); const [walletErr,setWalletErr]=useState(""); const [walletBusy,setWalletBusy]=useState(false); const lastMode=useRef<"pay"|"reclaim">("pay"); useEffect(()=>{if(reviewing)lastMode.current=reviewing;},[reviewing]);
   const [events,setEvents]=useState<{phase:string;at:string;error?:string}[]>([]);
   const [aiCalls,setAiCalls]=useState<unknown[]>([]);
   const [eligibility,setEligibility]=useState<{eligible:boolean;message:string}|null>(null);
@@ -144,7 +146,7 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
     secrets.set(created.run_id, { sealed, input: input.o, version: v, manifest: m, completionKey: config.runner.completion_pubkey });
     setRunId(created.run_id); setChain(created.run || null); setPayTx(created.pay_tx_url || "");
     window.history.replaceState(null, "", `/runs/${encodeURIComponent(created.run_id)}`);
-    if(created.contract_call){setPendingCall(created.contract_call);await auth.signCalls([created.contract_call]);}
+    if(created.contract_call){setPendingCall(created.contract_call);setWalletErr("");setReviewing("pay");}
   });
 
   const execute = () => act("Running in the locked chip", async () => {
@@ -192,9 +194,15 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
 
   const reclaim = () => act("Taking payment back",async()=>{
     const r=await backend<{contract_call?:ContractCall;run?:typeof chain;tx_url?:string}>(`runs/${encodeURIComponent(runId)}/reclaim`,{idempotency_key:`reclaim-${runId}`});
-    if(r.contract_call)await auth.signCalls([r.contract_call]);
+    if(r.contract_call){setPendingCall(r.contract_call);setWalletErr("");setReviewing("reclaim");return;}
     setChain(await backend(`runs/${encodeURIComponent(runId)}`)); if(r.tx_url)setPayTx(r.tx_url);
   });
+  async function confirmWallet(){
+    if(!pendingCall)return; setWalletBusy(true); setWalletErr("");
+    try { await auth.signCalls([pendingCall]); setReviewing(null); if(runId) setChain(await backend(`runs/${encodeURIComponent(runId)}`)); }
+    catch(e){ setWalletErr(walletError(e)); }
+    finally { setWalletBusy(false); }
+  }
   const rate = () => act("Saving rating", async () => {
     if (!d || !eligibility?.eligible) throw new Error("This job is not eligible for a review.");
     await backend(`methods/${encodeURIComponent(d.method_id)}/reviews`, { run_id: runId, rating, comment: comment || undefined, privacy_acknowledged: true });
@@ -241,10 +249,15 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
               {quote && <div className="note-row">Method price split {quote.allocation_base.seller_pct}% expert, {quote.allocation_base.dao_pct}% community, {quote.allocation_base.platform_pct}% platform. Quote expires {new Date(quote.expires_at).toLocaleTimeString()}.</div>}
               <div className="row"><span className="two"><b>{v.price_amount?.display || `${v.price_near} NEAR`} held by the escrow contract</b><span>Released to the expert, the community fund and Kalis only if every step works. Otherwise you can reclaim it after the timeout.</span></span></div>
             </div>
-            <div className="nf-foot"><span className="note-row">{icon("info")}<span>Wallet payment requires your connected NEAR testnet account. A submitted payment is never retried automatically.</span></span><button className="primary-btn" disabled={!!busy || !consent || !!runId || !!paymentAttempt.current || (payment === "wallet" && !auth.session)} onClick={pay}>{icon("lock")}{busy || "Seal and pay"}</button></div>
+            <div className="nf-foot"><span className="note-row">{icon("info")}<span>Wallet payment requires your connected NEAR testnet account. A submitted payment is never retried automatically.</span></span><button className="primary-btn" disabled={!!busy || !consent || !!runId || !!paymentAttempt.current || (payment === "wallet" && !auth.session)} onClick={pay}>{icon("lock")}{busy || (payment === "wallet" ? "Seal and review payment" : "Seal and pay")}</button></div>
           </div>}
           {runId && !answer && secrets.has(runId) && <button className="view" disabled={!!busy} onClick={openExisting}>Open completed answer on this device</button>}
-          {pendingCall && chain?.status !== "Paid" && <div className="note-row"><div><p>Wallet payment is awaiting chain confirmation. Check its status before submitting another signature.</p><button className="view" disabled={!!busy} onClick={()=>act("Checking wallet payment",async()=>setChain(await backend(`runs/${encodeURIComponent(runId)}`)))}>Check payment status</button></div></div>}
+          {pendingCall && reviewing && <WalletReview call={pendingCall} signer={auth.session?.account_id} busy={walletBusy} error={walletErr}
+            title={reviewing === "pay" ? "Review your payment" : "Review taking your payment back"}
+            explanation={reviewing === "pay" ? `You are about to pay for one private run of ${d?.title || "this method"}, version ${v?.number ?? ""}. The money goes into the Kalis escrow contract, not to the expert. It is released only if every step succeeds, otherwise you can take it back after the timeout.` : "This asks the escrow contract to return your payment for this run to your account. It works only after the timeout has passed."}
+            onConfirm={() => void confirmWallet()} onCancel={() => { setReviewing(null); setWalletErr(""); }}/>}
+          {pendingCall && !reviewing && chain?.status !== "Paid" && chain?.status !== "Reclaimed" && <div className="note-row"><div><p>{walletErr || "The payment is prepared but not signed yet. Nothing has been paid."}</p><button className="primary-btn" disabled={walletBusy} onClick={() => setReviewing(lastMode.current)}>Review and sign</button></div></div>}
+          {pendingCall && !reviewing && chain?.status !== "Paid" && <div className="note-row"><div><p>If you already signed, the payment may still be confirming on chain. Check its status before signing again.</p><button className="view" disabled={!!busy} onClick={()=>act("Checking wallet payment",async()=>setChain(await backend(`runs/${encodeURIComponent(runId)}`)))}>Check payment status</button></div></div>}
           {!!paymentAttempt.current && !runId && <button className="view" onClick={recoverPayment} disabled={!!busy}>Check payment status</button>}
           {current === "Run" && <div className="dblock"><h2 className="h3">{busy ? "Running in the locked chip. This can take up to four minutes." : "Ready to run"}</h2>
             <ol className={`steps ${busy ? "live" : ""}`}>{(m.steps || []).map((s, i) => <li key={s.id} style={{ "--i": i } as React.CSSProperties}><span className="sn">{i + 1}</span><span>{s.what}</span></li>)}</ol>

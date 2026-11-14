@@ -751,3 +751,73 @@ svg.i { width: 20px; height: 20px; flex: none }
   & .empty-context-body p { margin:0; }
   & .empty-context-body .context-action { padding:0; }
 }
+/* Shared card grid for every list page (tiles.tsx). Same anatomy as the Marketplace card. */
+.reference .tgrid .mcard.tile { min-height: 0 }
+.reference .tgrid .mcard-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px }
+.reference .tile-icon { width: 44px; height: 44px; border-radius: 11px; flex: none }
+.reference .tile-icon svg { width: 22px; height: 22px }
+.reference .tchip.is-warn i { background: #F44A32 } .reference .tchip.is-orange i { background: #FF5F04 }
+.reference .tchip.is-pink i { background: #FF77CD } .reference .tchip.is-grey i { background: var(--muted) }
+.reference .tchip { max-width: 70%; overflow: hidden; text-overflow: ellipsis }
+.reference .tile .mcard-foot .view, .reference .tile .mcard-foot .primary-btn { flex: none }
+.reference .tile .mcard-foot .foot-left { font-size: 13px; font-weight: 600; color: var(--ink2); margin-right: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.reference .tile .tile-text { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.45; color: var(--ink); overflow-wrap: anywhere }
+.reference .tile .tile-code { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--page); border: 1px solid var(--line); font: 600 13px/1.45 var(--font-inter), sans-serif; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 132px; overflow: auto }
+.reference .tile .tile-warn { margin: 0; font-size: 13px; font-weight: 600; color: #B3261E }
+.reference .tile details summary { font-size: 13px; font-weight: 600; color: #0038FF; cursor: pointer }
+.reference .tile details pre { max-height: 160px; overflow: auto; font-size: 12px }
+.reference .tile.is-wide { grid-column: span 2 }
+@media (max-width: 640px) { .reference .tile.is-wide { grid-column: auto } }
+.reference .add-cell { display: flex; min-width: 0 }
+.reference .add-tile { flex: 1; min-height: 190px; align-items: flex-start; justify-content: center; gap: 8px; border: 1.5px dashed var(--line2); background: var(--card); color: var(--ink); text-decoration: none; text-align: left; font: inherit; cursor: pointer }
+.reference .add-tile b { font-size: 17px; font-weight: 700 }
+.reference .add-tile > span:last-child { font-size: 13.5px; font-weight: 500; color: var(--ink2); line-height: 1.45 }
+.reference .add-tile:disabled { cursor: not-allowed; opacity: .6 }
+.reference .add-plus { width: 44px; height: 44px; border-radius: 11px; display: grid; place-items: center; background: #0038FF; color: #fff }
+.reference .add-plus svg { width: 22px; height: 22px }
+.reference .add-tile:hover .add-plus { transform: rotate(90deg); transition: transform .25s }
+.reference .tile-skeleton { min-height: 220px; gap: 12px }
+.reference .tile-skeleton span { display: block; height: 14px; border-radius: 6px; background: var(--line) }
+.reference .tile-skeleton span:first-child { width: 44px; height: 44px; border-radius: 11px }
+.reference .tile-skeleton span:nth-child(2) { width: 70% ; height: 18px } .reference .tile-skeleton span:nth-child(3) { width: 90% } .reference .tile-skeleton span:nth-child(4) { width: 50%; margin-top: auto }
+@media (prefers-reduced-motion: no-preference) { .reference .tile-skeleton span { animation: tile-pulse 1.4s ease-in-out infinite } }
+@keyframes tile-pulse { 50% { opacity: .45 } }
+.reference .state-panel { grid-column: 1 / -1; display: flex; gap: 12px; align-items: flex-start; padding: 16px 18px; border-radius: 12px; background: var(--page); border: 1px solid var(--line) }
+.reference .state-panel > svg { width: 20px; height: 20px; flex: none; color: #0038FF; margin-top: 2px }
+.reference .state-panel.is-error > svg { color: #B3261E }
+.reference .state-panel b { font-size: 15px; font-weight: 700 } .reference .state-panel p { margin: 4px 0 0; font-size: 14px; font-weight: 500; color: var(--ink2) }
+.reference .state-action { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap }
+.reference .step-track { display: grid; gap: 6px }
+.reference .step-bars { display: flex; gap: 4px }
+.reference .step-bars i { flex: 1; height: 6px; border-radius: 3px; background: var(--line) }
+.reference .step-bars i.on { background: #0038FF } .reference .step-bars i.bad { background: #F44A32 }
+@media (prefers-reduced-motion: no-preference) { .reference .step-bars i.on:last-of-type { transition: background .4s } .reference .tile.is-live .step-bars i.on + i:not(.on):not(.bad) { animation: tile-pulse 1.2s ease-in-out infinite; background: #9FA9F5 } }
+.reference .step-track span, .reference .step-track-note { font-size: 13px; font-weight: 600; color: var(--ink2) }
+/* Summary figures above a long history (Activity, Account payments) */
+.reference .sum-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; padding: 14px 14px 0 }
+.reference .sum-cell { padding: 12px 14px; border: 1px solid var(--line2); border-radius: 12px; background: var(--card) }
+.reference .sum-cell small { display: block; font-size: 13px; font-weight: 600; color: var(--ink2) }
+.reference .sum-cell b { display: block; margin-top: 2px; font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums }
+/* Day cards: one card per day, compact lines inside */
+.reference .day-card .day-lines { display: grid; gap: 0; margin: 0; padding: 0; list-style: none }
+.reference .day-lines li { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 7px 0; border-top: 1px solid var(--line); font-size: 13.5px; font-weight: 600 }
+.reference .day-lines li:first-child { border-top: 0 }
+.reference .day-lines li svg { width: 16px; height: 16px; color: #0038FF }
+.reference .day-lines li .line-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.reference .day-lines li em { font-style: normal; font-weight: 600; color: var(--ink2); font-size: 12.5px; white-space: nowrap; font-variant-numeric: tabular-nums }
+.reference .pager { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-top: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--ink2) }
+.reference .pager > div { display: flex; gap: 8px }
+/* Wallet review panel, shown before any wallet window opens */
+.reference .wreview { display: grid; gap: 14px; padding: 18px; border: 1px solid #0038FF; border-radius: 14px; background: var(--card); margin: 12px 0 }
+.reference .wreview-head { display: flex; gap: 12px; align-items: flex-start }
+.reference .wreview-head h2 { margin: 0; font-size: 17px; font-weight: 700 } .reference .wreview-head p { margin: 4px 0 0; font-size: 14px; font-weight: 500; color: var(--ink2); line-height: 1.5 }
+.reference .wreview-ic { width: 40px; height: 40px; flex: none; border-radius: 10px; background: #0038FF; color: #fff; display: grid; place-items: center } .reference .wreview-ic svg { width: 20px; height: 20px }
+.reference .wreview-rows { display: grid; border: 1px solid var(--line); border-radius: 12px; overflow: hidden }
+.reference .wreview-row { display: grid; grid-template-columns: 18px 120px minmax(0, 1fr); gap: 10px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); font-size: 14px }
+.reference .wreview-row:first-child { border-top: 0 } .reference .wreview-row svg { width: 16px; height: 16px; color: #0038FF }
+.reference .wreview-row span { font-weight: 600; color: var(--ink2) } .reference .wreview-row b { font-weight: 700; overflow-wrap: anywhere }
+@media (max-width: 560px) { .reference .wreview-row { grid-template-columns: 18px minmax(0, 1fr) } .reference .wreview-row b { grid-column: 2 } }
+.reference .wreview-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px } .reference .wreview-foot span { flex: 1 1 240px; font-size: 13px; font-weight: 600; color: var(--ink2) }
+.reference .tile.is-full { grid-column: 1 / -1 }
+.reference .tile.is-full .day-lines { grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); column-gap: 28px }
+.reference .tile.is-full .day-lines li:nth-child(-n+3) { border-top: 0 }
