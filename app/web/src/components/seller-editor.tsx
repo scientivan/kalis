@@ -223,7 +223,7 @@ export function SellerEditor({ id, onClose, onChanged }: { id: string; onClose: 
       <FieldList title="The Buyer Gets Back" note="Opened only on the buyer's device." fields={outputs} locked={locked} onChange={(i, k, v) => setFieldProp("outputs", i, k, v)} />
       <section className="se-box se-span se-checkbox">
         <header><b>{icon("shield")}Checks on the Buyer's Device</b><span>{checks.length ? `${checks.length} rules run after the answer opens, so the buyer can trust it without trusting you.` : "No checks yet. Buyers trust methods with checks more."}</span></header>
-        {!!checks.length && <div className="se-checks">{checks.map(c => <span key={c.id}>{icon("check")}{c.description || c.id}</span>)}</div>}
+        {!!checks.length && <ol className="cl-checks cl-checks3">{checks.map((c, i) => <li key={c.id}><span className="cl-n">{i + 1}</span><span>{c.description || c.id}</span></li>)}</ol>}
       </section>
     </div>,
     price: <div className="se-split">

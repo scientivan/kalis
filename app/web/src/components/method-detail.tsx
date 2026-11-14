@@ -36,11 +36,16 @@ const TABS = ["Overview", "Inputs", "Checks", "Versions", "Reviews"];
 const nameOf = (d: Detail, m: Manifest) => (m.listing?.seller?.display_name || d.owner).replace(/\s*\(demo seller\)/i, "");
 const dateOf = (ns?: string) => ns ? new Date(Number(BigInt(ns) / 1000000n)).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "Unknown date";
 const short = (h: string) => `${h.slice(0, 8)}…${h.slice(-6)}`;
+const TYPES: Record<string, string> = { array: "List", object: "Group of values", money: "Amount", number: "Number", integer: "Whole number", percent: "Percent", string: "Text", text: "Long text", boolean: "Yes or no", enum: "Choice", date: "Date" };
+const typeText = (f: Field) => `${TYPES[f.type || "string"] || f.type}${f.unit ? ` in ${f.unit}` : ""}`;
+// Chain notes were written as fragments ending in "."; drop the doubled punctuation before ", with".
+const cleanNote = (n?: string) => (n || "").replace(/\.,/g, ",").trim();
+const Stars = ({ n }: { n: number }) => <span className="cl-stars" role="img" aria-label={`${n} out of 5`}>{[1, 2, 3, 4, 5].map(i => <svg key={i} viewBox="0 0 20 20" className={i <= n ? "on" : ""} aria-hidden="true"><path d="M10 1.8l2.5 5.2 5.7.8-4.1 4 1 5.6L10 14.7l-5.1 2.7 1-5.6-4.1-4 5.7-.8z" /></svg>)}</span>;
 const kindOf = (v: Version) => v.method_kind?.kind === "prompt" ? "Prompt" : /AI/.test(v.method_kind?.label || "") ? "Program + AI" : "Program";
 
 export function MethodDetail({ id, tab }: { id: string; tab?: string }) {
   const router = useRouter();
-  const [d, setD] = useState<Detail | null>(null);
+  const [d, setD] = useState<Detail | null>(null); const [showAll, setShowAll] = useState(false);
   const [cover, setCover] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -91,23 +96,31 @@ export function MethodDetail({ id, tab }: { id: string; tab?: string }) {
               {!m.ai?.allowed?.length && !m.connectors?.length && !m.outbound?.length && !m.browser?.enabled && !m.memory?.read && <span className="use">{icon("lock")}Only the inputs you give it</span>}
             </div></div>
           </>}
-          {current === "Inputs" && <>
-            <div className="dblock"><h2 className="h3">You provide</h2><div className="rows">{(m.inputs?.fields || []).map(f => <div className="row" key={f.id}><span className="two"><b>{f.label}</b><span>{f.help || (f.type ? `${f.type}${f.unit ? ` in ${f.unit}` : ""}` : "")}</span></span><span className={`tag ${f.required ? "req" : ""}`}>{f.required ? "Required" : "Optional"}</span></div>)}</div></div>
-            <div className="dblock"><h2 className="h3">You get back</h2><div className="rows">{(m.outputs?.fields || []).map(f => <div className="row" key={f.id}><span className="two"><b>{f.label}</b><span>{f.type}{f.unit ? ` in ${f.unit}` : ""}</span></span></div>)}</div></div>
-          </>}
-          {current === "Checks" && <div className="dblock"><h2 className="h3">{m.buyer_checks?.length || 0} rules your device checks after the answer opens</h2><div className="rows">{(m.buyer_checks || []).map(c => <div className="row" key={c.id}><span className="okdot" aria-hidden="true">{icon("check")}</span><span className="two"><b>{c.description}</b></span></div>)}</div></div>}
-          {current === "Versions" && <div className="dblock"><h2 className="h3">{d.versions.length} published versions</h2><div className="rows">{[...d.versions].reverse().map(x => <div className="row ver" key={x.number}>
-            <span className="vn">v{x.number}</span>
-            <span className="two"><b>{dateOf(x.published_at_ns)}, {x.price_amount?.display || `${x.price_near} NEAR`}</b><span>{x.note || (x.parent ? `Builds on version ${x.parent}` : "First version")}{x.contributors?.length ? `, with ${x.contributors.join(", ")}` : ""}</span></span>
-            <span className="hash" title={`Code ${x.code_hash}\nManifest ${x.manifest_hash}`}>{short(x.code_hash)}</span>
-            {!x.runnable && <span className="tag">Not runnable</span>}
-          </div>)}</div></div>}
-          {current === "Reviews" && <div className="dblock">
-            <h2 className="h3">{summary?.average != null ? `${summary.average.toFixed(1)} out of 5 from ${summary.count} buyers` : "No ratings yet"}</h2>
-            {summary && summary.count > 0 && <div className="dist">{[5, 4, 3, 2, 1].map(n => { const c = summary.distribution[String(n)] || 0; return <div className="drow" key={n}><span>{n}</span><span className="dbar"><i style={{ width: summary.count ? `${(c / summary.count) * 100}%` : "0%" }} /></span><span>{c}</span></div>; })}</div>}
-            {reviews && !reviews.length && <div className="note-row">{icon("info")}<span>Only buyers who ran this method can rate it. Ratings are separate from the seller’s own tests.</span></div>}
-            <div className="rows">{(reviews || []).map(r => <div className="row" key={r.id}><span className="stars" aria-label={`${r.rating} out of 5`}>{"★".repeat(r.rating)}<em>{"★".repeat(5 - r.rating)}</em></span><span className="two"><b>{r.comment || "No comment"}</b><span>{new Date(r.created_at).toLocaleDateString("en-GB")}{r.version ? `, version ${r.version}` : ""}</span></span></div>)}</div>
+          {current === "Inputs" && <div className="cl-cols">
+            <section className="cl-group"><header><h2 className="h3">You Provide</h2><span>{(m.inputs?.fields || []).length} values. Locked ones are sealed on your device and never seen by the seller.</span></header>
+              <ul className="cl-grid">{(m.inputs?.fields || []).map(f => <li key={f.id} className="cl-item" title={f.help || undefined}>
+                <span className={`cl-ico ${f.private ? "on" : ""}`} aria-label={f.private ? "Private" : "Not private"}>{icon(f.private ? "lock" : "file")}</span>
+                <span className="cl-t"><b>{f.label}</b><span>{typeText(f)}{f.required ? "" : ", optional"}</span></span></li>)}</ul></section>
+            <section className="cl-group"><header><h2 className="h3">You Get Back</h2><span>{(m.outputs?.fields || []).length} values, opened only on your device.</span></header>
+              <ul className="cl-grid one">{(m.outputs?.fields || []).map(f => <li key={f.id} className="cl-item"><span className="cl-ico out">{icon("spark")}</span><span className="cl-t"><b>{f.label}</b><span>{typeText(f)}</span></span></li>)}</ul></section>
           </div>}
+          {current === "Checks" && <section className="cl-group"><header><h2 className="h3">{m.buyer_checks?.length || 0} Rules Your Device Checks</h2><span>They run after the answer opens, so you can trust the result without trusting the seller.</span></header>
+            <ol className="cl-checks">{(m.buyer_checks || []).map((c, i) => <li key={c.id}><span className="cl-n">{i + 1}</span><span>{c.description}</span></li>)}</ol></section>}
+          {current === "Versions" && <section className="cl-group"><header><h2 className="h3">{d.versions.length} Published Versions</h2><span>Every version keeps its own fingerprint on NEAR. New runs use the latest one.</span></header>
+            <ol className="cl-timeline">{[...d.versions].reverse().slice(0, showAll ? undefined : 3).map((x, i) => <li key={x.number} className={i === 0 ? "now" : ""}>
+              <span className="cl-v">v{x.number}</span>
+              <div className="cl-vb"><div className="cl-vh"><b>{dateOf(x.published_at_ns)}</b><span>{x.price_amount?.display || `${x.price_near} NEAR`}</span>{i === 0 && <span className="kchip">Current</span>}{!x.runnable && <span className="kchip">Not runnable</span>}<code className="hash" title={`Code ${x.code_hash}\nManifest ${x.manifest_hash}`}>{short(x.code_hash)}</code></div>
+                <p>{cleanNote(x.note) || (x.parent ? `Builds on version ${x.parent}.` : "First version.")}</p>
+                {!!x.contributors?.length && <span className="cl-who">{icon("people")}Improved with {x.contributors.join(", ")}</span>}</div>
+            </li>)}</ol>
+            {d.versions.length > 3 && <button type="button" className="view cl-more" onClick={() => setShowAll(v => !v)}>{showAll ? "Show fewer" : `Show ${d.versions.length - 3} older versions`}</button>}</section>}
+          {current === "Reviews" && <section className="cl-group">
+            <div className="cl-rev-head"><div className="cl-score"><b>{summary?.average != null ? summary.average.toFixed(1) : "None"}</b><Stars n={Math.round(summary?.average || 0)} /><span>{summary?.count ? `${summary.count} ${summary.count === 1 ? "buyer" : "buyers"}` : "No ratings yet"}</span></div>
+              {summary && summary.count > 0 && <div className="dist">{[5, 4, 3, 2, 1].map(n => { const c = summary.distribution[String(n)] || 0; return <div className="drow" key={n}><span>{n}</span><span className="dbar"><i style={{ width: summary.count ? `${(c / summary.count) * 100}%` : "0%" }} /></span><span>{c}</span></div>; })}</div>}</div>
+            {reviews && !reviews.length && <div className="note-row">{icon("info")}<span>Only buyers who ran this method can rate it. Ratings are separate from the seller’s own tests.</span></div>}
+            <ul className="cl-reviews">{(reviews || []).map(r => <li key={r.id}><div className="cl-rh"><Stars n={r.rating} /><span>{new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}{r.version ? `, version ${r.version}` : ""}</span></div>
+              <p className={r.comment ? "" : "muted"}>{r.comment || "Rated without a comment."}</p></li>)}</ul>
+          </section>}
         </div>
       </section>
       <aside className="card dside" aria-label="Price and seller">

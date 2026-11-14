@@ -1025,3 +1025,65 @@ svg.i { width: 20px; height: 20px; flex: none }
 .reference .se-form6 { grid-template-columns:repeat(6,minmax(0,1fr)) }
 .reference .se-form6 .s2 { grid-column:span 2 } .reference .se-form6 .s3 { grid-column:span 3 }
 @media (max-width:720px) { .reference .se-form6 { grid-template-columns:1fr } .reference .se-form6 .s2, .reference .se-form6 .s3 { grid-column:auto } }
+
+/* Compact lists on the method page (inputs, checks, versions, reviews): one container, dense rows, no box per item. */
+.reference .cl-cols { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:16px; align-items:start }
+.reference .cl-group { display:grid; gap:12px; align-content:start; min-width:0 }
+.reference .cl-group > header { display:grid; gap:2px }
+.reference .cl-group > header .h3 { margin:0 }
+.reference .cl-group > header > span { font-size:13px; font-weight:500; color:var(--muted); line-height:1.4 }
+.reference .cl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); margin:0; padding:0; list-style:none; border:1px solid var(--line2); border-radius:12px; overflow:hidden; background:var(--line) ; gap:1px }
+.reference .cl-grid.one { grid-template-columns:1fr }
+.reference .cl-item { display:flex; align-items:center; gap:10px; padding:10px 12px; background:#fff; min-width:0 }
+.reference .cl-ico { display:grid; place-items:center; flex:none; width:28px; height:28px; border-radius:8px; background:#f2f2f2; color:var(--muted) }
+.reference .cl-ico svg { width:15px; height:15px }
+.reference .cl-ico.on { background:#eef1ff; color:var(--blue) }
+.reference .cl-ico.out { background:#fff3e8; color:var(--orange) }
+.reference .cl-t { display:grid; min-width:0 }
+.reference .cl-t b { font-size:14px; font-weight:650; line-height:1.3 }
+.reference .cl-t span { font-size:12.5px; font-weight:500; color:var(--muted) }
+.reference .cl-checks { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px; margin:0; padding:0; list-style:none; border:1px solid var(--line2); border-radius:12px; overflow:hidden; background:var(--line) }
+.reference .cl-checks li { display:flex; align-items:center; gap:12px; padding:12px 14px; background:#fff; font-size:14px; font-weight:550; line-height:1.4; color:var(--ink) }
+.reference .cl-checks li:nth-last-child(1):nth-child(odd) { grid-column:1 / -1 }
+.reference .cl-n { display:grid; place-items:center; flex:none; width:24px; height:24px; border-radius:50%; background:#eef1ff; color:var(--blue); font-size:12px; font-weight:700; font-variant-numeric:tabular-nums }
+.reference .cl-timeline { display:grid; margin:0; padding:0; list-style:none; border:1px solid var(--line2); border-radius:12px; overflow:hidden }
+.reference .cl-timeline li { display:grid; grid-template-columns:44px minmax(0,1fr); gap:12px; padding:12px 14px; background:#fff; border-top:1px solid var(--line) }
+.reference .cl-timeline li:first-child { border-top:0 }
+.reference .cl-timeline li.now { background:#f6f8ff }
+.reference .cl-v { display:grid; place-items:center; height:28px; border-radius:8px; background:#f2f2f2; font-size:13px; font-weight:700; color:var(--ink2) }
+.reference .now .cl-v { background:var(--blue); color:#fff }
+.reference .cl-vb { display:grid; gap:4px; min-width:0 }
+.reference .cl-vh { display:flex; align-items:center; gap:10px; flex-wrap:wrap }
+.reference .cl-vh b { font-size:14px; font-weight:700 }
+.reference .cl-vh > span:not(.kchip) { font-size:13px; font-weight:600; color:var(--ink2) }
+.reference .cl-vh .hash { margin-left:auto; font-size:12px; color:var(--muted) }
+.reference .cl-vb p { margin:0; font-size:13px; font-weight:500; color:var(--ink2); line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden }
+.reference .cl-who { display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--muted) }
+.reference .cl-who svg { width:14px; height:14px }
+.reference .cl-more { justify-self:start }
+.reference .cl-rev-head { display:grid; grid-template-columns:auto minmax(0,1fr); gap:24px; align-items:center; padding:14px 16px; border:1px solid var(--line2); border-radius:12px; background:#fff }
+.reference .cl-score { display:grid; justify-items:start; gap:4px }
+.reference .cl-score b { font-size:32px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums }
+.reference .cl-score > span:last-child { font-size:12.5px; font-weight:600; color:var(--muted) }
+.reference .cl-stars { display:inline-flex; gap:2px }
+.reference .cl-stars svg { width:15px; height:15px; fill:#d9d9d9 }
+.reference .cl-stars svg.on { fill:var(--blue) }
+.reference .cl-reviews { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px; margin:0; padding:0; list-style:none }
+.reference .cl-reviews li { display:grid; gap:8px; align-content:start; padding:12px 14px; border:1px solid var(--line2); border-radius:12px; background:#fff }
+.reference .cl-rh { display:flex; align-items:center; justify-content:space-between; gap:10px }
+.reference .cl-rh > span:last-child { font-size:12.5px; font-weight:600; color:var(--muted) }
+.reference .cl-reviews p { margin:0; font-size:14px; font-weight:550; line-height:1.45; color:var(--ink) }
+.reference .cl-reviews p.muted { color:var(--muted); font-weight:500 }
+@media (max-width:900px) { .reference .cl-cols, .reference .cl-checks, .reference .cl-rev-head { grid-template-columns:1fr } }
+.reference .cl-grid::after { content:""; background:#fff }
+.reference .se-box > header:has(+ .cl-checks) { display:grid; gap:2px }
+.reference .cl-checks3 { grid-template-columns:repeat(3,minmax(0,1fr)) }
+.reference .cl-checks3 li { padding:9px 12px; font-size:13px }
+.reference .cl-checks3 li:nth-last-child(1):nth-child(odd) { grid-column:auto }
+.reference .cl-checks3::after { content:""; background:#fff }
+@media (max-width:1100px) { .reference .cl-checks3 { grid-template-columns:repeat(2,minmax(0,1fr)) } }
+.reference .se-checkbox > header { display:grid !important; gap:2px !important; align-items:start !important }
+/* Divider lines drawn on each cell, so empty trailing cells stay white instead of showing the gap colour. */
+.reference .cl-grid, .reference .cl-checks { background:#fff; gap:0 }
+.reference .cl-grid > li, .reference .cl-checks > li { box-shadow:inset -1px -1px 0 var(--line) }
+.reference .cl-grid::after, .reference .cl-checks3::after { content:none }
