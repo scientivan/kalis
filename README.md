@@ -111,6 +111,6 @@ The optional smoke script performs a paid testnet run and consumes configured fu
 - Full wallet publication/payment/community E2E, mobile behavior and accessibility were not reverified by this documentation audit.
 - Model proprietary routing, real fiat top-up, custodial balances, trial/licensing/royalties and quality-dispute policy are not implemented or remain undecided.
 - The nominated reviewer in a proposal is not enforced exclusively by the current review handler, which accepts another council member who is not the contributor. Grant revocation while testing withholds results in code, but that policy was previously still a proposal.
-- No public deployment or DNS activation has been completed in this work. Dien postponed deployment. The planned landing and app domains are calis.scientivan.dev and app.calis.scientivan.dev.
+- Deployment (15 Nov 2026): backend at https://api.kalis.scientivan.dev (VPS, systemd + Caddy) and the app at https://app.kalis.scientivan.dev (Vercel). https://kalis.scientivan.dev temporarily redirects to the app until a landing page is designed. Public HTTPS is live only after the Cloudflare DNS records in app/web/DEPLOYMENT.md exist; end-to-end checks on the public hosts are not verified yet.
 
 API contract is app/backend/API.md. Manifest format is app/methods/MANIFEST_V5.md. Current decisions and reconciliation are in RANCANGAN_PRODUK.md section 0 and 70, CURRENT_STATE.md and DOCUMENTATION_INDEX.md.

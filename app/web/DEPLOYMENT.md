@@ -1,34 +1,72 @@
 # Domain dan hosting Kalis
 
-Status terbaru 14 November 2026. Dien menunda deployment dan DNS. Jangan meminta ulang aktivasi selama pembahasan sinkronisasi dokumen dan Social Money. Persiapan di bawah disimpan untuk nanti.
+Status 15 November 2026. Backend dan frontend sudah di-deploy. DNS di Cloudflare ditambahkan Dien sendiri. Ejaan domain memakai Kalis dengan K (`kalis.scientivan.dev`), menggantikan rencana lama `calis`.
 
-Keputusan Dien, 14 November 2026. Nama domain memakai ejaan `calis`, sedangkan nama produk tetap Kalis.
-
-| Tujuan | URL | Sumber |
+| Host | Tujuan | Sumber |
 |---|---|---|
-| Landing page | https://calis.scientivan.dev | Proyek landing terpisah, belum dibuat dalam pekerjaan ini |
-| Aplikasi | https://app.calis.scientivan.dev | `app/web` |
+| https://kalis.scientivan.dev | Landing (sementara redirect ke aplikasi) | Proyek Vercel `kalis`, `app/web` |
+| https://app.kalis.scientivan.dev | Aplikasi | Proyek Vercel `kalis`, `app/web` |
+| https://api.kalis.scientivan.dev | Backend API | VPS `tinjau-vps` (15.235.146.33) |
 
-## Konfigurasi aplikasi
+Domain apex `scientivan.dev` tidak dipasang ke proyek ini karena dipakai website utama Dien.
 
-Gunakan proyek Vercel khusus aplikasi dengan framework Next.js. Jika mengimpor repo Product, set Root Directory ke `app/web`. Jika deploy dari CLI, jalankan dari folder `app/web`. Jangan mengatur keduanya sehingga path berulang. `vercel.json` menyediakan perintah install dan build. Tidak perlu basePath atau rewrite untuk memindahkan aplikasi ke subdomain. Halaman utama tetap marketplace dan seluruh path yang ada tetap berlaku.
+## Redirect landing sementara
 
-Set variabel server `KALIS_BACKEND_URL` ke origin HTTPS backend yang dapat dijangkau Vercel, tanpa slash penutup. URL publik backend belum diberikan. Default kode `http://127.0.0.1:8787` hanya untuk development lokal dan tidak mengarah ke komputer Dien dari Vercel. Jangan memakai prefix NEXT_PUBLIC untuk rahasia. Backend tetap memerlukan host persisten sendiri beserta konfigurasi dan penyimpanan yang sudah ditetapkan backend.
+Landing page belum dirancang. `app/web/src/proxy.ts` (proxy Next.js 16, dulu bernama middleware) mengalihkan semua permintaan dengan host `kalis.scientivan.dev` ke path yang sama di `https://app.kalis.scientivan.dev` dengan status 307. Status 307 dipilih supaya browser tidak menyimpan redirect secara permanen. Hapus atau ganti blok ini saat landing yang disetujui Dien dibangun.
 
-Browser mengakses API melalui `/api/backend` pada origin aplikasi. Proxy meneruskan permintaan ke backend. Tidak diperlukan pemindahan browser ke origin API atau pelonggaran pemeriksaan origin.
+## Frontend (Vercel)
 
-## Domain dan DNS
+Proyek Vercel `kalis` di tim `blacknwhite03s-projects`, framework Next.js, deploy dari folder `app/web` lewat CLI. Kedua domain terpasang dan sudah terverifikasi kepemilikannya, tanpa TXT.
 
-Pemeriksaan read-only Vercel menemukan domain scientivan.dev di akun yang tersedia. Nameserver aktif adalah Cloudflare, boyd.ns.cloudflare.com dan eva.ns.cloudflare.com. Belum ada proyek Calis yang terlihat pada halaman pertama daftar proyek Vercel. Tidak ada proyek yang dibuat, domain yang dipasang atau record DNS yang diubah dalam pekerjaan ini.
+Variabel server produksi `KALIS_BACKEND_URL=https://api.kalis.scientivan.dev` (tanpa slash penutup). Browser memanggil `/api/backend` di origin aplikasi, lalu proxy Next.js meneruskan ke backend. Jangan memakai prefix NEXT_PUBLIC untuk rahasia, dan jangan set `NEXT_PUBLIC_KALIS_PRIVATE_DEV` di produksi.
 
-Saat aktivasi, pasangkan hanya `app.calis.scientivan.dev` ke proyek aplikasi. Pasangkan `calis.scientivan.dev` ke proyek landing setelah landing siap. Jangan menambahkan domain apex scientivan.dev ke proyek ini karena sudah dipakai website utama.
+Redeploy frontend:
 
-Tambahkan record CNAME eksplisit di Cloudflare. Nama relatifnya adalah `app.calis` untuk aplikasi dan `calis` untuk landing. Ambil target masing-masing dari Settings → Domains pada proyek Vercel yang sesuai. Jangan menebak target atau menyalin target proyek lain. Gunakan DNS only saat verifikasi awal. Ikuti instruksi TXT jika Vercel meminta verifikasi kepemilikan. Kedua hostname harus tercantum eksplisit di Vercel, termasuk untuk penerbitan TLS.
+```bash
+cd app/web && npm test && npm run build && vercel deploy --prod --yes
+```
 
-Rujukan resmi [Vercel custom domain](https://vercel.com/docs/domains/working-with-domains/add-a-domain) dan [Vercel DNS](https://vercel.com/docs/domains/managing-dns-records).
+URL `*.vercel.app` dilindungi Vercel Deployment Protection (302 ke login). Gunakan `vercel curl <path> --deployment <url>` untuk mengeceknya.
 
-## Verifikasi setelah aktivasi
+## Backend (VPS)
 
-Buka root aplikasi dan /marketplace pada HTTPS. Pastikan /api/backend/api/health memberi respons backend sehat, lalu periksa navigasi dan login tanpa menandatangani transaksi. Pastikan origin asing tetap ditolak pada mutasi API. Jangan menjalankan smoke berbayar tanpa otorisasi yang sesuai. Periksa landing menuju aplikasi lewat URL absolut https://app.calis.scientivan.dev.
+VPS Ubuntu 26.04 yang juga menjalankan Tinjau dan SimpleArt. Kalis berdiri sendiri dan tidak mengubah layanan lain.
 
-Status saat ini adalah persiapan lokal. Aktivasi publik belum dijalankan. Bagian 52 rancangan mensyaratkan konfirmasi Dien sebelum deploy publik. Domain/DNS dan backend publik belum terverifikasi end-to-end.
+| Bagian | Lokasi |
+|---|---|
+| Kode | `/opt/kalis/app/backend` dan `/opt/kalis/app/methods` (milik user sistem `kalis`) |
+| Data persisten | `/var/lib/kalis/data` (`KALIS_DATA_DIR`) |
+| Env rahasia | `/etc/kalis/backend.env` (root, 600) |
+| Service | `/etc/systemd/system/kalis-backend.service`, port 8790 |
+| Reverse proxy | blok `api.kalis.scientivan.dev` di `/etc/caddy/Caddyfile` (cadangan `Caddyfile.before-kalis-20261115`) |
+
+Caddy mengurus TLS otomatis (Let's Encrypt) setelah DNS mengarah ke VPS, jadi certbot tidak dipakai. Port 8790 tidak dibuka di UFW, hanya 80/443 yang publik. Node 24 dari sistem dan `pdftotext` (poppler-utils) terpasang.
+
+Env produksi memakai `PORT=8790`, `PUBLIC_BASE=https://api.kalis.scientivan.dev`, `CORS_ORIGIN=https://app.kalis.scientivan.dev`, `KALIS_DATA_DIR=/var/lib/kalis/data`, ditambah rahasia dari `app/backend/.env` dan `Product/.env`. `KALIS_LOCAL_RUNNER` dan `KALIS_PRIVATE_LOCAL_RUNNER` sengaja tidak diset karena keduanya hanya untuk development.
+
+Redeploy backend dari komputer Dien (data di VPS tidak ditimpa):
+
+```bash
+cd app
+rsync -az --delete --exclude node_modules --exclude .env --exclude data backend/ tinjau-vps:/opt/kalis/app/backend/
+rsync -az --delete --exclude node_modules methods/ tinjau-vps:/opt/kalis/app/methods/
+ssh tinjau-vps 'cd /opt/kalis/app/backend && sudo chown -R ubuntu /opt/kalis/app && npm ci --omit=dev && sudo chown -R kalis:kalis /opt/kalis && sudo systemctl restart kalis-backend'
+```
+
+Log: `ssh tinjau-vps 'sudo journalctl -u kalis-backend -f'`.
+
+Saat `PRIVATE_RUNNER_HASH` di `app/backend/src/private-release.js` atau `app/web/src/lib/backend/private-release.js` berubah, redeploy backend dan frontend.
+
+## DNS Cloudflare (semua DNS only)
+
+| Tipe | Nama | Target |
+|---|---|---|
+| A | `api.kalis` | `15.235.146.33` |
+| CNAME | `kalis` | `f75e3a34f78a66ed.vercel-dns-017.com` |
+| CNAME | `app.kalis` | `f75e3a34f78a66ed.vercel-dns-017.com` |
+
+## Verifikasi
+
+Sudah: `curl localhost:8790/api/health` di VPS sehat, `/api/privacy/config` memberi `mode: tee`, `enabled: true`, runner hash `457e260c…`. Build Vercel produksi Ready, halaman `/` memberi 200 lewat `vercel curl`. Redirect host landing diuji lokal dengan `next start`.
+
+Setelah DNS aktif: buka https://api.kalis.scientivan.dev/api/health, https://app.kalis.scientivan.dev/api/backend/api/health, https://app.kalis.scientivan.dev/marketplace, dan pastikan https://kalis.scientivan.dev mengalihkan ke aplikasi. Jangan menjalankan smoke berbayar tanpa otorisasi.

@@ -679,3 +679,7 @@ Tidak mengubah kode produk, login, mutasi backend, seed, signing, spending, push
 Source runner/backend/frontend serta rancangan 52 dan 65.1–65.3 ditelusuri. Bukti dan penghalang ada di PRIVACY_TEE_INVESTIGATION.md. Tidak ditemukan bukti keterbatasan fundamental OutLayer, tetapi runner belum punya API proteksi, storage dan proof owner. Shared platform payment key, localhost connector dan pdftotext host adalah dependensi nyata untuk migrasi. Registrasi private-values bukan syarat platform. Penetapan protocol/migrasi masih usulan, worker testnet belum diprobe baru. MD/PDF diperbarui, Social Money ditunda sementara. Tidak mengubah kode, signing, spending atau deploy. Cek NEAR tidak menemukan konflik.
 
 Verifikasi investigasi privasi. PDF 73 halaman lolos generator tanpa overflow, halaman hasil investigasi diperiksa visual. Pengujian TEE baru dan migrasi fitur belum dilakukan.
+
+## Deployment publik (15 November 2026)
+
+Backend berjalan di VPS tinjau-vps sebagai service kalis-backend (port 8790 di belakang Caddy) untuk https://api.kalis.scientivan.dev, health dan /api/privacy/config (mode tee, enabled) lulus di localhost VPS. Frontend di proyek Vercel kalis dengan domain kalis.scientivan.dev dan app.kalis.scientivan.dev, build produksi Ready. kalis.scientivan.dev sementara redirect 307 ke aplikasi lewat app/web/src/proxy.ts. Ejaan domain diganti dari calis ke kalis. Uji lewat host publik belum terverifikasi karena menunggu DNS Cloudflare. Rincian ada di app/web/DEPLOYMENT.md. npm test 32 lulus dan npm run build berhasil.
