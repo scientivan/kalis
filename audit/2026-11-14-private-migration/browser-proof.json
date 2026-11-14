@@ -1,0 +1,13 @@
+{
+  "observed_at": "2026-11-14T17:01:45.897Z",
+  "mode": "native development only, not a TEE",
+  "checks": {
+    "note_saved": true,
+    "survives_reload": true,
+    "device_key_non_extractable": true,
+    "no_plaintext_sentinel_in_requests": true,
+    "no_legacy_endpoint_requests": true
+  },
+  "sealed_requests": 8,
+  "external_ai_or_payment": false
+}

@@ -230,3 +230,10 @@ Empty-state packaging correction. Put the explanation and its contextual action 
 Author naming approved. Methods replaces Listings, with Drafts and Published child pages. Create method is a button within Drafts. Existing draft creation remains draft-only, without implying manifest/seal/publish is implemented.
 
 Community structure approved. Both roles have Fund, Proposals, Bounties and Issues as child links. Fund shows treasury and council, Proposals shows funding decisions, Bounties shows paid improvement opportunities, Issues shows reported problems. Contribution tests, reviews and payout belong within bounty/contribution details.
+
+
+## 11. Documentation reconciliation, 14 November 2026
+
+Current capability and evidence boundaries live in CURRENT_STATE.md, with route coverage in app/web/COVERAGE.md. Earlier notes saying seller creation is draft-only or community is read-only are historical. SellerEditor and wallet request/confirmation UI now exist, but presence is not authenticated E2E proof. The active source shell exposes Author Methods → Create and Published, while earlier naming approval says Drafts. Keep that difference explicit until resolved, rather than treating implementation as a new naming approval.
+
+All five protection services run on the ordinary backend. Current checkout additionally sends private-marked values plaintext to protections/private-values for outbound detection. Operator-blind claims must not hide this gap. No new design decision or privacy exception is approved by this note. Deployment is postponed and Social Money innovation is the next discussion after sync.

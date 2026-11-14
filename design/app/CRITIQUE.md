@@ -1,3 +1,5 @@
+> Historical artifact or handoff, retained for context. Synchronized 14 November 2026. Implementation status and earlier missing-feature claims in this file are not the current product state. Read [../../CURRENT_STATE.md](../../CURRENT_STATE.md) and [../../FRONTEND_GUIDE.md](../../FRONTEND_GUIDE.md) first. Preserve the original evidence and proposals below without interpreting them as new approval.
+
 # Review screenshot aplikasi Kalis
 
 14 November 2026. Target `design/app/index.html`. Analisis dan usulan, belum perubahan frontend atau persetujuan rancangan baru. Bukti visual berasal dari enam screenshot Dien. Pemeriksaan interaksi native browser belum tersedia.

@@ -13,30 +13,19 @@
 - Show inputs, consequential decisions, actionable outputs, and how results are evaluated. Do not invent proof of performance or efficiency.
 - Keep explanations focused and concise. Avoid repeatedly expanding the product into unrelated concepts.
 
-## Current product direction (as of 13 November 2026, version 1.29)
+## Current product direction, 14 November 2026
 
-Read `RANCANGAN_PRODUK.md` section 0 first. It overrides older entries below, which are kept as history.
+Read RANCANGAN_PRODUK.md section 0 and 70, CURRENT_STATE.md and DOCUMENTATION_INDEX.md first. The active app is app/web with backend integration. Current catalog observed nine methods. Salary and tender are implemented methods, not only illustrations. Five protections run on the ordinary backend. Checkout currently sends private-marked values plaintext to private-values storage, a gap against the operator-privacy requirement, not an approved exception.
 
-- Product name: Kalis (Indonesian, from KBBI: impervious to water, immune).
-- Private AI workspace with a marketplace for expert methods. Sellers sell methods that stay secret. Buyers run them on their own sensitive data without revealing it. A shared fund pays for method improvements.
-- The product guarantees how methods run and are protected, not method quality. Method quality is the seller's responsibility, judged by buyers (for example through ratings).
-- Tracks: Privacy & Private AI, Social Money, Open Innovation.
-- MVP demo method: minimum-cost portfolio rebalancing under user allocation and cash limits, based on `validation/portfolio-method-02/`. Synthetic data, no profit promise.
-- Frontend illustrations: portfolio, salary negotiation, tender bidding. Portfolio and tender run end to end. Salary negotiation is illustration only.
-- The five protections (credentials, outbound data, persistent memory, multimodal documents, browser agent) are all built and working in the MVP. The demo video shows only some. The README documents all of them. Anything not working at submission is listed as a limitation. Which protections apply depends on the method sold.
-- Third-party integration (for example a trading platform or broker) is a focus. Use a clearly labelled mock connector if no real API key. No real trades.
-- Second demo use case: tender bidding (web2), showing browser agent, memory, documents and outbound data protection.
-- Payment is hybrid. Web2 buyers top up a balance with fiat, web3 buyers may pay crypto. Seller share, DAO fund and bounties settle on NEAR. In the MVP, fiat top-up is a labelled mock and settlement uses real testnet transfers. Users and methods are not limited to web3.
-- Every new user decision or piece of information must be recorded in RANCANGAN_PRODUK.md and .pdf.
-- Execution architecture (option A): methods run as WASM in OutLayer TEE (NEAR ecosystem, built by FastNEAR); AI parts use NEAR AI Cloud. The OutLayer coordinator can see unencrypted input, so buyer data is encrypted before sending; this sealed-input path passed a testnet test (only ciphertext on chain). Testnet account `scientivan.testnet` exists (section 51).
-- Build order: demo flow steps 1–2 (method publication, private TEE execution) first, then steps 3–5 (DAO fund, bounty, version history).
-- NEAR handles shared funds, agreed decisions, and payments. Confidential execution handles data protection. NFTs are not used. AI Swarms is optional.
+Tracks remain Privacy & Private AI, Social Money and Open Innovation. Community fund, proposal/bounty/private evaluation/review and wallet payout/version requests exist. No real fiat gateway or custodial balance exists. Current versions use 80/10/10 while the DAO share is version-set with a 10 percent minimum. Deployment is postponed by Dien.
+
+Dien explicitly requests two-way documentation reconciliation, because either implementation or documents may be wrong. Never turn code behavior into an approved product policy without evidence. Preserve history, rationale, open questions and attributed test results. After sync, discuss Social Money innovation before choosing or building new features.
 
 ## Status
 
 Development phase started 13 November 2026. Deadline 14 November 2026 23:59 UTC. The freelancer proposal example below is superseded as the demo method and kept only as history.
 
-## Further approved decisions
+## Further decisions from earlier discussions, historical context
 
 - Methods are modular. Contributors can inspect and patch explicitly opened modules. Private cores expose interfaces. Internal private-core repairs require approved limited access or a replacement module. User data stays private and payment evaluators cannot be edited by candidate patches.
 - The approved example now combines project proposals and negotiation with cost/capacity optimization. It produces feasible scope, prices and schedules, or reports infeasibility. Compare against both good prompting and AI with calculation/code tools. No superiority or willingness-to-pay claim is established yet.
@@ -190,3 +179,18 @@ Pengguna meminta seluruh integrasi backend ke frontend sebagai fokus, bukan satu
 
 
 Dien meminta kebutuhan backend yang kurang disusun untuk Claude, sementara Codex tetap menangani frontend dan integrasi. Handoff ada di app/web/BACKEND_REQUIREMENTS_FOR_CLAUDE.md. Endpoint dan DTO baru adalah usulan teknis, bukan persetujuan policy yang masih terbuka.
+
+
+## Domain yang disepakati, 14 November 2026
+
+Landing page di https://calis.scientivan.dev dan aplikasi di https://app.calis.scientivan.dev. Ejaan domain calis mengikuti keputusan Dien, nama produk tetap Kalis. Domain apex scientivan.dev tidak dipindahkan.
+
+
+## Sinkronisasi dan prioritas Social Money, 14 November 2026
+
+Utamakan keselarasan seluruh dokumen aktif dengan keputusan, implementasi, runtime dan bukti. Kode tidak otomatis menang atas dokumen. Jangan menutupi batas privasi atau menganggap UI/request sebagai hasil chain. Setelah sinkronisasi, bahas inovasi Social Money. Deployment dan DNS ditunda.
+
+
+## Prioritas privasi dan batas yang sudah disepakati
+
+14 November 2026. Dien menegaskan batas privasi sudah ada dalam rancangan dan meminta alasan/hambatan sebelum development. Jangan meminta pengguna menetapkan ulang batas tersebut. Bedakan pengecualian publik yang disepakati dari gap implementasi. Telusuri kemampuan platform dan kode, jangan mengasumsikan deadline/biaya sebagai alasan historis. Social Money ditunda sampai investigasi/perbaikan privasi dibahas. Lihat PRIVACY_TEE_INVESTIGATION.md.

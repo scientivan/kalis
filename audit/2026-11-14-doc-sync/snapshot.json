@@ -1,0 +1,643 @@
+{
+  "observed_at": "2026-11-14T15:57:52.088Z",
+  "mode": "GET and unauthenticated browser inspection only",
+  "api": {
+    "health": {
+      "status": "pass",
+      "data": {
+        "ok": true,
+        "network": "testnet",
+        "time": "2026-11-14T15:57:52.104Z"
+      }
+    },
+    "capabilities": {
+      "status": "pass",
+      "data": {
+        "network": "testnet",
+        "auth_mode": {
+          "current": "near_account_or_demo",
+          "supported": [
+            "near_account",
+            "demo_workspace"
+          ],
+          "note": "Sign in with a NEAR account through a NEP-413 signed challenge (POST /api/auth/challenge, /api/auth/verify) and send Authorization: Bearer <session_token>. Without it, X-Kalis-Workspace is a demo label, not proof of ownership."
+        },
+        "payment_modes": [
+          {
+            "id": "demo_topup",
+            "status": "demo",
+            "reason": "Mock fiat top-up. A platform-held testnet account pays. No real money moves."
+          },
+          {
+            "id": "wallet",
+            "status": "enabled",
+            "reason": "The API returns an unsigned contract call for the buyer's NEAR wallet."
+          }
+        ],
+        "method_kinds": [
+          {
+            "id": "wasm",
+            "status": "enabled",
+            "reason": "Seller WASM in the wasmi sandbox; may call models listed in its manifest through kalis.ai_chat."
+          },
+          {
+            "id": "prompt",
+            "status": "enabled",
+            "reason": "Sealed seller prompt sent to one private attested model. Verdict is at best attention."
+          }
+        ],
+        "ai_routes": [
+          {
+            "id": "private_attested",
+            "status": "enabled",
+            "reason": "NEAR AI Cloud models with fresh-nonce attestation and signed responses."
+          },
+          {
+            "id": "proprietary",
+            "status": "unavailable",
+            "reason": "The runner does not support proprietary models yet (no consent, redaction or enforcement path)."
+          }
+        ],
+        "features": [
+          {
+            "id": "run_list",
+            "status": "enabled",
+            "reason": "Runs created by the calling principal, cursor pagination."
+          },
+          {
+            "id": "run_drafts_quotes",
+            "status": "enabled",
+            "reason": "Draft, revision-bound consent and quote before payment."
+          },
+          {
+            "id": "payment_idempotency",
+            "status": "enabled",
+            "reason": "Idempotency-Key header or idempotency_key in the body."
+          },
+          {
+            "id": "async_execution",
+            "status": "enabled",
+            "reason": "POST /api/runs/:id/execute with {async:true}, then poll the operation."
+          },
+          {
+            "id": "timeout_reclaim",
+            "status": "enabled",
+            "reason": "Uses the contract's refund_expired after the timeout."
+          },
+          {
+            "id": "buyer_model_narrowing",
+            "status": "enabled",
+            "reason": "A narrower model list on the run draft is sent to the runner as ai_restrict and enforced inside the TEE (runner build 823e9913)."
+          },
+          {
+            "id": "run_bound_protections",
+            "status": "enabled",
+            "reason": "Protection requests with run_id use the manifest of the version that run paid for, owned by the caller. Without run_id they use the latest version and say so."
+          },
+          {
+            "id": "private_artifacts",
+            "status": "enabled",
+            "reason": "POST /api/artifacts stores ciphertext only, owner access only. Retention policy is not decided; DELETE removes it at once."
+          },
+          {
+            "id": "input_provenance",
+            "status": "enabled",
+            "reason": "Run drafts record where each input came from (document, connector, memory, browser, file import, typed) and whether the buyer reviewed it."
+          },
+          {
+            "id": "five_protections",
+            "status": "demo",
+            "reason": "Run on the Kalis backend, not in a TEE. The operator could read them."
+          },
+          {
+            "id": "ratings",
+            "status": "enabled",
+            "reason": "One rating 1-5 per executed run, by the principal who created it. Zero ratings show as null, not 0."
+          },
+          {
+            "id": "transactions_activity",
+            "status": "enabled",
+            "reason": "Escrow hold, release split, stage refund and timeout reclaim from the contract; activity feed of runs, protection audit and reviews."
+          },
+          {
+            "id": "earnings",
+            "status": "read_only",
+            "reason": "Public read-only seller view with ?account=. Owner view needs NEAR sign-in."
+          },
+          {
+            "id": "balance",
+            "status": "unavailable",
+            "reason": "No custodial ledger. The mock fiat top-up is not a balance."
+          },
+          {
+            "id": "file_import",
+            "status": "enabled",
+            "reason": "GET /file-import.js parses .xlsx and .docx on the buyer device; the file is never uploaded."
+          },
+          {
+            "id": "document_text_retention",
+            "status": "enabled",
+            "reason": "Extracted document text is returned once and not stored. The backend still sees the document on its way to NEAR AI."
+          },
+          {
+            "id": "seller_publication",
+            "status": "enabled",
+            "reason": "Drafts, sealed artifact upload, validation and publication through unsigned contract calls the seller's NEAR wallet signs. Needs NEAR sign-in."
+          },
+          {
+            "id": "profiles_preferences",
+            "status": "enabled",
+            "reason": "Profile and preferences per principal. Demo profiles are labelled demo. Preferences only narrow model lists."
+          },
+          {
+            "id": "version_evidence",
+            "status": "enabled",
+            "reason": "Per-version test evidence when the seller provides it; separate from ratings."
+          },
+          {
+            "id": "run_evidence",
+            "status": "enabled",
+            "reason": "GET /api/runs/:id/evidence: signed completion, ciphertext commitments, chain hashes and attestation comparison. No plaintext."
+          },
+          {
+            "id": "community_write",
+            "status": "enabled",
+            "reason": "Issues, bounty proposals, votes, contributions, private tests, reviews, payout and new versions. Money and authority steps are unsigned calls for the right wallet; authority is read from the Sputnik DAO policy. Competing claimers and disputes are not decided (see /api/community/config)."
+          },
+          {
+            "id": "private_test_cases",
+            "status": "enabled",
+            "reason": "Cases sealed to the runner TEE key, separate grants with attempt limit and expiry. Evaluation runs inside the runner (evaluate command, needs runner build 823e9913 or later deployed); the candidate sees pass or fail per field and counts only."
+          }
+        ],
+        "limits": [
+          "Intel and NVIDIA certificate chains are not verified by this backend.",
+          "Uploaded documents are read by the backend on their way to NEAR AI. Do not upload private documents."
+        ]
+      }
+    },
+    "config": {
+      "status": "pass",
+      "data": {
+        "network": "testnet",
+        "rpc": "https://rpc.testnet.fastnear.com",
+        "explorer": "https://explorer.testnet.near.org",
+        "market": "market.scientivan.testnet",
+        "dao": "kalis-fund.sputnik-v2.testnet",
+        "platform": "platform.scientivan.testnet",
+        "platform_share_pct": 10,
+        "min_dao_share_pct": 10,
+        "refund_timeout_minutes": 30,
+        "runner": {
+          "project": "scientivan.testnet/kalis-runner",
+          "tee_pubkey": "d4dd5b661d908c178ab83ab17e1317b42d9521f37d5220fb51ad8d1f2ce3753e",
+          "completion_pubkey": "8b77ffa184b87d84d0302813f74d7bab21cf96ab8b88a1e781d3af2744f3c7a7",
+          "build_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+          "key_version": 1,
+          "attestation_note": "Intel/NVIDIA chains not verified (not_verified)",
+          "preflight_note": "Seal data only to tee_pubkey. A run's attestation must name build_hash (or the runner_hash of the version you pay for); compare before trusting a result."
+        },
+        "demo_topup": {
+          "enabled": true,
+          "buyer_account": "kalis-buyer.testnet",
+          "label": "Mock fiat top-up. A platform-held testnet account pays on your behalf. No real money moves."
+        },
+        "crypto_module": "/kalis-crypto.js",
+        "method_kinds": {
+          "wasm": "Program (WASM). Seller code runs in the sandbox; it may ask the AI models its manifest lists.",
+          "prompt": "Prompt for an AI model. The runner sends the sealed prompt and the buyer data to one private attested model.",
+          "seller_prompt_warning": "A prompt can leak. A buyer can hide text in their data that asks the model to repeat your prompt. Kalis tells the model never to reveal it and withholds any answer that repeats 8 or more words of your prompt in a row, but a model can still paraphrase it. Sell a prompt only if you accept that risk.",
+          "seller_prompt_warning_version": "4167d973bdc96b37"
+        }
+      }
+    },
+    "methods": {
+      "status": "pass",
+      "data": [
+        {
+          "method_id": "portfolio-rebalance",
+          "owner": "arif-planner.scientivan.testnet",
+          "version": 6,
+          "kind": "wasm",
+          "runner_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+          "split": {
+            "seller": 80,
+            "dao": 10,
+            "platform": 10
+          }
+        },
+        {
+          "method_id": "salary-counteroffer",
+          "owner": "maya-careers.scientivan.testnet",
+          "version": 3,
+          "kind": "prompt",
+          "runner_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+          "split": {
+            "seller": 80,
+            "dao": 10,
+            "platform": 10
+          }
+        },
+        {
+          "method_id": "tender-bid",
+          "owner": "rani-procurement.scientivan.testnet",
+          "version": 2,
+          "kind": "wasm",
+          "runner_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+          "split": {
+            "seller": 80,
+            "dao": 10,
+            "platform": 10
+          }
+        },
+        {
+          "method_id": "defi-liquidation-guard",
+          "owner": "bima-pratama.scientivan.testnet",
+          "version": 1,
+          "kind": "wasm",
+          "runner_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+          "split": {
+            "seller": 80,
+            "dao": 10,
+            "platform": 10
+          }
+        },
+        {
+          "method_id": "cash-runway-13w",
+          "owner": "sari-wulandari.scientivan.testnet",
+          "version": 1,
+          "kind": "wasm",
+          "runner_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+          "split": {
+            "seller": 80,
+            "dao": 10,
+            "platform": 10
+          }
+        },
+        {
+          "method_id": "supplier-concession-plan",
+          "owner": "dimas-hidayat.scientivan.testnet",
+          "version": 1,
+          "kind": "prompt",
+          "runner_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+          "split": {
+            "seller": 80,
+            "dao": 10,
+            "platform": 10
+          }
+        },
+        {
+          "method_id": "token-unlock-sell-plan",
+          "owner": "kenji-arakawa.scientivan.testnet",
+          "version": 1,
+          "kind": "prompt",
+          "runner_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+          "split": {
+            "seller": 80,
+            "dao": 10,
+            "platform": 10
+          }
+        },
+        {
+          "method_id": "term-sheet-dilution",
+          "owner": "laura-mendes.scientivan.testnet",
+          "version": 1,
+          "kind": "prompt",
+          "runner_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+          "split": {
+            "seller": 80,
+            "dao": 10,
+            "platform": 10
+          }
+        },
+        {
+          "method_id": "scientivanmsk-freelance-rate",
+          "owner": "scientivanmsk.testnet",
+          "version": 2,
+          "kind": "prompt",
+          "runner_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+          "split": {
+            "seller": 80,
+            "dao": 10,
+            "platform": 10
+          }
+        }
+      ]
+    },
+    "community/config": {
+      "status": "pass",
+      "data": {
+        "dao": "kalis-fund.sputnik-v2.testnet",
+        "council": [
+          "scientivan.testnet"
+        ],
+        "proposal_bond": {
+          "value": "1000000000000000000000000",
+          "asset": "NEAR",
+          "decimals": 24,
+          "network": "testnet",
+          "display": "1 NEAR"
+        },
+        "bounty_bond": {
+          "value": "1000000000000000000000000",
+          "asset": "NEAR",
+          "decimals": 24,
+          "network": "testnet",
+          "display": "1 NEAR"
+        },
+        "proposal_period_ns": "604800000000000",
+        "vote_policy": {
+          "weight_kind": "RoleWeight",
+          "quorum": "0",
+          "threshold": [
+            1,
+            2
+          ]
+        },
+        "authority": "Read from the Sputnik DAO policy on chain. The backend creates no authority.",
+        "rules": [
+          {
+            "id": "reviewer",
+            "status": "enabled",
+            "reason": "A council member who is not the contributor."
+          },
+          {
+            "id": "payout",
+            "status": "enabled",
+            "reason": "BountyDone proposal approved on chain. Created with add_proposal because bounty_done of the deployed Sputnik contract rejects the required bond (BUILD_STATUS 6.12)."
+          },
+          {
+            "id": "competing_claimers",
+            "status": "unavailable",
+            "reason": "How several claimers of one bounty are ranked is not decided."
+          },
+          {
+            "id": "disputes",
+            "status": "unavailable",
+            "reason": "Dispute handling for rejected candidates is not decided."
+          },
+          {
+            "id": "royalty",
+            "status": "unavailable",
+            "reason": "Contributors receive the bounty only. Royalties are an open decision (RANCANGAN 7)."
+          }
+        ]
+      }
+    },
+    "dao": {
+      "status": "pass",
+      "data": {
+        "dao": "kalis-fund.sputnik-v2.testnet",
+        "balance_near": "6.219",
+        "available_near": "1.51582",
+        "council": [
+          "scientivan.testnet"
+        ],
+        "bounties": [
+          {
+            "id": 0,
+            "description": "Bounty: rtk make portfolio-rebalance use less compute without changing any answer. Must still pass all 12 synthetic cases.",
+            "token": "",
+            "amount": "10000000000000000000000",
+            "times": 0,
+            "max_deadline": "86400000000000",
+            "amount_near": "0.01"
+          },
+          {
+            "id": 1,
+            "description": "Bounty for portfolio-rebalance v5 (core): Uses too much fuel on 3-asset cases | Accept if: Same status, cost and trades as the base version on every private case [kalis:prop-mwfsrgyz-8856a6cc]",
+            "token": "",
+            "amount": "1000000000000000000000",
+            "times": 1,
+            "max_deadline": "604800000000000",
+            "amount_near": "0.001"
+          },
+          {
+            "id": 2,
+            "description": "Bounty for portfolio-rebalance v5 (core): Uses too much fuel on 3-asset cases | Accept if: Same status, cost and trades as the base version on every private case [kalis:prop-mwfsssa3-87d66818]",
+            "token": "",
+            "amount": "1000000000000000000000",
+            "times": 1,
+            "max_deadline": "604800000000000",
+            "amount_near": "0.001"
+          }
+        ],
+        "proposals": [
+          {
+            "id": 0,
+            "proposer": "scientivan.testnet",
+            "description": "Bounty: rtk make portfolio-rebalance use less compute without changing any answer. Must still pass all 12 synthetic cases.",
+            "kind": "AddBounty",
+            "status": "Approved",
+            "kind_detail": {
+              "AddBounty": {
+                "bounty": {
+                  "description": "Bounty: rtk make portfolio-rebalance use less compute without changing any answer. Must still pass all 12 synthetic cases.",
+                  "token": "",
+                  "amount": "10000000000000000000000",
+                  "times": 1,
+                  "max_deadline": "86400000000000"
+                }
+              }
+            }
+          },
+          {
+            "id": 1,
+            "proposer": "kalis-contrib.testnet",
+            "description": "Bounty 0 done. method v2 sha256 646d4690642480d1b3e77748af4980927e34e1d4e56feb3fb6bff428af5003f8 skips combinations that cannot beat the best cost. 12/12 synthetic cases unchanged locally, C03 and C09 correct on OutLayer TEE (calls 3f5d48d4, c67bd018). Fuel on C03 down from 2936658 to 2012021.",
+            "kind": "BountyDone",
+            "status": "Approved",
+            "kind_detail": {
+              "BountyDone": {
+                "bounty_id": 0,
+                "receiver_id": "kalis-contrib.testnet"
+              }
+            }
+          },
+          {
+            "id": 2,
+            "proposer": "scientivan.testnet",
+            "description": "Bounty for portfolio-rebalance v5 (core): Uses too much fuel on 3-asset cases | Accept if: Same status, cost and trades as the base version on every private case [kalis:prop-mwfsrgyz-8856a6cc]",
+            "kind": "AddBounty",
+            "status": "Approved",
+            "kind_detail": {
+              "AddBounty": {
+                "bounty": {
+                  "description": "Bounty for portfolio-rebalance v5 (core): Uses too much fuel on 3-asset cases | Accept if: Same status, cost and trades as the base version on every private case [kalis:prop-mwfsrgyz-8856a6cc]",
+                  "token": "",
+                  "amount": "1000000000000000000000",
+                  "times": 1,
+                  "max_deadline": "604800000000000"
+                }
+              }
+            }
+          },
+          {
+            "id": 3,
+            "proposer": "scientivan.testnet",
+            "description": "Bounty for portfolio-rebalance v5 (core): Uses too much fuel on 3-asset cases | Accept if: Same status, cost and trades as the base version on every private case [kalis:prop-mwfsssa3-87d66818]",
+            "kind": "AddBounty",
+            "status": "Approved",
+            "kind_detail": {
+              "AddBounty": {
+                "bounty": {
+                  "description": "Bounty for portfolio-rebalance v5 (core): Uses too much fuel on 3-asset cases | Accept if: Same status, cost and trades as the base version on every private case [kalis:prop-mwfsssa3-87d66818]",
+                  "token": "",
+                  "amount": "1000000000000000000000",
+                  "times": 1,
+                  "max_deadline": "604800000000000"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "issues": {
+      "status": "pass",
+      "data": {
+        "count": 3,
+        "next_cursor": null
+      }
+    },
+    "proposals": {
+      "status": "pass",
+      "data": {
+        "count": 1,
+        "next_cursor": null
+      }
+    },
+    "bounties": {
+      "status": "pass",
+      "data": {
+        "count": 3,
+        "next_cursor": null
+      }
+    }
+  },
+  "pages": [
+    {
+      "path": "/marketplace",
+      "title": "Kalis",
+      "h1": "Marketplace",
+      "text": "Marketplace\nAll\nPrograms\nPrompts\nSearch methods\nGoal\nAll goals\nSort\nDefault\nProgram\nRebalance a portfolio at minimum transaction cost\n\nThe cheapest set of whole-unit trades that keeps every asset inside your target range, your sector cap and your cash minimum.\n\n★ 4.5 (2)\n9 checks\n5 steps\nA\nArif Santoso\nFrom0.1 NEAR\nView\nPrompt\nWrite a salary counter-offer that protects your walk-away number\n\nA counter salary, a signing bonus, two non-salary asks and a reply you can send.\n\n★ 4.0 (1)\n6 checks\n2 steps\nM\nMaya Lestari\nFrom0.05 NEAR\nView\nProgram + AI\nPrice a tender bid above your minimum margin\n\nA bid price with the reasons behind it, the bid security amount and a checklist of the tender's mandatory documents.\n\n★ 4.0 (1)\n5 checks\n7 steps\nR\nRani Hartono\nFrom0.1 NEAR\nView\nProgram\nRescue a DeFi loan before it gets liquidated\n\nHow much to repay and how much collateral to add so your loan reaches a safe health factor and survives a 20% price drop.\n\n★ 4.0 (1)\n5 checks\n5 steps\nB\nBima Pratama\nFrom0.08 NEAR\nView\nProgram\nKeep payroll paid through the next 13 weeks\n\nA week-by-week payment plan that pays payroll and tax first, delays only what suppliers allow, and tells you the first week cash runs short.\n\n★ 4.0 (1)\n7 checks\n4 steps\nS\nSari Wulandari\nFrom0.1 NEAR\nView\nPrompt\nPlan your concessions before tomorrow's supplier negotiation\n\nAn opening ask, three concessions that each win something back, clause changes and a script, all inside your private walk-away limits.\n\nUnrated\n6 checks\n2 steps\nD\nDimas Hidayat\nFrom0.06 NEAR\nView\nPrompt\nSell unlocked tokens without crashing the price\n\nA day-by-day selling schedule that splits OTC blocks from market sales and keeps each day under your share of volume.\n\n★ 4.0 (1)\n4 checks\n2 steps\nK\nKenji Arakawa\nFrom0.07 NEAR\nView\nPrompt\nCheck your dilution before you sign the term sheet\n\nYour post-money ownership table, whether founders stay above your floor, and the terms worth pushing back on.\n\n★ 4.0 (1)\n7 checks\n2 steps\nL\nLaura Mendes\nFrom0.08 NEAR\nView\nPrompt\nSet a freelance day rate above your floor\n\nA day rate to propose, the project fee it gives, two scope terms and a reply you can send to the client.\n\n★ 4.5 (2)\n7 checks\n2 steps\nK\nKalis demo seller\nFrom0.03 NEAR\nView\nShowing 9 of 9 methods",
+      "overflow": false
+    },
+    {
+      "path": "/runs/ongoing",
+      "title": "Kalis",
+      "h1": "Ongoing",
+      "text": "Ongoing\n\nReview actions waiting for your approval and follow jobs that are still in progress.\n\nNeeds your approval\nWaiting\nDone\nAll\nNothing is waiting for your approval\n\nWhen a method wants to send something outside Kalis, it waits here until you read and approve the exact text.\n\nJobs in progress\nNo jobs in progress\n\nJobs you pay for appear here until their answer is ready.\n\nFind a method",
+      "overflow": false
+    },
+    {
+      "path": "/runs/results",
+      "title": "Kalis",
+      "h1": "Results",
+      "text": "Results\n\nReview completed jobs, their checks and payment records. Decrypted answers remain available only in the tab that holds their key.\n\nAll\nPaid\nRefunded\nNo completed jobs yet\n\nA job appears here once its answer is ready and the payment is settled.\n\nFind a method",
+      "overflow": false
+    },
+    {
+      "path": "/connections",
+      "title": "Kalis",
+      "h1": "Connections",
+      "text": "Connections\n\nRead-only access, for a limited time, that you can revoke.\n\nYour connections\nAdd a connection\nLets a labelled mock app share read-only data with a method, for a limited time.\nEvery connection here is a labelled mock service\n\nNo real broker, sheet or wallet is connected. A method asks for a connection when it needs one.",
+      "overflow": false
+    },
+    {
+      "path": "/workspace/files",
+      "title": "Kalis",
+      "h1": "Documents",
+      "text": "Documents\n\nText is read from your file, then sealed into the run.\n\nRead documents\nRead a document\nReads the text of a file so a method can use it. The server keeps only a fingerprint.\nNo documents yet\n\nYou add one while preparing a run that reads files.\n\nFind a method",
+      "overflow": false
+    },
+    {
+      "path": "/workspace/memory",
+      "title": "Kalis",
+      "h1": "Notes",
+      "text": "Notes\n\nA method can only suggest a note. You decide what is saved.\n\nSaved\nSuggested\nAdd a note\nSave a fact a method may remember, such as your risk limit.\nNo saved notes\n\nNotes you save, or suggestions you accept, appear here.",
+      "overflow": false
+    },
+    {
+      "path": "/marketplace/publish",
+      "title": "Kalis",
+      "h1": "Create",
+      "text": "Create\n\nSign in with your NEAR testnet wallet to manage your methods and their pictures.\n\nSign in with NEAR",
+      "overflow": false
+    },
+    {
+      "path": "/marketplace/mine",
+      "title": "Kalis",
+      "h1": "Published",
+      "text": "Published\n\nSign in with your NEAR testnet wallet to manage your methods and their pictures.\n\nSign in with NEAR",
+      "overflow": false
+    },
+    {
+      "path": "/community",
+      "title": "Kalis",
+      "h1": "Fund",
+      "text": "Fund\n\nSee the shared budget and the council responsible for funding method improvements.\n\nCommunity fund\nNEAR testnet\nFund balance\n\nPart of each paid run goes here. The council uses it to pay for accepted method improvements.\n\n6.219 NEAR\nFor bounties\nAvailable for improvements\n\nWhat is left after bounties already promised to contributors.\n\n1.51582 NEAR\nS\nCouncil\nscientivan.testnet\n\nVotes on funding proposals and reviews contributed fixes.\n\nCouncil voting policy and bonds\nA council member who is not the contributor.\nBountyDone proposal approved on chain. Created with add_proposal because bounty_done of the deployed Sputnik contract rejects the required bond (BUILD_STATUS 6.12).\nHow several claimers of one bounty are ranked is not decided.\nDispute handling for rejected candidates is not decided.\nContributors receive the bounty only. Royalties are an open decision (RANCANGAN 7).",
+      "overflow": false
+    },
+    {
+      "path": "/community/proposals",
+      "title": "Kalis",
+      "h1": "Proposals",
+      "text": "Proposals\n\nPropose a funded fix and follow the council’s decision. Acceptance rules are fixed before work starts.\n\nProposals\nCreate proposal\nNot signed yet\nThe bid ignores the delivery penalty clause when the tender has one\n\nFor Price a tender bid above your minimum margin\n\nVersion 2\npricing part\n0.05 NEAR\nDetails\nSign in with a NEAR account to propose, claim or submit paid work.\nSign in with NEAR",
+      "overflow": false
+    },
+    {
+      "path": "/community/bounties",
+      "title": "Kalis",
+      "h1": "Bounties",
+      "text": "Bounties\n\nFind funded improvements, submit a sealed candidate and follow testing, review and payment.\n\nBounties\nClosed\nRtk make portfolio-rebalance use less compute without changing any answer. Must still pass all 12 synthetic cases.\n\nCreated outside this app. No fixed evaluator, so it cannot be tested here.\n\n0.01 NEAR\nDetails\nOpen\nUses too much fuel on 3-asset cases\n\nCreated outside this app. No fixed evaluator, so it cannot be tested here.\n\n0.001 NEAR\nDetails\nOpen\nUses too much fuel on 3-asset cases\n\nCreated outside this app. No fixed evaluator, so it cannot be tested here.\n\n0.001 NEAR\nDetails\nSign in with a NEAR account to propose, claim or submit paid work.\nSign in with NEAR\nPrivate Test Access\nLoad your cases and grants\nUsing a method does not allow anyone to test with your data. You control separate, candidate-bound grants and can revoke them.\nAdd a Sealed Test Case\nGrant Limited Testing Access",
+      "overflow": false
+    },
+    {
+      "path": "/community/issues",
+      "title": "Kalis",
+      "h1": "Issues",
+      "text": "Issues\n\nReport a problem with a method and follow it from investigation to a funded improvement.\n\nIssues\nReport a problem\nOpen\nUses many trades when a single trade would keep the same bounds\n\nFor Rebalance a portfolio at minimum transaction cost under allocation and cash limits\n\nVersion 6\ncore part\nDetails\nOpen\nWeek 13 runway is shown even when payroll data stops at week 10\n\nFor Keep payroll paid through the next 13 weeks\n\nVersion 1\ncore part\nDetails\nFunding proposed\nThe bid ignores the delivery penalty clause when the tender has one\n\nFor Price a tender bid above your minimum margin\n\nVersion 2\npricing part\nDetails",
+      "overflow": false
+    },
+    {
+      "path": "/account",
+      "title": "Kalis",
+      "h1": "Account",
+      "text": "Account\n\nSign in with NEAR to sell methods and see your earnings.\n\nPayments\nEarnings\nNo payments yet\n\nEach payment into escrow, release and refund appears here, grouped by day.\n\nD\nDemo browser\nIdentity\nNot signed in\nBalance is not available. Kalis keeps no account balance, and the test top-up is not money you hold.\nSign in with NEAR",
+      "overflow": false
+    },
+    {
+      "path": "/activity",
+      "title": "Kalis",
+      "h1": "Activity",
+      "text": "Activity\n\nRuns, approvals, notes, documents and reviews, one card per day.\n\nAll\nRuns\nApprovals\nNotes\nDocuments\nReviews\nNo activity yet\n\nRuns, approvals, notes, documents and reviews appear here as they happen.\n\nFind a method",
+      "overflow": false
+    }
+  ],
+  "module_parity": {
+    "crypto": true,
+    "checks": true,
+    "file-import": true
+  },
+  "proxy_health": {
+    "status": 200,
+    "body": {
+      "ok": true,
+      "network": "testnet",
+      "time": "2026-11-14T15:58:20.518Z"
+    }
+  },
+  "source_sha256": {
+    "app/web/src/app/[[...path]]/page.tsx": "3b269b77d4247269ff215d65490b86e589f32a49f705d921642c85238f39529a",
+    "app/web/src/components/shell.tsx": "76b219dc9c8f779e7862a979e30e3b8726b4bece35c75bce94fd5394c21e1b33",
+    "app/web/src/components/run-page.tsx": "bce125fff316f62a0f5e49287283945543d3a9c119fdd981b7e6fd42bd52e3e3",
+    "app/web/src/components/seller-editor.tsx": "e648d22e373cc6ecf3dac314af29195a4d733caf494a8c68c34b3e014a3b4fd5",
+    "app/web/src/components/community-workspace.tsx": "71bc97d1d44a1a14407a1cddbd6d1522eb7b9cdd097b94239d0bffbc4b4661aa",
+    "app/backend/src/config.js": "f31226493e707653f33d3389dfb2064ba63c541b8c0a5411f7301bc6e81bf07d",
+    "app/backend/src/capabilities.js": "915e3b95166965ac15f5a3cccc16e87e182ea0c58ebebd6f97c728bfb77c11c3",
+    "app/backend/src/community-api.js": "9b4189975c9a7c4dbfb81ef242abc0d39a7d333838eae9364f20d6d2bdef3dee",
+    "app/backend/src/protections/outbound.js": "2418d276861344e78ebe29447364e3e6b815282b7d82205edcd07863a4845112",
+    "app/backend/src/protections/store.js": "e0c7523850beab234789b63b0542c716812001b873e883ae3cb9f72a24141dc2"
+  }
+}

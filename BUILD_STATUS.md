@@ -2,13 +2,20 @@
 
 Dokumen ini mencatat apa yang **sudah** dan **belum** dikerjakan, beserta buktinya. Tujuannya agar agent atau sesi baru bisa melanjutkan tanpa salah informasi.
 
-- **Update terakhir:** 13 November 2026, draf halaman aplikasi dan dokumentasi frontend (Codex).
+- **Update terakhir:** 15 November 2026, migrasi lima perlindungan ke runner privat (lokal, native) oleh Codex dan Claude.
 - **Deadline submission:** 14 November 2026 23:59 UTC (15 November 06:59 WIB).
-- **Penulis update terakhir:** Codex (sesi 13 November 2026).
+- **Penulis update terakhir:** Claude, menyelesaikan migrasi privasi Codex tanpa transaksi atau deployment.
+
+
+## Ringkasan aktual 14 November 2026
+
+Aplikasi aktif app/web terhubung backend. GET lokal dan 14 halaman Chrome tanpa login berhasil. Katalog saat audit berisi sembilan metode. Runner aktif 823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d. Source dan bukti direkonsiliasi di CURRENT_STATE.md serta rancangan bagian 70, dengan indeks dokumen di DOCUMENTATION_INDEX.md.
+
+Jalur plaintext checkout sudah ditutup dan lima protections memakai protokol tersegel (lihat 6.19). Buktinya baru lokal mode native. Runner privat belum di-build sebagai TEE atau di-deploy. Social Money sudah punya DAO fund, issue/proposal/bounty/private evaluation/review dan unsigned payout/version, tetapi legacy bounty tanpa evaluator serta beberapa policy belum selesai. Deployment ditunda, inovasi Social Money dibahas setelah sinkronisasi.
 
 ## 0. Cara membaca dan aturan update
 
-**Urutan sumber kebenaran** bila ada pertentangan:
+**Urutan acuan keputusan** bila ada pertentangan. Ini bukan urutan untuk mengabaikan bukti runtime. Source/runtime membuktikan kondisi aktual, sedangkan keputusan menetapkan perilaku yang seharusnya. Selisih keduanya dicatat sebagai gap.
 
 1. `../NEAR.md` bagian "Compliance gate" (aturan hackathon). Selalu menang.
 2. `RANCANGAN_PRODUK.md` bagian 0 dan bagian bernomor terbesar (keputusan produk, "apa dan kenapa").
@@ -32,6 +39,8 @@ Dokumen ini mencatat apa yang **sudah** dan **belum** dikerjakan, beserta buktin
 
 ## 1. Ringkasan produk (satu paragraf)
 
+Ringkasan berikut adalah tujuan produk. Batas aktual adalah runner privat untuk lima protections baru terbukti lokal mode native dan belum di-deploy sebagai TEE, sebagaimana 6.19 dan CURRENT_STATE.md.
+
 Nama produk **Kalis**. Marketplace metode AI privat. Penjual menjual metode yang tetap rahasia. Pembeli menjalankannya pada data sensitif miliknya tanpa membukanya ke penjual maupun operator. Sebagian pembayaran masuk dana DAO yang membayar bounty perbaikan metode. Track: Privacy & Private AI, Social Money, Open Innovation. Rincian di `RANCANGAN_PRODUK.md` bagian 0, 47–52.
 
 ## 2. Keputusan teknis yang berlaku
@@ -54,6 +63,8 @@ Nama produk **Kalis**. Marketplace metode AI privat. Penjual menjual metode yang
 Alasan kotak dalam wajib: manifest OutLayer hanya mengatur jaringan. Fungsi lain seperti storage OutLayer dan transaksi NEAR tidak tercakup (struct `ProjectManifest`, inferensi agent dari daftar field).
 
 ## 3. Akun dan resource
+
+Build aktif runner kini 823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d, sesuai config.js dan versi market yang teramati. Hash dalam tabel resource lama adalah sejarah dan bukan konfigurasi deployment terbaru.
 
 Nilai rahasia **tidak** ditulis di sini.
 
@@ -90,6 +101,8 @@ Secret OutLayer: `PROTECTED_SEAL_KEY` (hex32, dibuat di TEE) untuk project `seal
 
 ## 4. Peta kode
 
+Tabel lama mencatat tahap awal. Lokasi aktif tambahan adalah app/web untuk aplikasi, app/backend untuk API dan app/market-contract untuk registry/escrow. Manifest aktif mengikuti hash versi chain, bukan otomatis manifest.json pertama. Runner hash aktif dan katalog mengikuti CURRENT_STATE.md. Status probe/spike tidak menggantikan keberhasilan runner final.
+
 | Path | Isi | Status |
 |---|---|---|
 | `validation/portfolio-method-02/benchmark.py` | Solver acuan Python (MILP dan oracle enumerasi), 12 kasus | ✅ 12/12 cocok dengan enumerasi |
@@ -117,21 +130,24 @@ Secret OutLayer: `PROTECTED_SEAL_KEY` (hex32, dibuat di TEE) untuk project `seal
 | `design/kalis-hero.html` | Draf hero dengan lanskap dan ilustrasi UI siklus produk enam tahap. CSS/JS aktif di `design/kalis-story.*`. Draf batik tersimpan di `design/kalis-hero-v1.html` | 🟡 menunggu review visual Dien, browser pengujian diblokir sandbox |
 | `app/methods/portfolio-rebalance/manifest.json` | Draf manifest metode portofolio (tanpa AI, tanpa konektor, tanpa jaringan) | 🟡 draf, skema belum final |
 
-Semua kode ditulis 13 November 2026 (masuk jendela kode hackathon sejak 19 Oktober 2026).
+Pekerjaan awal ditulis 13 November 2026 dan pengembangan berlanjut 14 November 2026, dalam jendela kode hackathon sejak 19 Oktober 2026.
 
 ## 5. Status alur demo (lima langkah, bagian 47)
 
-| Langkah | Isi | Status | Catatan |
-|---|---|---|---|
-| 1 | Penjual publikasi metode. Hash versi dan pemilik dicatat di NEAR | 🟡 | Kontrak jalan di testnet (6.5). Belum ada UI penjual |
-| 2 | Pembeli menjalankan metode secara privat di TEE dengan attestation | 🟡 | Enkripsi dan attestation terbukti di `sealed-probe`. Opsi B belum jalan di testnet |
-| 3 | Sebagian pembayaran ke dana DAO | ✅ | Escrow dan pembagian 80/10/10 ke `kalis-fund.sputnik-v2.testnet` terbukti di testnet (6.11) |
-| 4 | Proposal perbaikan dan bounty lewat DAO | ✅ | Bounty 0 di `kalis-fund` diusulkan, disetujui, diklaim, diselesaikan, dibayar (6.12) |
-| 5 | Riwayat versi dan kontributor | ✅ | Versi 2 di market dengan `parent 1` dan kontributor, dipakai run berbayar (6.12) |
+| Langkah | Implementasi dan bukti | Batas verifikasi |
+|---|---|---|
+| 1 Publikasi metode | Market contract, sellers API dan editor/signing UI tersedia. Bukti 6.17, katalog GET aktif | Tidak melakukan publikasi wallet ulang dalam audit |
+| 2 Run privat | Runner opsi B berjalan di testnet, bukti 6.8 dan 6.15–6.18, buyer UI terintegrasi | Payload inti tersegel. Plaintext checkout sudah ditutup (6.19) |
+| 3 Dana DAO | Escrow split ke Sputnik DAO, bukti 6.11 dan konfigurasi live | 80/10/10 konfigurasi sekarang, DAO share versi minimal 10 persen |
+| 4 Proposal dan bounty | Bukti payout 6.12, API/Community UI tersedia | Legacy bounty tanpa evaluator app tidak siap private test, wallet E2E belum diuji ulang |
+| 5 Versi kontributor | Parent/contributor di market dan adapter publish versi accepted | Seluruh aturan review DAO tidak dipaksa market contract pada publikasi langsung pemilik |
 
-Urutan build: langkah 1–2 sampai jalan, baru 3–5 (bagian 48).
+Urutan build awal tetap bagian 48 sebagai riwayat. Status frontend bukan lagi mock-only.
+
 
 ## 6. Bukti yang sudah ada
+
+Bagian 6.1–6.18 merekam hasil historis per tanggal/versi, termasuk kegagalan yang kemudian diselesaikan. Kalimat belum dibuat atau sedang berjalan di dalam entri lama tidak menetapkan status sekarang. Lihat ringkasan aktual dan CURRENT_STATE.md.
 
 ### 6.1 Enkripsi input dan keluaran di OutLayer (✅)
 
@@ -335,6 +351,18 @@ File `app/kalis-runner/client/kalis.mjs` (Node, perlu disesuaikan ke WebCrypto u
 - `recheckPortfolio(data, answer)` mengembalikan `{passed, checks:[{id, ok, message}], unverifiable}`. `message` adalah kalimat bahasa Inggris siap tampil.
 - Usulan status tampilan: aman bila `report.all_ok`, `recheck.passed`, hash metode/manifest/runner cocok dengan registry, dan attestation cocok. Jangan dipakai bila ada salah satu yang gagal. Perlu perhatian untuk jawaban `infeasible`, karena klaim itu tidak bisa dicek di perangkat.
 
+### 6.19 Lima perlindungan lewat runner privat tersegel (🟡 lokal saja)
+
+Status per 15 November 2026. Migrasi dikerjakan Codex dan diselesaikan Claude. Semua bukti di bawah adalah **mode native development di satu mesin, bukan TEE**.
+
+Jalur plaintext checkout sudah ditutup. run-page.tsx tidak lagi memanggil protections/private-values. Nilai private disimpan hanya di IndexedDB browser selama 24 jam untuk pemeriksaan outbound di perangkat. Proxy web menolak semua request ke api/protections/.
+
+Lima perlindungan (credentials, memory, documents, outbound, browser agent) serta audit kini berjalan lewat protokol tersegel. Browser mengenkripsi setiap operasi ke kunci runner privat dan menandatanganinya dengan kunci perangkat yang tidak bisa diekspor. Backend hanya meneruskan ciphertext lewat POST /api/privacy/execute. Runner (app/kalis-runner/src/privacy.rs) memeriksa tanda tangan pemilik, revisi state dan nonce anti-replay, lalu mengembalikan hasil terenkripsi. Relay memakai ulang call OutLayer yang sama saat retry dan hanya menyimpan commitment serta output terenkripsi.
+
+Bukti lokal. privacy-local-test.mjs 27 cek lulus, termasuk isolasi antar-pemilik, tanda tangan palsu ditolak, replay ditolak, PDF privat ditolak tanpa fallback plaintext, dan semua state tersimpan berupa ciphertext. privacy-http-test.mjs 13 cek relay lulus, termasuk endpoint plaintext lama ditolak. Regresi eksekusi portofolio lulus. Frontend build lulus dan 32 tes lulus (29 dan 3). Bukti browser (privacy-browser-test.mjs) menyimpan catatan berisi sentinel, reload, lalu memastikan sentinel tidak muncul di request mana pun, kunci perangkat non-extractable, dan tidak ada request ke endpoint lama. Hasil ada di audit/2026-11-14-private-migration/.
+
+Yang belum. PRIVATE_RUNNER_HASH masih not-built, jadi belum ada build TEE yang di-attest dan dikunci. Dukungan storage/HTTP pada worker OutLayer testnet belum diprobe. Deploy runner privat, penguncian secret dan versi market memerlukan persetujuan Dien. Tanpa itu, halaman proteksi di deployment biasa menolak dengan private_runner_unavailable. Data lama di backend tidak dimigrasi atau dihapus. Kepemilikan data terikat ke satu browser, belum ada pemulihan atau multi-perangkat. Konektor di runner tetap mock berlabel. Dokumen publik tetap boleh diekstrak backend setelah opt-in eksplisit sesuai 65.1.
+
 ### 6.5 Kontrak registry (✅)
 
 Kontrak `registry.scientivan.testnet`. Fungsi: `register_method`, `publish_version`, `get_method`, `list_methods`, `get_version`, `list_versions`. Setiap versi menyimpan `code_hash` (WASM penjual), `manifest_hash`, `runner_hash`, `parent`, `contributors`, `note`. Biaya storage dibayar pemanggil lewat deposit, sisanya dikembalikan. Event NEP-297 `method_registered` dan `version_published`.
@@ -360,36 +388,36 @@ Implementasi backend di `app/backend/src/protections/`, bukti di 6.14. Semua dit
 
 ## 8. Daftar mock dan data sintetis
 
-Semua wajib berlabel mock di UI, README, dan video.
-
-| Item | Status label |
+| Item | Kondisi terkini |
 |---|---|
-| Top-up fiat | Belum dibuat |
-| Konektor broker/trading | Belum dibuat |
-| Portal pengadaan tender | Belum dibuat |
-| Data portofolio (12 kasus) | Sintetis, dari `validation/portfolio-method-02/cases.json` |
-| Data perusahaan tender (CV Maju) | Fiktif, belum dibuat |
+| Fiat top-up | Mock berlabel, akun platform membayar NEAR testnet, bukan saldo fiat |
+| Konektor broker, sheets, docs dan wallet | Implementasi mock backend tersedia, bukan integrasi layanan atau trading nyata |
+| Portal pengadaan tender | Mock HTTP tersedia, bukan browser agent headless |
+| Portofolio, tender, karier dan metode demo lain | Data/seller demo fiktif, bukan nasabah atau saran profesional |
+| Rating dan riwayat testnet | Bisa berasal dari seed/script, bukan bukti pelanggan nyata |
+| Public deployment | Belum diaktifkan, domain/DNS ditunda |
+
 
 ## 9. Buku klaim README
 
-Setiap kalimat README harus punya bukti. Kolom "Boleh?" menunjukkan apakah klaim itu boleh ditulis sekarang.
-
-| Klaim | Boleh? | Bukti |
+| Klaim | Status | Bukti atau batas |
 |---|---|---|
-| Data pembeli dienkripsi di perangkat pembeli dan hanya dibuka di TEE OutLayer | ✅ | 6.1 |
-| Transaksi publik dan koordinator OutLayer hanya melihat ciphertext | ✅ | 6.1 |
-| Attestation membuktikan versi program yang dijalankan | ✅ | 6.1 |
-| Inferensi AI berjalan di TEE dengan tanda tangan jawaban yang valid | ✅ | 6.3 (hanya DeepSeek V4.1 Flash) |
-| Kode penjual tidak dapat mengakses jaringan | ✅ | 6.7 dan 6.8 (testnet, jalur HTTPS) |
-| Kode penjual dan data pembeli tetap rahasia dari operator, chain, dan pihak lawan | ✅ sebagian | 6.8. Jumlah instruksi publik masih berbeda sekitar 2% |
-| Hash versi metode, manifest, dan runner tercatat di NEAR | ✅ | 6.5 (testnet) |
-| Operator tidak dapat melihat data | ❌ | Benar untuk jalur 6.1 saja. Browser agent tidak di TEE |
-| Rantai sertifikat Intel/NVIDIA terverifikasi | ❌ | Belum dicek sendiri |
-| Lima perlindungan berjalan dan ditegakkan per manifest metode | ✅ | 6.14 dan bagian 7. Empat perlindungan berjalan di backend, bukan TEE |
-| Pembayaran per run ditahan escrow dan dilepas hanya bila semua tahap berhasil, dengan porsi ke DAO | ✅ | 6.11 (testnet, NEAR testnet) |
-| Perbaikan metode didanai bounty DAO dan versi baru mencatat kontributornya | ✅ | 6.12 (testnet). Kontrak belum memaksa persetujuan DAO untuk versi kontributor |
+| Runner membuka input/metode tersegel dan mengembalikan jawaban tersegel | Ada bukti historis | 6.1, 6.8, 6.15–6.18, sesuai versi |
+| Seluruh website hanya mengirim ciphertext kepada backend | Tidak boleh diklaim | run-page.tsx pay mengirim field private plaintext, outbound.markPrivate menyimpannya |
+| Lima perlindungan tersedia | Ya pada backend biasa | 6.14, bagian 7, CURRENT_STATE.md. Bukan lima fungsi dalam TEE |
+| AI evidence dan sandbox | Ada implementasi/bukti historis | Jangan menyamakan dengan verifikasi rantai sertifikat Intel/NVIDIA penuh |
+| Registry/escrow aktif | market.scientivan.testnet | registry.scientivan.testnet historis |
+| Dana DAO dan bounty pernah dibayar | Bukti historis 6.11–6.12 | Bukan semua bounty sekarang siap diuji, bukan request call sudah dibayar |
+| Publikasi editor dan wallet UI tersedia | Source tersedia | SellerEditor dan auth.signCalls, audit sekarang tidak signing |
+| Katalog memiliki sembilan metode saat audit | GET methods berhasil | Bukan bukti run berbayar seluruh versi aktif |
+| Kontributor mendapat royalti | Belum | Royalti, pengklaim bersaing dan sengketa masih terbuka |
+| Produk privat dari operator tanpa batas | Tidak boleh diklaim | Jalur protections sudah tersegel secara lokal, tetapi runner privat belum di-deploy sebagai TEE (6.19) |
+| Keunggulan metode, profit dan adopsi teruji | Tidak boleh diklaim | Benchmark dan rating demo tidak membuktikannya |
+
 
 ## 10. Belum terverifikasi
+
+Gap terkini mencakup wallet E2E penuh, mobile/aksesibilitas, privasi checkout, enforcement reviewer, policy revoke dan legacy bounty. Daftar riset lama berikut tetap konteks dan tidak berarti seluruh fitur terblokir.
 
 - Rantai sertifikat Intel dan NVIDIA pada quote OutLayer dan NEAR AI.
 - Kecepatan interpreter `wasmi` di dalam OutLayer untuk metode yang lebih berat dari C03 (C03 sekitar 5,3 detik).
@@ -399,22 +427,16 @@ Setiap kalimat README harus punya bukti. Kolom "Boleh?" menunjukkan apakah klaim
 
 ## 11. Tugas berikutnya (urut prioritas)
 
-1. 🟡 **Pastikan penyebab kegagalan testnet OutLayer.** Diperbarui 15:45 UTC: gunakan jalur HTTPS (6.6) untuk semua uji berikutnya. Jalur on-chain tetap dicoba ulang berkala. Coba ulang setiap kali sesi dimulai dan setiap sekitar 1–2 jam kerja. Catat hasilnya di tabel "Log percobaan ulang OutLayer" di bawah. Tugas 2 dan 3 menunggu tugas ini. Sambil menunggu, kerjakan tugas 4. Selesai bila `sealed-probe` `{"cmd":"pubkey"}` kembali berhasil, lalu `runner-spike` `{"cmd":"ping"}` dan C03 berhasil, atau penyebab spesifiknya ditemukan.
-2. ✅ **Uji jaringan diblokir.** Selesai 13 Nov 16:20 UTC (6.7).
-3. ✅ **Gabungkan opsi B dengan enkripsi.** Selesai 13 Nov 16:40 UTC (6.8). Sisa: selisih jumlah instruksi sekitar 2%. Perbedaan dari rencana awal: WASM penjual tidak disimpan sebagai secret OutLayer, melainkan disegel ke kunci TEE dan dikirim bersama setiap panggilan. Hasilnya sama rahasianya, tanpa biaya storage secret, dan blob tersegel itu dapat dipublikasikan.
-4. ✅ **Kontrak registry NEAR (langkah 1).** Selesai 13 Nov 12:30 UTC, pesan error diperbaiki 15:15 UTC (6.5).
-5. 🟡 **Frontend (tugas aktif).** Nama Kalis, copy Inggris, stack Next.js + Vercel. Draf batik ditolak karena terasa AI slop. Arah pengganti mengikuti HelloNear yang simpel, bersih dan interaktif (`RANCANGAN_PRODUK.md` bagian 53). Draf lokal `design/kalis-hero.html` kini memakai ilustrasi siklus enam tahap, tanpa API atau transaksi. Scene Three.js sebelumnya digantikan. Sintaks, aset, anchor dan kontras teks lolos pemeriksaan. Render desktop/mobile belum diperiksa karena browser dan binding localhost diblokir sandbox. Buka file HTML langsung untuk review. Draf baru belum disetujui.
-   - **Port ke Next.js sudah jalan (13 Nov 18:25 UTC, dilanjutkan Claude Code setelah Codex kena usage limit).** Lokasi `app/web/` (Next.js 16.4.6, React 19). Semua data masih **mock di localStorage**, belum memanggil `app/backend/` (6.13) sama sekali.
-   - Bukti: `npm install` sukses, `npx tsc --noEmit` tanpa error, `npm test` 13/13 lolos (`tests/domain.test.ts`), `npm run build` sukses.
-   - Diuji di Chrome pada `next start` port 3311. Alur pembeli lolos: top-up mock $10, pakai metode, simpan izin, setujui, isi escrow, jalankan, laporan, review (saldo 880 sen, pembagian 80/10/10 sen, rating tercatat). Alur kontribusi lolos: masalah, proposal, voting, bounty, patch, uji, review, payout sekali, versi `v2` terbit, run lama tetap `v1`.
-   - Lanjutan (14 Nov, Claude Code): kode dipecah per area (`ui`, `workspace`, `marketplace`, `community`, `balance`, `settings`.tsx) dan diformat prettier. Ditambah: kategori di form penjual (sebelumnya selalu `Business`), filter "My methods" lewat `owned`, scope dan expiry koneksi, persetujuan kiriman keluar tersimpan dan tampil di Activity (hanya metode tender), form review disembunyikan bila hash tidak cocok. Schema mock naik ke 2 (`kalis-mock-v2`, data v1 dibuang). Test 16/16, build sukses.
-   - Diuji di Chrome: lima skenario gagal sesuai bagian 56 (`stage-failure` dan `timeout` dana kembali, `hash-mismatch`/`no-solution`/`local-failure` dana dilepas dengan peringatan), form buat metode sampai terbit, koneksi, kiriman keluar.
-   - Audit ulang terhadap rancangan (14 Nov, `RANCANGAN_PRODUK.md` bagian 63, matriks `app/web/COVERAGE.md`). Ditambah: manifest per versi mengikuti `app/methods/*/manifest.json`, laporan tujuh tahap runner dan status aman/perhatian/jangan dipakai (`src/lib/fixtures.ts`), perlindungan tender (browser agent, dokumen scan, nilai privat, kiriman keluar ditahan, memori menunggu tinjauan), impor broker mock, bukti uji per versi, onboarding. Schema mock 3 (`kalis-mock-v3`). Test 20/20, build sukses, semua alur itu dicek di Chrome.
-   - Belum diuji: tampilan mobile (breakpoint CSS ada, resize Chrome tidak berefek), audit visual terhadap `DESIGN.md`. Integrasi ke API backend belum dimulai.
-6. ✅ **Langkah 3–5 dan lima perlindungan.** Selesai (6.11, 6.12, 6.14). Berikutnya: diskusi metode bersama Dien sebelum membangun metode tender.
-7. **README dan video** mengikuti buku klaim bagian 9.
+Status lama tentang OutLayer gagal, frontend mock-only, tender belum dibuat dan API belum terintegrasi sudah digantikan. Log lama tetap di bagian bukti/changelog.
 
-### Log percobaan ulang OutLayer
+1. Sinkronisasi dokumen dua arah berdasarkan bagian 0 dan 70 rancangan serta CURRENT_STATE.md. Audit ini tidak mengubah kode produk.
+2. Bahas inovasi Social Money bersama Dien dari fund/proposal/bounty/evaluation yang sudah ada. Belum memilih fitur baru atau policy.
+3. Gap privasi checkout, reviewer enforcement, revoke policy dan bounty legacy dicatat di CURRENT_STATE.md serta app/web/FRONTEND_GAPS.md untuk keputusan/perbaikan terpisah.
+4. Verifikasi wallet E2E, mobile dan aksesibilitas hanya pada lingkup yang dibutuhkan dan dengan otorisasi transaksi yang sesuai. Jangan memakai seed atau pembacaan halaman sebagai bukti pembayaran.
+5. README dan video mengikuti bukti versi aktual serta batas privasi. Deployment dan DNS tetap ditunda Dien.
+
+
+### Log historis percobaan ulang OutLayer
 
 Perintah uji: `outlayer run scientivan.testnet/sealed-probe '{"cmd":"pubkey"}' --secrets-profile default --secrets-account scientivan.testnet` (dari `app/sealed-probe`), lalu `outlayer run scientivan.testnet/runner-spike '{"cmd":"ping"}'` (dari `app/runner-spike`).
 
@@ -632,3 +654,22 @@ Handoff app/web/BACKEND_REQUIREMENTS_FOR_CLAUDE.md diperluas dengan bagian H, de
 
 Riset publik selesai dan dicatat di research/website-reference-2026-11-14.md, dengan delapan pembanding utama, sumber resmi, matriks penerapan halaman, dokumentasi brand system n8n dan usulan wording. Rancangan bagian 68 dan PDF diselaraskan. Tidak ada perubahan kode atau status fitur. Inspeksi render dan interaksi pembanding belum dilakukan. Compliance gate tidak menemukan konflik pada riset dan dokumentasi lokal.
 - **14 Nov 2026 07:00 UTC (Claude Code).** Riset referensi desain, dua mock marketplace (Luno CRM dan Luno Crypto), palet extrafazant.nl, tema terang saja. Semua aturan desain disimpan di `FRONTEND_GUIDE.md` untuk Codex. Frontend diserahkan ke Codex.
+
+
+## Persiapan domain aplikasi, 14 November 2026
+
+Persiapan lokal untuk landing calis.scientivan.dev dan aplikasi app.calis.scientivan.dev disepakati. Bukti ada di app/web/src/app/layout.tsx, app/web/vercel.json dan app/web/DEPLOYMENT.md. Pemeriksaan read-only Vercel berhasil dan nameserver domain berada di Cloudflare. Backend publik belum diberikan. Belum membuat proyek, deploy publik, memasang domain atau mengubah DNS. Verifikasi berhasil dengan npm run build dan npm test di app/web, 31 tes lulus. PDF diregenerasi menjadi 70 halaman dan generator menyatakan no overflow, isi hostname halaman domain diperiksa. Rancangan bagian 69 dan sumber PDF diselaraskan. Compliance gate NEAR tidak menemukan konflik.
+
+
+## Sinkronisasi dokumentasi menyeluruh, 14 November 2026
+
+Atas permintaan Dien, dokumen aktif direkonsiliasi dua arah dengan source, runtime dan bukti historis. Rancangan bagian 0/70, README, PRODUCT, DESIGN, coverage/gaps/integration/navigation, API notes, panduan, memori dan indeks dokumen diperbarui. Handoff/prototipe/review lama diberi status historis. Bukti di audit/2026-11-14-doc-sync/. GET sembilan endpoint dan proxy health berhasil, 14 halaman Chrome tanpa login terbuka. Build dan 31 tes frontend sesi sama lulus sebelum perubahan dokumentasi, local manifest 47 dan Office 8 lulus. Crypto/checks/file-import browser identik backend. PDF diregenerasi menjadi 72 halaman, generator memverifikasi no overflow dan isi cover serta halaman Social Money diperiksa visual. Tautan lokal dokumen aktif dan git diff --check lulus.
+
+Tidak mengubah kode produk, login, mutasi backend, seed, signing, spending, push atau deploy. Gap private-values/reviewer/revoke/legacy bounty dipertahankan eksplisit. Deployment ditunda dan diskusi inovasi Social Money menjadi langkah berikutnya. Compliance gate NEAR tidak menemukan konflik.
+
+
+## Investigasi privasi sebelum Social Money, 14 November 2026
+
+Source runner/backend/frontend serta rancangan 52 dan 65.1–65.3 ditelusuri. Bukti dan penghalang ada di PRIVACY_TEE_INVESTIGATION.md. Tidak ditemukan bukti keterbatasan fundamental OutLayer, tetapi runner belum punya API proteksi, storage dan proof owner. Shared platform payment key, localhost connector dan pdftotext host adalah dependensi nyata untuk migrasi. Registrasi private-values bukan syarat platform. Penetapan protocol/migrasi masih usulan, worker testnet belum diprobe baru. MD/PDF diperbarui, Social Money ditunda sementara. Tidak mengubah kode, signing, spending atau deploy. Cek NEAR tidak menemukan konflik.
+
+Verifikasi investigasi privasi. PDF 73 halaman lolos generator tanpa overflow, halaman hasil investigasi diperiksa visual. Pengujian TEE baru dan migrasi fitur belum dilakukan.

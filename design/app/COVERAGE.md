@@ -1,3 +1,5 @@
+> Historical artifact or handoff, retained for context. Synchronized 14 November 2026. Implementation status and earlier missing-feature claims in this file are not the current product state. Read [../../CURRENT_STATE.md](../../CURRENT_STATE.md) and [../../FRONTEND_GUIDE.md](../../FRONTEND_GUIDE.md) first. Preserve the original evidence and proposals below without interpreting them as new approval.
+
 # Audit cakupan frontend terhadap rancangan produk
 
 14 November 2026. Acuan seluruh bagian 0–61, termasuk bagian 55 tentang laporan eksekusi dan bagian 56 tentang escrow yang nomornya berulang. Urutan keputusan dan isi terbaru dipakai, bukan hanya nomor bagian. Bagian 6, 22 dan 31 yang digantikan tidak dijadikan kebutuhan metode demo baru. Riset pasar dan riwayat benchmark bukan fitur aplikasi baru.
