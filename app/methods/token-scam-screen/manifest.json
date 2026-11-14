@@ -209,6 +209,10 @@
       "what": "Check percentages and amounts"
     },
     {
+      "id": "read_chain",
+      "what": "Read the contract's code hash, exported admin methods and ft_metadata from NEAR testnet inside the TEE (guard runner only)"
+    },
+    {
       "id": "hard_rules",
       "what": "Apply the rules that always block"
     },

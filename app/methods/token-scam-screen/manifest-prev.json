@@ -1,0 +1,444 @@
+{
+  "manifest_version": 5,
+  "method_id": "token-scam-screen",
+  "kind": "wasm",
+  "listing": {
+    "title": "Stop your trading agent from buying a scam token",
+    "outcome": "ALLOW, WARN or BLOCK for a token your agent wants to buy, with the evidence: failed sell simulation, taxes, owner powers, liquidity lock, holder concentration, your block list and injected instructions, plus the largest amount allowed.",
+    "category": "Agent security",
+    "seller": {
+      "display_name": "Yoga Prasetyo (demo seller)",
+      "role": "On-chain fraud analyst",
+      "demo": true
+    },
+    "urgency": "The agent wants to buy within minutes. Asking a public scanner reveals what you are about to buy, and an agent that reads the web can be tricked into a honeypot.",
+    "limits": [
+      "One token per run",
+      "Uses the on-chain facts and block list you provide; the method does not query a chain",
+      "Screens for scam traits only. It does not predict the price",
+      "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+    ],
+    "sample_output": "Synthetic example: MOONPAY2 cannot be sold in simulation, has a 99% sell tax, and the agent's instruction says 'ignore the safety screen'. Verdict BLOCK, amount allowed 0.",
+    "not_advice": true
+  },
+  "inputs": {
+    "format": "json",
+    "documents": [],
+    "fields": [
+      {
+        "id": "token",
+        "label": "Token facts",
+        "type": "object",
+        "required": true,
+        "fields": [
+          {
+            "id": "symbol",
+            "label": "Symbol",
+            "type": "string",
+            "required": true
+          },
+          {
+            "id": "contract",
+            "label": "Contract",
+            "type": "string",
+            "required": true
+          },
+          {
+            "id": "deployer",
+            "label": "Deployer",
+            "type": "string",
+            "required": true
+          },
+          {
+            "id": "sell_simulation_ok",
+            "label": "A simulated sell succeeds",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "id": "buy_tax_pct",
+            "label": "Buy tax (%)",
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "max": 100
+          },
+          {
+            "id": "sell_tax_pct",
+            "label": "Sell tax (%)",
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "max": 100
+          },
+          {
+            "id": "owner_can_mint",
+            "label": "Owner can mint",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "id": "owner_can_pause",
+            "label": "Owner can pause",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "id": "owner_can_blacklist",
+            "label": "Owner can blacklist",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "id": "proxy_upgradeable",
+            "label": "Upgradeable proxy",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "id": "verified_source",
+            "label": "Verified source",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "id": "liquidity_usd",
+            "label": "Pool liquidity",
+            "type": "money",
+            "unit": "USD",
+            "required": true,
+            "min": 0
+          },
+          {
+            "id": "liquidity_locked_pct",
+            "label": "Liquidity locked (%)",
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "max": 100
+          },
+          {
+            "id": "lock_days_left",
+            "label": "Lock days left",
+            "type": "number",
+            "required": true,
+            "min": 0
+          },
+          {
+            "id": "top10_holders_pct",
+            "label": "Top 10 holders (%)",
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "max": 100
+          },
+          {
+            "id": "deployer_holds_pct",
+            "label": "Deployer holds (%)",
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "max": 100
+          },
+          {
+            "id": "contract_age_days",
+            "label": "Contract age (days)",
+            "type": "number",
+            "required": true,
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": "block_list",
+        "label": "Your block list",
+        "type": "array",
+        "required": true,
+        "items": {
+          "type": "string"
+        }
+      },
+      {
+        "id": "agent_request",
+        "label": "What the agent wants",
+        "type": "object",
+        "required": true,
+        "fields": [
+          {
+            "id": "amount_usd",
+            "label": "Amount",
+            "type": "money",
+            "unit": "USD",
+            "required": true,
+            "min": 0,
+            "private": true
+          },
+          {
+            "id": "instruction",
+            "label": "Agent's instruction",
+            "type": "text",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "sample": {
+      "fictional": true,
+      "ref": "fixtures/attack-input.json"
+    }
+  },
+  "ai": {
+    "allowed": [],
+    "proprietary": false
+  },
+  "outbound": [],
+  "memory": {
+    "read": false,
+    "write": false
+  },
+  "browser": {
+    "enabled": false
+  },
+  "steps": [
+    {
+      "id": "read_facts",
+      "what": "Read the token facts, your block list and the agent's request"
+    },
+    {
+      "id": "check_inputs",
+      "what": "Check percentages and amounts"
+    },
+    {
+      "id": "hard_rules",
+      "what": "Apply the rules that always block"
+    },
+    {
+      "id": "score_risks",
+      "what": "Score the warning signs"
+    },
+    {
+      "id": "decide",
+      "what": "Give ALLOW, WARN or BLOCK and the largest amount allowed"
+    }
+  ],
+  "connectors": [],
+  "outputs": {
+    "status_field": "verdict",
+    "unverifiable_status": [],
+    "fields": [
+      {
+        "id": "verdict",
+        "label": "Verdict",
+        "type": "enum",
+        "enum": [
+          "ALLOW",
+          "WARN",
+          "BLOCK"
+        ],
+        "display": "badge"
+      },
+      {
+        "id": "reasons",
+        "label": "Evidence",
+        "type": "array",
+        "display": "table"
+      },
+      {
+        "id": "risk_points",
+        "label": "Risk points",
+        "type": "number",
+        "display": "number"
+      },
+      {
+        "id": "max_amount_usd",
+        "label": "Largest amount allowed (USD)",
+        "type": "number",
+        "display": "money"
+      },
+      {
+        "id": "requested_amount_usd",
+        "label": "Amount the agent asked for (USD)",
+        "type": "number",
+        "display": "money"
+      },
+      {
+        "id": "note",
+        "label": "What happens next",
+        "type": "text",
+        "display": "text"
+      }
+    ]
+  },
+  "buyer_checks": [
+    {
+      "id": "failed_sell_blocks",
+      "description": "A token that cannot be sold in simulation is blocked",
+      "when": {
+        "==": [
+          {
+            "var": "input.token.sell_simulation_ok"
+          },
+          false
+        ]
+      },
+      "rule": {
+        "==": [
+          {
+            "var": "answer.verdict"
+          },
+          "BLOCK"
+        ]
+      },
+      "message": "A token that cannot be sold was not blocked."
+    },
+    {
+      "id": "high_sell_tax_blocks",
+      "description": "A sell tax above 10% is blocked",
+      "when": {
+        ">": [
+          {
+            "var": "input.token.sell_tax_pct"
+          },
+          10
+        ]
+      },
+      "rule": {
+        "==": [
+          {
+            "var": "answer.verdict"
+          },
+          "BLOCK"
+        ]
+      },
+      "message": "A token with a sell tax above 10% was not blocked."
+    },
+    {
+      "id": "block_list_blocks",
+      "description": "A contract or deployer on your block list is blocked",
+      "when": {
+        "or": [
+          {
+            "in": [
+              {
+                "var": "input.token.contract"
+              },
+              {
+                "var": "input.block_list"
+              }
+            ]
+          },
+          {
+            "in": [
+              {
+                "var": "input.token.deployer"
+              },
+              {
+                "var": "input.block_list"
+              }
+            ]
+          }
+        ]
+      },
+      "rule": {
+        "==": [
+          {
+            "var": "answer.verdict"
+          },
+          "BLOCK"
+        ]
+      },
+      "message": "A token on your block list was not blocked."
+    },
+    {
+      "id": "block_means_zero",
+      "description": "A BLOCK allows no amount at all",
+      "when": {
+        "==": [
+          {
+            "var": "answer.verdict"
+          },
+          "BLOCK"
+        ]
+      },
+      "rule": {
+        "==": [
+          {
+            "var": "answer.max_amount_usd"
+          },
+          0
+        ]
+      },
+      "message": "The token is blocked but an amount is still allowed."
+    },
+    {
+      "id": "amount_not_above_request",
+      "description": "The amount allowed is not more than the agent asked for",
+      "rule": {
+        "<=": [
+          {
+            "var": "answer.max_amount_usd"
+          },
+          {
+            "var": "answer.requested_amount_usd"
+          }
+        ]
+      },
+      "message": "More is allowed than the agent asked for."
+    },
+    {
+      "id": "request_echoed",
+      "description": "The amount judged is the amount the agent asked for",
+      "rule": {
+        "==": [
+          {
+            "var": "answer.requested_amount_usd"
+          },
+          {
+            "var": "input.agent_request.amount_usd"
+          }
+        ]
+      },
+      "message": "The method judged a different amount."
+    },
+    {
+      "id": "evidence_given",
+      "description": "Anything other than ALLOW comes with evidence",
+      "when": {
+        "!=": [
+          {
+            "var": "answer.verdict"
+          },
+          "ALLOW"
+        ]
+      },
+      "rule": {
+        ">": [
+          {
+            "count": [
+              {
+                "var": "answer.reasons"
+              }
+            ]
+          },
+          0
+        ]
+      },
+      "message": "The verdict has no evidence."
+    }
+  ],
+  "seller_secrets": [
+    "hard-block rules, risk point weights, block threshold, injection markers and size limits"
+  ],
+  "disclosures": [
+    "Not financial advice. An ALLOW says no scam trait was found in the facts given, not that the token is safe or will rise.",
+    "Your agent never holds the keys. A BLOCK means the signer must refuse; WARN needs your approval; nothing is signed or sent by the method.",
+    "Seller rules were written for the Kalis demo by the platform team. The seller is fictional."
+  ],
+  "runtime": {
+    "runner": "kalis-runner 0.5",
+    "outlayer_network": [
+      "cloud-api.near.ai"
+    ]
+  },
+  "dao_share_percent": 10
+}

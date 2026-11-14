@@ -1,0 +1,3 @@
+token-scam-screen ALLOW read [] from "https://rpc.testnet.near.org" at block null []
+token-scam-screen WARN read [] from "https://rpc.testnet.near.org" at block null ["pause_power"]
+wallet-allowance-guard WARN read [] from "https://rpc.testnet.near.org" at block null [["WARN",["chain_unread","no_ai_review"]]]

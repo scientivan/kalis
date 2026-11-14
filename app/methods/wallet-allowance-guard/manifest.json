@@ -218,16 +218,20 @@
       "what": "Read your goal, the allowance policy and the agent's actions"
     },
     {
+      "id": "read_chain",
+      "what": "Read the sandbox account balance and access keys from NEAR testnet inside the TEE (guard runner only; other runners report that no chain read was made)"
+    },
+    {
       "id": "check_inputs",
       "what": "Check amounts and expiry"
     },
     {
       "id": "ai_read_actions",
-      "what": "Private AI reads each action against your goal and looks for injected instructions"
+      "what": "Private AI labels each action (goal fit, injection, provenance, instruction in data, risk) with a strict schema; it can only tighten"
     },
     {
       "id": "apply_policy",
-      "what": "Apply recipients, contracts, methods, per-action max and remaining allowance"
+      "what": "Structural injection rules (authority claims, recipient or limit changes, hidden, encoded or look-alike text, split payments), then recipients, contracts, methods, per-action max and remaining allowance"
     },
     {
       "id": "build_approval_list",
