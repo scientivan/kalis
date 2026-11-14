@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { backend, type ApiVersion } from "../lib/backend/client";
 import { AppShell, icon } from "./shell";
-import { Segmented, PageInfo } from "./controls";
+import { Segmented, NearTech, PageInfo } from "./controls";
+import { NEAR_TECH } from "../lib/near-tech";
 
 type Field = { id: string; label: string; type?: string; required?: boolean; private?: boolean; source?: string; help?: string; unit?: string };
 type Manifest = {
@@ -73,6 +74,7 @@ export function MethodDetail({ id, tab }: { id: string; tab?: string }) {
         <h1>{d?.title || (error ? "Method unavailable" : "Loading method")}</h1>
       </div>
       <div className="ph-actions">
+        <NearTech {...NEAR_TECH.method} />
         <PageInfo title="Running this method privately" points={[{ icon: icon("lock"), text: "Your inputs are sealed on your device before they leave it." }, { icon: icon("chip"), text: "The seller’s code runs in a locked chip. Nobody sees your data or the code." }, { icon: icon("check"), text: "Your device checks the answer against the rules in Checks." }]} />
         <button className="ghost-ic" aria-label="Refresh" title="Refresh" onClick={() => setRevision(n => n + 1)}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2.5v3h-3" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
       </div>
@@ -85,7 +87,7 @@ export function MethodDetail({ id, tab }: { id: string; tab?: string }) {
           {current === "Overview" && <>
             <div className="dblock"><h2 className="h3">What you get</h2><p className="lead">{m.listing?.outcome || "The seller did not describe the result."}</p></div>
             <div className="dblock"><h2 className="h3">{m.steps?.length || 0} steps you can follow while it runs</h2>
-              <ol className="steps">{(m.steps || []).map((s, i) => <li key={s.id} style={{ "--i": i } as React.CSSProperties}><span className="sn">{i + 1}</span><span>{s.what}</span></li>)}</ol></div>
+              <ol className="sflow" style={{ "--n": Math.min(m.steps?.length || 1, 5), "--n3": Math.min(m.steps?.length || 1, 3) } as React.CSSProperties}>{(m.steps || []).map((s, i) => <li key={s.id} style={{ "--i": i } as React.CSSProperties}><span className="sn">{i + 1}</span><span className="sflow-t">{s.what}</span>{i < (m.steps?.length || 0) - 1 && <svg className="sflow-arrow" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9h11M10 4.5 14.5 9 10 13.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}</li>)}</ol></div>
             <div className="dblock"><h2 className="h3">What it may use</h2><div className="uses">
               {(m.ai?.allowed || []).map(a => <span className="use" key={a} title={m.ai?.proprietary ? "Proprietary model" : "Private model with attestation"}>{icon("chip")}Private AI {a.split("/").pop()}</span>)}
               {(m.connectors || []).map(c => <span className="use" key={c.id} title={c.what}>{icon("link")}{connectorName(c.id)} connector{/mock/i.test(c.id + c.what) ? " (mock)" : ""}</span>)}

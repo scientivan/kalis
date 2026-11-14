@@ -1126,3 +1126,29 @@ svg.i { width: 20px; height: 20px; flex: none }
 .reference .ds-cols { display:block; columns:2 340px; column-gap:14px }
 .reference .ds-cols > .ds-sheet { break-inside:avoid; margin-bottom:14px }
 .reference .rp-noquote > header { display:grid !important; gap:2px }
+/* Powered by NEAR chip, once per page head */
+.reference .neart-btn { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 11px 0 6px; border: 1px solid var(--line2); border-radius: 8px; background: var(--card); color: var(--ink); font: 600 13px var(--font-inter), sans-serif; cursor: pointer; white-space: nowrap; transition: border-color .2s }
+.reference .neart-btn:hover, .reference .neart.open .neart-btn { border-color: #0038FF }
+.reference .neart-btn:focus-visible { outline: 2px solid #0038FF; outline-offset: 2px }
+.reference .neart-mark { flex: none; width: 20px; height: 20px; border-radius: 6px; background: #101010; color: #fff; display: grid; place-items: center }
+.reference .ph-actions .neart-pop, .reference .se-head-acts .neart-pop { left: auto; right: 0 }
+.reference .neart-pop { width: 320px }
+.reference .neart-row { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; font-weight: 500; line-height: 1.45; color: var(--ink); animation: ddIn .3s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i) * 60ms) }
+.reference .neart-row .neart-mark { margin-top: 1px }
+.reference .neart-row strong { display: block; font-weight: 700 }
+@media (max-width: 600px) { .reference .neart-txt { display: none } .reference .neart-btn { padding: 0 5px; } .reference .neart .neart-pop { position: fixed; top: 76px; left: 16px; right: 16px; width: auto } .reference .ph:has(.page-purpose) { flex-wrap: wrap } }
+@media (prefers-reduced-motion: reduce) { .reference .neart-row { animation: none } }
+/* Method steps as a flow of cards. Up to 5 per row, arrows sit in the gap between cards. */
+.reference .sflow { --gap: 30px; margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 14px var(--gap); align-items: stretch }
+.reference .sflow li { position: relative; display: flex; flex-direction: column; gap: 10px; min-height: 118px; padding: 14px; border: 1px solid var(--line2); border-radius: 12px; background: var(--card); font-size: 14px; font-weight: 500; line-height: 1.45; color: var(--ink); animation: ddIn .32s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i) * 60ms) }
+.reference .sflow .sn { width: 26px; height: 26px; border-radius: 7px; font-size: 13px }
+.reference .sflow-arrow { position: absolute; top: 50%; right: calc(var(--gap) / -2 - 9px); margin-top: -9px; color: #0038FF }
+.reference .sflow li:nth-child(5n) .sflow-arrow { display: none }
+@media (max-width: 1100px) { .reference .sflow { grid-template-columns: repeat(var(--n3), minmax(0, 1fr)) } .reference .sflow li:nth-child(5n) .sflow-arrow { display: block } .reference .sflow li:nth-child(3n) .sflow-arrow { display: none } }
+@media (max-width: 640px) {
+  .reference .sflow { grid-template-columns: 1fr; gap: var(--gap) }
+  .reference .sflow li { min-height: 0 }
+  .reference .sflow li { flex-direction: row; align-items: flex-start }
+  .reference .sflow li:nth-child(n) .sflow-arrow { display: block; top: auto; right: auto; bottom: calc(var(--gap) / -2 - 9px); left: 50%; margin: 0 0 0 -9px; transform: rotate(90deg) }
+}
+@media (prefers-reduced-motion: reduce) { .reference .sflow li { animation: none } }

@@ -10,7 +10,8 @@ import { backend } from "../lib/backend/client";
 import { useNearAuth } from "../lib/near/auth";
 import { sealData, sealMethod, sha256Hex } from "../lib/backend/crypto";
 import { AppShell, icon } from "./shell";
-import { Dropdown, PageInfo } from "./controls";
+import { Dropdown, NearTech, PageInfo } from "./controls";
+import { NEAR_TECH } from "../lib/near-tech";
 
 type Obj = Record<string, any>;
 type Section = "Fund" | "Proposals" | "Bounties" | "Issues";
@@ -87,7 +88,7 @@ export function CommunityWorkspace({ section }: { section: Section }) {
   }
   const canWrite = enabled && !busy;
   return <AppShell active={section}>
-    <section className="card ph"><h1>{section}</h1><div className="ph-actions"><PageInfo title={section} points={[{icon:icon("people"),text:explanations[section]},{icon:icon("wallet"),text:"Money and authority actions require your own testnet wallet signature."}]} /><button className="ghost-ic" aria-label="Refresh" onClick={() => void refresh()}>{icon("pulse")}</button></div><div className="page-purpose">{icon("people")}<p>{explanations[section]}</p></div></section>
+    <section className="card ph"><h1>{section}</h1><div className="ph-actions"><NearTech {...NEAR_TECH.community} /><PageInfo title={section} points={[{icon:icon("people"),text:explanations[section]},{icon:icon("wallet"),text:"Money and authority actions require your own testnet wallet signature."}]} /><button className="ghost-ic" aria-label="Refresh" onClick={() => void refresh()}>{icon("pulse")}</button></div><div className="page-purpose">{icon("people")}<p>{explanations[section]}</p></div></section>
     {error && <section className="card list-card"><div className="dpane"><ErrorPanel message={plainError(error)} onRetry={() => void refresh()} title="Something did not load"/></div></section>}
     {notice && <section className="card ph" role="status"><Note>{notice}</Note></section>}
     {pendingCall && <section className="card list-card"><div className="dpane"><WalletReview call={pendingCall as any} signer={auth.session?.account_id} busy={busy === "Waiting for wallet"} error={signError}

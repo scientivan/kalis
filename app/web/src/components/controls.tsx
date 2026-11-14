@@ -68,3 +68,27 @@ export function PageInfo({ title, points }: { title: string; points: { icon: Rea
     </div>
   </div>;
 }
+
+/** One per page. Names the NEAR technology that powers this page, with one line of detail per item. */
+export type NearItem = { name: string; detail: string };
+export function NearTech({ label, items }: { label: string; items: NearItem[] }) {
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: MouseEvent) => { if (!root.current?.contains(e.target as Node)) setOpen(false); };
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", close); document.addEventListener("keydown", esc);
+    return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", esc); };
+  }, [open]);
+  return <div className={`pinfo neart ${open ? "open" : ""}`} ref={root}>
+    <button className="neart-btn" aria-expanded={open} aria-label={`Powered by NEAR. ${label}`} onClick={() => setOpen(!open)}>
+      <span className="neart-mark" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 9.5v-7l7 7v-7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
+      <span className="neart-txt">{label}</span>
+    </button>
+    <div className="pinfo-pop neart-pop" role="dialog" aria-label="Powered by NEAR" hidden={!open}>
+      <b>Powered by NEAR</b>
+      {items.map((p, i) => <div className="neart-row" key={p.name} style={{ "--i": i } as React.CSSProperties}><span className="neart-mark" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 9.5v-7l7 7v-7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></span><span><strong>{p.name}</strong>{p.detail}</span></div>)}
+    </div>
+  </div>;
+}

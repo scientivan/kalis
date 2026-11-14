@@ -13,7 +13,8 @@ import { useNearAuth, type ContractCall } from "../lib/near/auth";
 import { WalletReview, walletError } from "./wallet-review";
 import { PreparationSources } from "./data-tools";
 import { Capability } from "./capability";
-import { PageInfo, Dropdown } from "./controls";
+import { NearTech, PageInfo, Dropdown } from "./controls";
+import { NEAR_TECH } from "../lib/near-tech";
 import { Fx, StepRail, Msg } from "./form-kit";
 import { ManifestInput, type ManifestField } from "./manifest-fields";
 import { statusLabel } from "../lib/labels";
@@ -265,7 +266,7 @@ export function RunPage({ runId: initialRun }: { runId?: string }) {
     {d && v && <section className="card list-card se rp">
       <header className="se-head">
         <div className="ph-title"><Link className="ghost-ic" href={`/marketplace/${encodeURIComponent(d.method_id)}`} aria-label="Back to the method" title="Back to the method"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg></Link><div><h2>{d.title}</h2><span>Private run of version {v.number}</span></div></div>
-        <div className="se-head-acts"><span className={`kchip ${status === "Released" ? "" : "se-chip-wait"}`}>{escrowText}</span><PageInfo title="What Happens in a Private Run" points={[{ icon: icon("lock"), text: "Your data is sealed in this browser. Only ciphertext leaves." }, { icon: icon("coins"), text: "Your payment waits in escrow until every step works." }, { icon: icon("check"), text: "The answer opens here, and your device checks it." }]} /></div>
+        <div className="se-head-acts"><span className={`kchip ${status === "Released" ? "" : "se-chip-wait"}`}>{escrowText}</span><NearTech {...NEAR_TECH.runs} /><PageInfo title="What Happens in a Private Run" points={[{ icon: icon("lock"), text: "Your data is sealed in this browser. Only ciphertext leaves." }, { icon: icon("coins"), text: "Your payment waits in escrow until every step works." }, { icon: icon("check"), text: "The answer opens here, and your device checks it." }]} /></div>
       </header>
       <div className="se-body">
         <StepRail label="Run steps" steps={[...dataPages, ...STAGES.slice(1).map(s => ({ id: s, title: STAGE_TITLE[s], hint: STAGE_HINT[s] }))]} current={railId} done={Object.fromEntries([...dataPages.map(p => [p.id, stage > 0 || !!quote]), ...STAGES.map((s, i) => [s, i < stage || (s === "Result" && !!answer)])])} disabled={Object.fromEntries(STAGES.map(s => [s, !reachable(s)]))} onPick={id => { const i = dataPages.findIndex(p => p.id === id); if (i >= 0) { setDataPage(i); setView("Your data"); } else allowed(id); }} />

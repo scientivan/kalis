@@ -11,7 +11,8 @@ import { CONNECTOR_APPS, appForConnector } from "../lib/connector-apps";
 import { BrandLogo } from "./brand-logo";
 import { useNearAuth } from "../lib/near/auth";
 import { AppShell, icon } from "./shell";
-import { PageInfo, Segmented } from "./controls";
+import { NearTech, PageInfo, Segmented } from "./controls";
+import { NEAR_TECH, type NearPage } from "../lib/near-tech";
 import { CommunityWorkspace } from "./community-workspace";
 import { ConnectionCreate, DocumentUpload, DocumentDetails, NoteCreate, NoteEdit } from "./data-tools";
 import { AccountEditors, PaymentHistory } from "./account-tools";
@@ -52,10 +53,10 @@ const clean = (t: string) => { const x = t.replace(/\s*\[kalis:[^\]]*\]/g, "").r
 const when = (iso?: string) => iso ? new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
 const Refresh = ({ onClick }: { onClick: () => void }) => <button className="ghost-ic" aria-label="Refresh" title="Refresh" onClick={onClick}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2.5v3h-3" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg></button>;
 
-function Page({ active, title, info, onRefresh, children }: { active: string; title: string; info: { title: string; points: [string, string][] }; onRefresh: () => void; children: ReactNode }) {
+function Page({ active, title, info, near, onRefresh, children }: { active: string; title: string; info: { title: string; points: [string, string][] }; near?: NearPage; onRefresh: () => void; children: ReactNode }) {
   return <AppShell active={active}>
     <section className="card ph"><div className="ph-title"><h1>{title}</h1></div>
-      <div className="ph-actions"><PageInfo title={info.title} points={info.points.map(([ic, text]) => ({ icon: icon(ic), text }))} /><Refresh onClick={onRefresh} /></div><div className="page-purpose">{icon(info.points[0][0])}<p>{info.points[0][1]}</p></div></section>
+      <div className="ph-actions">{near && <NearTech {...near} />}<PageInfo title={info.title} points={info.points.map(([ic, text]) => ({ icon: icon(ic), text }))} /><Refresh onClick={onRefresh} /></div><div className="page-purpose">{icon(info.points[0][0])}<p>{info.points[0][1]}</p></div></section>
     {children}
   </AppShell>;
 }
@@ -108,7 +109,7 @@ export function MyRunsPage({ section = "Ongoing" }: { section?: "Ongoing" | "Res
   const steps=(j:Job)=>{const m=methods[j.method_id];const v=m?.versions?.find(x=>x.number===j.version)||m?.latest;return Array.isArray(v?.manifest?.steps)?v!.manifest!.steps!.length:null;};
   const outcome=(j:Job)=>methods[j.method_id]?.latest?.manifest?.listing?.outcome;
   const shown=jobs.filter(job=>section === "Results" ? DONE.includes(job.phase) && (filter==="All"||(filter==="Paid"?job.phase==="released":job.phase!=="released")) : !DONE.includes(job.phase));
-  return <Page active={section} title={section} onRefresh={()=>setRev(n=>n+1)} info={{title:section === "Ongoing"?"Jobs in progress":"Completed jobs",points:[["play",section === "Ongoing"?"Review actions waiting for your approval and follow jobs that are still in progress.":"Review completed jobs, their checks and payment records. Decrypted answers remain available only in the tab that holds their key."],["lock","Your answer-opening key is never sent to the server."]]}}>
+  return <Page active={section} title={section} near={NEAR_TECH.runs} onRefresh={()=>setRev(n=>n+1)} info={{title:section === "Ongoing"?"Jobs in progress":"Completed jobs",points:[["play",section === "Ongoing"?"Review actions waiting for your approval and follow jobs that are still in progress.":"Review completed jobs, their checks and payment records. Decrypted answers remain available only in the tab that holds their key."],["lock","Your answer-opening key is never sent to the server."]]}}>
     {section === "Ongoing"&&<ApprovalPanel key={rev}/>}
     <Main title={section === "Ongoing" ? "Jobs in progress" : undefined} tools={section === "Results" ? <Segmented label="Payment" options={["All","Paid","Refunded"]} value={filter} onChange={setFilter}/> : undefined}>
       <TileGrid label={section === "Ongoing" ? "Jobs in progress" : "Completed jobs"}>
@@ -189,7 +190,7 @@ export function ActivityPage() {
   const items = r.data?.items || [];
   const today = new Date().toLocaleDateString("en-CA");
   const count = (t: string) => items.filter(a => a.resource_type === t).length;
-  return <Page active="Activity" title="Activity" onRefresh={() => setRev(n => n + 1)} info={{ title: "Everything that happened", points: [["pulse", "Runs, approvals, notes, documents and reviews, one card per day."], ["lock", "Summaries only. No data, answers or tokens are shown."]] }}>
+  return <Page active="Activity" near={NEAR_TECH.activity} title="Activity" onRefresh={() => setRev(n => n + 1)} info={{ title: "Everything that happened", points: [["pulse", "Runs, approvals, notes, documents and reviews, one card per day."], ["lock", "Summaries only. No data, answers or tokens are shown."]] }}>
     <Main tools={<Segmented label="Type" options={Object.keys(ACT_TABS)} value={tab} onChange={setTab} />}>
       {!!items.length && <Summary cells={[["Shown", items.length], ["Today", items.filter(a => new Date(a.occurred_at).toLocaleDateString("en-CA") === today).length], ["Job events", count("run")], ["Reviews", count("review")]]}/>}
       {r.loading && <TileGrid label="Loading activity"><SkeletonTiles/></TileGrid>}
@@ -211,7 +212,7 @@ export function AccountPage() {
   const tx = useApi<{ items: Entry[] }>("me/transactions?limit=20", rev);
   const earn = useApi<Earn>(auth.session ? "me/earnings" : null, rev);
   const [tab, setTab] = useState("Payments");
-  return <Page active="Account" title="Account" onRefresh={() => setRev(n => n + 1)} info={{ title: "Your account", points: [["wallet", "Sign in with NEAR to sell methods and see your earnings."], ["coins", "Kalis holds no balance for you. Payments go straight to escrow."]] }}>
+  return <Page active="Account" near={NEAR_TECH.account} title="Account" onRefresh={() => setRev(n => n + 1)} info={{ title: "Your account", points: [["wallet", "Sign in with NEAR to sell methods and see your earnings."], ["coins", "Kalis holds no balance for you. Payments go straight to escrow."]] }}>
     <div className="detail">
       <Main tools={<Segmented label="Section" options={["Payments", "Earnings"]} value={tab} onChange={setTab} />}>
         {tab === "Payments" && <PaymentHistory key={String(rev) + (auth.session?.account_id || "demo")} />}
@@ -258,7 +259,7 @@ export function ConnectionsPage() {
   const [rev, setRev] = useState(0); const [err, setErr] = useState(""); const [adding, toggle] = useAdd(); const [pick, setPick] = useState<string | undefined>();
   const r = useApi<Cred[] | { items: Cred[] }>("protections/credentials", rev);
   const items = Array.isArray(r.data) ? r.data : r.data?.items || [];
-  return <Page active="Connectors" title="Connectors" onRefresh={() => setRev(n => n + 1)} info={{ title: "Apps a method may read from", points: [["link", "Read-only access, for a limited time, that you can revoke."], ["lock", "Methods never get your token. They get only what they declared."], ["info", "Private connectors use the sealed runner. This browser holds the ownership key."]] }}>
+  return <Page active="Connectors" near={NEAR_TECH.connectors} title="Connectors" onRefresh={() => setRev(n => n + 1)} info={{ title: "Apps a method may read from", points: [["link", "Read-only access, for a limited time, that you can revoke."], ["lock", "Methods never get your token. They get only what they declared."], ["info", "Private connectors use the sealed runner. This browser holds the ownership key."]] }}>
     <AppsList connected={new Set(items.filter(c => !c.revoked && c.status !== "revoked").map(c => c.connector))} onConnect={c => { setPick(c); if (!adding) toggle(); else setTimeout(() => document.getElementById("add-form")?.scrollIntoView({ behavior: "smooth" }), 50); }}/>
     <Main title="Your connectors">
       {err && <ErrorPanel message={err} onRetry={() => { setErr(""); setRev(n => n + 1); }} title="That change did not go through"/>}
@@ -285,7 +286,7 @@ export function DocumentsPage() {
   const r = useApi<Doc[] | { items: Doc[] }>("protections/documents", rev);
   const title = useMethodTitles();
   const items = Array.isArray(r.data) ? r.data : r.data?.items || [];
-  return <Page active="Documents" title="Documents" onRefresh={() => setRev(n => n + 1)} info={{ title: "Documents a method read", points: [["file", "Text is read from your file, then sealed into the run."], ["lock", "The server keeps only a fingerprint, not the text."], ["info", "Private images are sealed first. Backend extraction requires explicit public-document permission."]] }}>
+  return <Page active="Documents" near={NEAR_TECH.documents} title="Documents" onRefresh={() => setRev(n => n + 1)} info={{ title: "Documents a method read", points: [["file", "Text is read from your file, then sealed into the run."], ["lock", "The server keeps only a fingerprint, not the text."], ["info", "Private images are sealed first. Backend extraction requires explicit public-document permission."]] }}>
     <Main title="Read documents">
       <TileGrid label="Read documents">
         <AddTile title={adding ? "Close the form" : "Read a document"} desc="Reads the text of a file so a method can use it. The server keeps only a fingerprint." onClick={toggle}/>
@@ -308,7 +309,7 @@ export function NotesPage() {
   const [rev, setRev] = useState(0); const [err, setErr] = useState(""); const [tab, setTab] = useState("Saved"); const [adding, toggle] = useAdd();
   const r = useApi<Note[] | { items: Note[] }>("protections/memory", rev);
   const items = (Array.isArray(r.data) ? r.data : r.data?.items || []).filter(n => tab === "Saved" ? n.status === "approved" || n.status === "active" : n.status === "pending");
-  return <Page active="Notes" title="Notes" onRefresh={() => setRev(n => n + 1)} info={{ title: "Notes methods may remember", points: [["note", "A method can only suggest a note. You decide what is saved."], ["check", "Methods that declare it may read your saved notes."], ["info", "Private notes belong to this browser’s device key. Clearing browser data loses access."]] }}>
+  return <Page active="Notes" near={NEAR_TECH.notes} title="Notes" onRefresh={() => setRev(n => n + 1)} info={{ title: "Notes methods may remember", points: [["note", "A method can only suggest a note. You decide what is saved."], ["check", "Methods that declare it may read your saved notes."], ["info", "Private notes belong to this browser’s device key. Clearing browser data loses access."]] }}>
     <Main tools={<Segmented label="Status" options={["Saved", "Suggested"]} value={tab} onChange={setTab} />}>
       {err && <ErrorPanel message={err} onRetry={() => { setErr(""); setRev(n => n + 1); }} title="That change did not go through"/>}
       <TileGrid label={tab === "Saved" ? "Saved notes" : "Suggested notes"}>

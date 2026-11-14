@@ -1,4 +1,6 @@
 "use client";
+import { NearTech } from "./controls";
+import { NEAR_TECH } from "../lib/near-tech";
 // Seller view: the signed-in account's listed methods and drafts, with the Marketplace card picture.
 import { statusLabel } from "../lib/labels";
 import { useEffect, useState } from "react";
@@ -102,7 +104,7 @@ function MyMethodsContent({ covers, onChanged, section }: MyMethodsProps) {
   // While a draft is open the editor takes the whole page, so the seller never scrolls past the grid to reach it.
   if (editing) return <SellerEditor key={editing} id={editing} onClose={() => { setEditing(null); window.scrollTo({ top: 0 }); }} onChanged={() => { setReload(n => n + 1); onChanged(); }} />;
   return <>
-    <section className="card ph"><div className="ph-title"><h1>{heading}</h1></div><div className="page-purpose">{icon(section === "Drafts" ? "plus" : "tag")}<p>{section === "Drafts" ? "Start a method and prepare it before publishing. Drafts are not available to buyers." : "Methods you published on NEAR, with their Marketplace pictures."}</p></div></section>
+    <section className="card ph"><div className="ph-title"><h1>{heading}</h1></div><div className="ph-actions"><NearTech {...NEAR_TECH.author} /></div><div className="page-purpose">{icon(section === "Drafts" ? "plus" : "tag")}<p>{section === "Drafts" ? "Start a method and prepare it before publishing. Drafts are not available to buyers." : "Methods you published on NEAR, with their Marketplace pictures."}</p></div></section>
     <section className="card list-card"><div className="toolbar"><h2 className="list-title">{section === "Drafts" ? "Your drafts" : "Published methods"}</h2></div>
       <TileGrid label={section === "Drafts" ? "Your drafts" : "Published methods"}>
         {section === "Drafts" && <AddTile title={creating ? "Close the Form" : "Create a Method"} desc="Starts a draft. You write the manifest, seal the code and publish with your wallet later." onClick={openCreate} />}
