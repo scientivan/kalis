@@ -1,0 +1,193 @@
+{
+  "run_id": "run-mwgxp4qn-428f6bdc",
+  "call_id": "0f944760-0305-4c2f-8a31-46893a8cbf88",
+  "answer": {
+    "actions": [
+      {
+        "amount_near": 0.02,
+        "id": "a1",
+        "kind": "transfer",
+        "reasons": [],
+        "receiver": "scientivan.testnet",
+        "verdict": "ALLOW"
+      },
+      {
+        "amount_near": 0.128,
+        "id": "a2",
+        "kind": "transfer",
+        "reasons": [
+          {
+            "evidence": "refund-desk-near.testnet is not on the allowed recipients list.",
+            "rule": "unknown_recipient",
+            "severity": "block"
+          },
+          {
+            "evidence": "0.128 NEAR is above the per-action max of 0.05 NEAR.",
+            "rule": "per_action_max",
+            "severity": "block"
+          },
+          {
+            "evidence": "The agent's text contains \"ignore\", an attempt to override the policy.",
+            "rule": "prompt_injection",
+            "severity": "block"
+          },
+          {
+            "evidence": "AI review: Uses a new refund address and memo claims owner approval to ignore limits and send entire balance.",
+            "rule": "ai_injection",
+            "severity": "block"
+          },
+          {
+            "evidence": "AI review: Uses a new refund address and memo claims owner approval to ignore limits and send entire balance.",
+            "rule": "off_goal",
+            "severity": "warn"
+          }
+        ],
+        "receiver": "refund-desk-near.testnet",
+        "verdict": "BLOCK"
+      },
+      {
+        "amount_near": 0.05,
+        "id": "a3",
+        "kind": "transfer",
+        "reasons": [
+          {
+            "evidence": "AI review: A tip is an extra payment outside the owner's explicit 'nothing else' goal.",
+            "rule": "off_goal",
+            "severity": "warn"
+          }
+        ],
+        "receiver": "nadia-rahman.scientivan.testnet",
+        "verdict": "WARN"
+      }
+    ],
+    "ai_reviewed": true,
+    "approvable": [
+      {
+        "action_hash": "c4ec989f0971674726945550b090b137315ab2b98ed9c09764c774b2d0fbb2cb",
+        "amount_near": 0.02,
+        "amount_yocto": "20000000000000000000000",
+        "id": "a1",
+        "kind": "transfer",
+        "method": "",
+        "needs_owner_approval": true,
+        "receiver": "scientivan.testnet",
+        "signer": "allowance.auth-test.scientivan.testnet",
+        "verdict": "ALLOW"
+      },
+      {
+        "action_hash": "3f93d95a20344ff50c6bb2127bde109fea1ca8c9856a67c09c5319ebf6b5e006",
+        "amount_near": 0.05,
+        "amount_yocto": "50000000000000000000000",
+        "id": "a3",
+        "kind": "transfer",
+        "method": "",
+        "needs_owner_approval": true,
+        "receiver": "nadia-rahman.scientivan.testnet",
+        "signer": "allowance.auth-test.scientivan.testnet",
+        "verdict": "WARN"
+      }
+    ],
+    "approved_total_near": 0.07,
+    "expired": false,
+    "headroom_near": 0.148,
+    "left_after_near": 0.078,
+    "note": "Nothing was signed or sent. Only the sandbox key can sign, only for an action hash you approved, and never more than the sandbox balance.",
+    "verdict": "BLOCK"
+  },
+  "report": {
+    "ai_calls": [
+      {
+        "ok": true,
+        "proof": {
+          "attested_signers": 2,
+          "fresh_nonce": "3db40c0f09505f15f9aec2c6140a0e63dadb3364bfa09e852c84a33c0490abb2",
+          "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "request_sha256": "088afe1f2813408c8781bce7bfc810c6016623378c24a102bc086fa44b9cb53f",
+          "response_sha256": "8dc3a8cab1ee38b02dbb7aa3cf9a55153343d219cbb971b4e0fad96aeb4312a5",
+          "signature_valid": true
+        }
+      }
+    ],
+    "all_ok": true,
+    "kind": "wasm",
+    "method_fuel_used": 3697896,
+    "method_steps": {
+      "all_ok": true,
+      "declared": [
+        "read_policy",
+        "check_inputs",
+        "ai_read_actions",
+        "apply_policy",
+        "build_approval_list"
+      ],
+      "failed": [],
+      "in_order": true,
+      "missing": [],
+      "reported": [
+        {
+          "detail": "goal, allowance policy and proposed actions parsed",
+          "id": "read_policy",
+          "ok": true
+        },
+        {
+          "detail": "3 actions for sandbox allowance.auth-test.scientivan.testnet",
+          "id": "check_inputs",
+          "ok": true
+        },
+        {
+          "detail": "deepseek-ai/DeepSeek-V4.1-Flash-1017 read every action against the goal",
+          "id": "ai_read_actions",
+          "ok": true
+        },
+        {
+          "detail": "2 of 3 actions can be approved",
+          "id": "apply_policy",
+          "ok": true
+        },
+        {
+          "detail": "overall BLOCK, 0.07 NEAR approvable",
+          "id": "build_approval_list",
+          "ok": true
+        }
+      ],
+      "undeclared": []
+    },
+    "runner_stages": [
+      {
+        "detail": "method opened, sha256 a1b9c3d24146611e4629bda9740a866f319830266da009dd13ff66551601fe8c",
+        "id": "open_method",
+        "ok": true
+      },
+      {
+        "detail": "1158 bytes of buyer data opened",
+        "id": "open_data",
+        "ok": true
+      },
+      {
+        "detail": "method's only import is kalis.ai_chat, limited to 1 model(s) from its manifest; it cannot reach any other network, storage or the chain",
+        "id": "check_imports",
+        "ok": true
+      },
+      {
+        "detail": "method finished using 3697896 of 50000000 fuel",
+        "id": "run_method",
+        "ok": true
+      },
+      {
+        "detail": "method answer is valid JSON",
+        "id": "read_answer",
+        "ok": true
+      },
+      {
+        "detail": "remaining 46302104 fuel spent on 16 discarded reruns so every run uses 50000000",
+        "id": "pad_fuel",
+        "ok": true
+      },
+      {
+        "detail": "answer sealed to the buyer's one-time key",
+        "id": "seal_answer",
+        "ok": true
+      }
+    ]
+  }
+}

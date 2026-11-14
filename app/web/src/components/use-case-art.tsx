@@ -207,6 +207,20 @@ function ScamScreen() {
     </g>)}
   </>;
 }
+function AllowanceGuard() {
+  const rows: [string, string, string][] = [["Invoice INV-112", "0.02", "ALLOW"], ["Unknown address", "0.128", "BLOCK"], ["Tip nobody asked", "0.05", "BLOCK"]];
+  return <>
+    <rect width="320" height="120" fill={LILAC} />
+    <rect x="20" y="12" width="280" height="96" rx="8" fill={PAPER} stroke={LINE} />
+    <T x={32} y={32}>Allowance 0.15 NEAR</T>
+    {rows.map(([n, a, v], i) => <g key={n}>
+      <T x={32} y={57 + i * 18} s={12}>{n}</T>
+      <T x={170} y={57 + i * 18} s={12}>{a}</T>
+      <rect x="222" y={45 + i * 18} width="66" height="16" rx="8" fill={v === "ALLOW" ? BLUE : ORANGE} />
+      <T x={234} y={57 + i * 18} s={11} c={PAPER}>{v}</T>
+    </g>)}
+  </>;
+}
 function Robustness() {
   return <>
     <rect width="320" height="120" fill={LILAC} />
@@ -240,7 +254,7 @@ const ART: Record<string, () => React.ReactElement> = {
   "portfolio-rebalance": Rebalance, "salary-counteroffer": Counter, "tender-bid": SealedBid, "defi-liquidation-guard": Loan,
   "cash-runway-13w": Payroll, "supplier-concession-plan": Concessions, "token-unlock-sell-plan": Unlock, "term-sheet-dilution": CapTable,
   "scientivanmsk-freelance-rate": DayRate,
-  "perp-risk-limit-fit": PerpFit, "strategy-robustness-audit": Robustness, "large-swap-split": SwapSplit, "token-scam-screen": ScamScreen,
+  "perp-risk-limit-fit": PerpFit, "strategy-robustness-audit": Robustness, "large-swap-split": SwapSplit, "token-scam-screen": ScamScreen, "wallet-allowance-guard": AllowanceGuard,
   "upcoming-offer-counter": Offer, "upcoming-tender-margin": Tender, "upcoming-contract-check": Contract,
   "upcoming-payroll-cash": Cash, "upcoming-wrong-orders": Orders, "upcoming-bottleneck": Board,
 };

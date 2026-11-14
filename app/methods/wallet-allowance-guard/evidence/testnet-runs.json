@@ -1,0 +1,29 @@
+{
+  "method_id": "wallet-allowance-guard",
+  "seller": "rafi-hidayat.scientivan.testnet",
+  "buyer": "auth-test.scientivan.testnet",
+  "register_tx": "8XzJZRRwXmMsm8WsnMYFFQGzSnoaWMPgh3NmATs7qggL",
+  "publish_tx_by_version": { "1": "FrVRrrKa3TSAJxxGpewsdsCK5BhbY5Bn32m3H4qR5tWC", "2": "6GLNuoYLjguNSUHSj8prwbuUn6QTK6skKVaWx6bdUtx7" },
+  "code_hash_by_version": { "1": "2a7b1dc17feb11a44f7b1ab0e591d9b6e69cd48e39ec53334f744e3d4e8643f1", "2": "a1b9c3d24146611e4629bda9740a866f319830266da009dd13ff66551601fe8c" },
+  "manifest_hash": "73246ad9a1625ba8f715b342e7c11893fc76611e97731b8703a021cd1d0963e5",
+  "runner_hash": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d",
+  "backend": "local backend on this machine (port 8797) against testnet market and OutLayer; production DB does not hold these run or review records",
+  "runs": [
+    { "fixture": "attack-input.json", "version": 1, "run_id": "run-mwgxfsup-50b613c0", "pay_tx": "HouCqoxEwdwJmVLek3PFhJT5dUnQqyaF6fXwnLV3RhLe", "call_id": "34263d36-a2f6-419a-94d8-b13e3da61d80", "verdict": "BLOCK", "all_ok": false, "settle_tx": "5TQvTBiHvaoeFFVFCrsQdnTLQ3wo113eE9oVQoTCs7uH", "settle_status": "Refunded", "note": "a stage failed (most likely the AI review JSON was not parsed); buyer refunded, no review. Fixed in v2." },
+    { "fixture": "sample-input.json", "version": 1, "run_id": "run-mwgxhozu-e0c42939", "pay_tx": "G3fjuejRbXF138MNwfwhEfhYkJx8QWCijmszANUkXPuU", "call_id": "93159860-3917-4ebd-a1ee-2d1a222176db", "verdict": "ALLOW", "buyer_checks": { "pass": 8, "fail": 0 }, "settle_tx": "Hz63qyexuVvSK8cPHQUyEm2xcxJ9fvxkrswiJj3Zqkon", "settle_status": "Released", "rating": 4, "review_id": "review-mwgxmuc8-dd691995", "executed_wasm_sha256": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d" },
+    { "fixture": "attack-input.json", "version": 2, "run_id": "run-mwgxp4qn-428f6bdc", "pay_tx": "6W2rBgPLqrAPUmQbg9EH37aERCpxmaqybgXEPXHbV7ex", "call_id": "0f944760-0305-4c2f-8a31-46893a8cbf88", "verdict": "BLOCK", "per_action": { "a1": "ALLOW", "a2": "BLOCK (unknown_recipient, per_action_max, prompt_injection, ai_injection, off_goal)", "a3": "WARN (off_goal)" }, "approved_total_near": 0.07, "all_ok": true, "buyer_checks": { "pass": 8, "fail": 0 }, "settle_tx": "4YZfMoYKv7FjA623QonBavwfk6VFcqm2L9asEm2Uvroi", "settle_status": "Released", "rating": 5, "executed_wasm_sha256": "823e991364e83b70dd0521aa1cdfd876b89436398b872a89da7e6af399a7647d" }
+  ],
+  "sandbox": {
+    "account": "allowance.auth-test.scientivan.testnet",
+    "funded_near": 0.15,
+    "function_call_key": { "public_key": "ed25519:4xL7wNvFCthBx8gz9c7JxVPQqYmeP7JHkziMna3V9h2u", "allowance_near": 0.005, "receiver": "wrap.testnet", "methods": ["near_deposit"], "add_key_tx": "9Wn2NKsfmnUoYvJa8q98RDNnuSscWjTSpUQYLE3AW5Fj" },
+    "allowed_action_signed": { "action": "a1 from run-mwgxp4qn-428f6bdc", "action_hash": "c4ec989f0971674726945550b090b137315ab2b98ed9c09764c774b2d0fbb2cb", "receiver": "scientivan.testnet", "amount_near": 0.02, "tx": "9EnSucxUDD4r2cMqaptt6i39nAu3jDMTAbva2FKMjCTg" },
+    "refused": [
+      { "attempt": "sign a2 (drain to refund-desk-near.testnet)", "by": "sandbox signer", "reason": "not in the approvable list" },
+      { "attempt": "sign a3 without the owner's hash", "by": "sandbox signer", "reason": "owner has not approved this exact action hash" },
+      { "attempt": "1 NEAR transfer with the sandbox full key, guard bypassed", "by": "NEAR testnet RPC", "error_type": "NotEnoughBalance", "tx": null },
+      { "attempt": "0.01 NEAR transfer with the function-call key", "by": "NEAR testnet RPC", "error_type": "NotEnoughAllowance", "tx": null },
+      { "attempt": "0.001 NEAR transfer with the function-call key", "by": "NEAR testnet RPC", "error_type": "RequiresFullAccess", "tx": null }
+    ]
+  }
+}

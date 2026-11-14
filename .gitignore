@@ -31,3 +31,4 @@ npm-debug.log*
 
 # empty git dirs from cargo init (no commits), renamed so files are tracked here
 **/.git-cargo-init/
+app/guests/wallet-allowance-guard/
