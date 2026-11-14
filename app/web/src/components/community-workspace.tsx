@@ -13,6 +13,7 @@ import { AppShell, icon } from "./shell";
 import { Dropdown, NearTech, PageInfo } from "./controls";
 import { NEAR_TECH } from "../lib/near-tech";
 import { FundSocialMoney } from "./social-money";
+import { BountyPools } from "./pool-money";
 
 type Obj = Record<string, any>;
 type Section = "Fund" | "Proposals" | "Bounties" | "Issues";
@@ -126,6 +127,7 @@ export function CommunityWorkspace({ section }: { section: Section }) {
         {section === "Issues" && <><Note>{selected.expected || "No expected outcome provided."}</Note><Proof label="Synthetic reproduction" value={selected.synthetic_reproduction}/>{selected.owner === principal && allowed(selected,"close") && <ReasonAction label="Close issue" disabled={!canWrite} onSubmit={reason => act("Closing issue",`issues/${id(selected.id)}/close`,{reason})}/>}{allowed(selected,"create_proposal") && <Link className="view" href={`/community/proposals?issue=${id(selected.id)}`}>Propose funding</Link>}</>}
         {section === "Proposals" && <><Proof label="Acceptance criteria and fixed evaluator" value={{acceptance_criteria:selected.acceptance_criteria,evaluator:selected.evaluator,reviewer:selected.reviewer}}/>{allowed(selected,"sign_add_proposal") && <button className="primary-btn" disabled={!canWrite || !auth.session} onClick={() => setPendingCall(selected.contract_call)}>Review and sign proposal</button>}<div className="nf-foot"><button className="view" disabled={!canWrite || !council || !allowed(selected,"vote_reject")} onClick={() => void act("Preparing vote",`proposals/${id(selected.id)}/vote`,{vote:"reject"},false)}>Reject proposal</button><button className="primary-btn" disabled={!canWrite || !council || !allowed(selected,"vote_approve")} onClick={() => void act("Preparing vote",`proposals/${id(selected.id)}/vote`,{vote:"approve"},false)}>Approve proposal</button></div>{!council && <Note>Only members of the DAO council can vote.</Note>}</>}
         {section === "Bounties" && <BountyDetail bounty={selected} enabled={enabled} council={council} busy={!!busy} act={act} onCall={setPendingCall}/>}
+        {section === "Bounties" && selected?.id !== undefined && <BountyPools bountyId={selected.id} />}
       </div></section>}
     </>}
     {section === "Bounties" && (privateCapability?.status === "enabled" || privateCapability?.status === "demo" ? <PrivateCases enabled={true} onError={setError}/> : <section className="card ph"><Note>{privateCapability?.reason || "Checking private-test availability."}</Note></section>)}

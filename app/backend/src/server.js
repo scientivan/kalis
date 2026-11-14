@@ -18,6 +18,7 @@ import { registerAuthRoutes } from "./auth.js";
 import { registerSellerRoutes, PROMPT_WARNING_VERSION, coverUrl } from "./sellers-api.js";
 import { registerEvidenceRoutes } from "./evidence-api.js";
 import { registerSocialRoutes } from "./social-api.js";
+import { registerPoolRoutes } from "./pool-api.js";
 import { ApiError, toNear, getMethod, versionView, manifestByHash, sealedMethodByHash } from "./market.js";
 import { AuthError } from "./principal.js";
 import { capabilities } from "./capabilities.js";
@@ -93,6 +94,7 @@ registerAuthRoutes(route);
 registerSellerRoutes(route);
 registerEvidenceRoutes(route);
 registerSocialRoutes(route);
+registerPoolRoutes(route);
 
 route("GET", /^\/api\/dao$/, async () => {
   const dao = (await view(config.market, "get_config")).dao;
